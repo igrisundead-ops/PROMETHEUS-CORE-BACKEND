@@ -1,0 +1,8 @@
+# Nolan clip-cutting reference script
+# One idea per line or use "Label: text" pairs.
+
+Hook: Open with a concrete payoff, result, or surprising lesson in the first breath.
+Retention: Highlight where editing, structure, or pacing changed audience retention.
+Transformation: Show a before-and-after shift in skill, business, confidence, or results.
+Specificity: Favor numbers, timelines, percentages, or concrete details over generic claims.
+Payoff: End right after the key lesson lands so the clip feels complete and leaves curiosity.

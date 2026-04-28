@@ -1,0 +1,208 @@
+{
+  "batch": "prometheus-concrete",
+  "inputDir": "C:\\Users\\HomePC\\Downloads\\prometheus CONCRETE assets",
+  "stagedSourceDir": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\showcase-source\\imports\\prometheus-concrete",
+  "outputDir": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\showcase-assets\\imports\\prometheus-concrete",
+  "createdAt": "2026-03-29T02:51:50.523Z",
+  "dryRun": false,
+  "totalFiles": 12,
+  "supportedFiles": 12,
+  "skippedFiles": 0,
+  "processedFiles": 0,
+  "cachedFiles": 12,
+  "failedFiles": 0,
+  "items": [
+    {
+      "originalName": "months__calender..year-removebg-preview.png",
+      "status": "cached",
+      "assetId": "calendar-concrete-months-year",
+      "searchTerms": [
+        "calendar",
+        "month",
+        "months",
+        "year",
+        "timeline",
+        "schedule",
+        "planning"
+      ],
+      "suggestedCanonicalLabel": "calendar",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/calendar-concrete-months-year.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/calendar-concrete-months-year.png"
+    },
+    {
+      "originalName": "camera-removebg-preview.png",
+      "status": "cached",
+      "assetId": "camera-concrete-primary",
+      "searchTerms": [
+        "camera",
+        "dslr camera",
+        "photography",
+        "filming",
+        "shooting",
+        "video",
+        "content"
+      ],
+      "suggestedCanonicalLabel": "camera",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/camera-concrete-primary.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/camera-concrete-primary.png"
+    },
+    {
+      "originalName": "camera_2-removebg-preview.png",
+      "status": "cached",
+      "assetId": "camera-concrete-secondary",
+      "searchTerms": [
+        "camera",
+        "mirrorless camera",
+        "photography",
+        "filming",
+        "shooting",
+        "content"
+      ],
+      "suggestedCanonicalLabel": "camera",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/camera-concrete-secondary.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/camera-concrete-secondary.png"
+    },
+    {
+      "originalName": "camera_3-removebg-preview.png",
+      "status": "cached",
+      "assetId": "camera-concrete-tertiary",
+      "searchTerms": [
+        "camera",
+        "dslr",
+        "lens",
+        "photography",
+        "filming",
+        "shooting",
+        "content"
+      ],
+      "suggestedCanonicalLabel": "camera",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/camera-concrete-tertiary.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/camera-concrete-tertiary.png"
+    },
+    {
+      "originalName": "camera_vintage-removebg-preview.png",
+      "status": "cached",
+      "assetId": "camera-concrete-vintage",
+      "searchTerms": [
+        "camera",
+        "vintage camera",
+        "photography",
+        "filming",
+        "shooting",
+        "content",
+        "video"
+      ],
+      "suggestedCanonicalLabel": "camera",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/camera-concrete-vintage.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/camera-concrete-vintage.png"
+    },
+    {
+      "originalName": "cap_-removebg-preview.png",
+      "status": "cached",
+      "assetId": "cap-concrete",
+      "searchTerms": [
+        "cap",
+        "hat",
+        "headwear"
+      ],
+      "suggestedCanonicalLabel": "cap",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/cap-concrete.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/cap-concrete.png"
+    },
+    {
+      "originalName": "expert__professional-removebg-preview.png",
+      "status": "cached",
+      "assetId": "expert-concrete-professional",
+      "searchTerms": [
+        "expert",
+        "professional",
+        "coach",
+        "mentor",
+        "authority",
+        "badge"
+      ],
+      "suggestedCanonicalLabel": "expert",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/expert-concrete-professional.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/expert-concrete-professional.png"
+    },
+    {
+      "originalName": "home__house-removebg-preview.png",
+      "status": "cached",
+      "assetId": "home-concrete-house",
+      "searchTerms": [
+        "home",
+        "house",
+        "property",
+        "household",
+        "real estate"
+      ],
+      "suggestedCanonicalLabel": "home",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/home-concrete-house.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/home-concrete-house.png"
+    },
+    {
+      "originalName": "home_image-removebg-preview.png",
+      "status": "cached",
+      "assetId": "home-concrete-image",
+      "searchTerms": [
+        "home",
+        "house",
+        "property",
+        "real estate",
+        "living"
+      ],
+      "suggestedCanonicalLabel": "home",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/home-concrete-image.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/home-concrete-image.png"
+    },
+    {
+      "originalName": "money__purchase...-removebg-preview.png",
+      "status": "cached",
+      "assetId": "money-concrete-purchase",
+      "searchTerms": [
+        "money",
+        "purchase",
+        "payment",
+        "cash",
+        "finance",
+        "currency"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/money-concrete-purchase.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/money-concrete-purchase.png"
+    },
+    {
+      "originalName": "money purchase, pay - slazzer.png",
+      "status": "cached",
+      "assetId": "money-concrete-purchase-pay",
+      "searchTerms": [
+        "money",
+        "purchase",
+        "pay",
+        "payment",
+        "cash",
+        "finance",
+        "currency"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/money-concrete-purchase-pay.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/money-concrete-purchase-pay.png"
+    },
+    {
+      "originalName": "thinking__choice__choose-removebg-preview.png",
+      "status": "cached",
+      "assetId": "thinking-concrete-choice",
+      "searchTerms": [
+        "thinking",
+        "choice",
+        "choose",
+        "decision",
+        "question",
+        "idea"
+      ],
+      "suggestedCanonicalLabel": "thinking",
+      "stagedSourcePath": "public/showcase-source/imports/prometheus-concrete/thinking-concrete-choice.png",
+      "outputPath": "public/showcase-assets/imports/prometheus-concrete/thinking-concrete-choice.png"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "female-coach-rvm",
+  "sourceVideo": "input-video.mp4",
+  "alphaSrc": null,
+  "foregroundSrc": null,
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "status": "missing",
+  "provider": "offline-cache",
+  "cacheDir": "public/mattes/female-coach",
+  "updatedAt": "2026-03-23T09:30:45.614Z"
+}

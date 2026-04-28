@@ -1,0 +1,133 @@
+{
+  "duration": 60,
+  "dialogueSource": "fixtures/dialogue/dialogue_source.wav",
+  "dialogue": [
+    {
+      "start": 0,
+      "end": 7.2,
+      "gainDb": -3,
+      "label": "opening statement"
+    },
+    {
+      "start": 8.1,
+      "end": 14.8,
+      "gainDb": -3,
+      "label": "supporting explanation"
+    }
+  ],
+  "musicCues": [
+    {
+      "id": "cue_1",
+      "file": "fixtures/music/fast_intro.wav",
+      "start": 0,
+      "end": 18,
+      "gainDb": -4,
+      "transitionOut": {
+        "preset": "tail_wash_out",
+        "start": 16.8,
+        "duration": 1.2,
+        "settings": {
+          "echoMix": 0.38,
+          "echoDelayMs": 108
+        }
+      },
+      "tags": ["intro", "lift"]
+    },
+    {
+      "id": "cue_2",
+      "file": "fixtures/music/second_lift.wav",
+      "start": 17.6,
+      "end": 39,
+      "gainDb": -5,
+      "transitionIn": {
+        "preset": "soft_overlap_in",
+        "start": 17.6,
+        "duration": 0.8,
+        "settings": {
+          "fadeInSeconds": 0.8
+        }
+      },
+      "transitionOut": {
+        "preset": "impact_handoff",
+        "start": 37.8,
+        "duration": 1.2,
+        "settings": {
+          "echoMix": 0.24,
+          "echoDelayMs": 42
+        }
+      },
+      "tags": ["lift", "bridge"]
+    },
+    {
+      "id": "cue_3",
+      "file": "fixtures/music/final_push.wav",
+      "start": 38.9,
+      "end": 58,
+      "gainDb": -5,
+      "transitionIn": {
+        "preset": "reverb_throw",
+        "start": 38.9,
+        "duration": 0.8,
+        "settings": {
+          "echoMix": 0.44,
+          "echoDelayMs": 96
+        }
+      },
+      "transitionOut": {
+        "preset": "filter_sink",
+        "start": 56.8,
+        "duration": 1.2,
+        "settings": {
+          "lowpassHz": 1800
+        }
+      },
+      "tags": ["finale", "resolve"]
+    }
+  ],
+  "sfx": [
+    {
+      "id": "riser_1",
+      "file": "fixtures/sfx/riser.wav",
+      "start": 37.2,
+      "end": 38.4,
+      "gainDb": -8,
+      "role": "sfx",
+      "tags": ["riser"]
+    },
+    {
+      "id": "impact_1",
+      "file": "fixtures/sfx/impact.wav",
+      "start": 38.4,
+      "end": 39.2,
+      "gainDb": -5,
+      "role": "sfx",
+      "transitionIn": {
+        "preset": "impact_handoff",
+        "start": 38.4,
+        "duration": 0.4,
+        "settings": {
+          "highpassHz": 120
+        }
+      },
+      "tags": ["impact"]
+    }
+  ],
+  "master": {
+    "targetI": -16,
+    "truePeak": -1.5,
+    "lra": 11,
+    "sampleRate": 48000,
+    "previewSampleRate": 22050
+  },
+  "presetOverrides": {
+    "dialogue_safe_bed": {
+      "duckingGainDb": -10,
+      "fadeInSeconds": 0.7,
+      "fadeOutSeconds": 1
+    },
+    "tail_wash_out": {
+      "echoMix": 0.38,
+      "echoDelayMs": 108
+    }
+  }
+}

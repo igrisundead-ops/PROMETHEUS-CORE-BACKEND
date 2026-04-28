@@ -1,0 +1,108 @@
+{
+  "generatedAt": "2026-04-17T11:20:56.570Z",
+  "activeSourceId": "1b47edd6cf806c3b2ff85c7b3e73f6b0e45456083117946c3839bc8ca991f561",
+  "sourceVideoPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\.cache\\local-preview-uploads\\1776424837161-Dan-Martell--Scared-of-Achieving-SHORT-VER.mp4",
+  "sourceVideoHash": "6323a195cef1f3bf1aabb33a6368a5f49a80f4dc8d167f33d88eb17737a53bc8",
+  "previewVideoUrlVersion": "input-video-landscape.1b47edd6cf-mo2thocr.preview",
+  "syncState": "ready",
+  "syncIssues": [],
+  "transcriptCacheKey": "c887603c701d6557a960768b6bc849f7a32ec4572a82bd2bfbd8281d3fab976d",
+  "transcriptCachePath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\.cache\\assemblyai\\c887603c701d6557a960768b6bc849f7a32ec4572a82bd2bfbd8281d3fab976d.words.json",
+  "transcriptSource": "cache",
+  "transcriptionMode": "assemblyai",
+  "transcriptionProvider": "assemblyai",
+  "transcriptionFallbacks": [],
+  "transcriptSourceMediaPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\.cache\\transcript-media\\6323a195cef1f3bf1aabb33a6368a5f49a80f4dc8d167f33d88eb17737a53bc8.transcript-source.m4a",
+  "transcriptSourceMediaSizeBytes": 459166,
+  "originalVideoSizeBytes": 106676957,
+  "presentationMode": "long-form",
+  "captionProfileId": "longform_svg_typography_v1",
+  "captionProfileDisplayName": "Long-form SVG Typography v1",
+  "requestedMotionTier": "premium",
+  "resolvedMotionTier": "premium",
+  "jobId": null,
+  "description": null,
+  "selectedMotionMomentCount": 2,
+  "flaggedMotionMomentCount": 0,
+  "suppressedMotionMomentCount": 0,
+  "showcaseGovernor": null,
+  "nolanClipPlan": {
+    "engineId": "nolan-clip-cutting-engine",
+    "version": "1.0.0",
+    "candidateCount": 10,
+    "pageCount": 1,
+    "recommendedClipIds": [
+      "nolan-0053320-0069000",
+      "nolan-0041100-0060200",
+      "nolan-0047940-0064520"
+    ],
+    "referenceScriptPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\nolan.reference-script.txt",
+    "referenceSectionCount": 5,
+    "outputPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\nolan-clips.longform.json"
+  },
+  "outputs": {
+    "transcriptPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\transcript.longform.words.json",
+    "captionsPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\captions.longform.json",
+    "videoMetadataPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\video.longform.metadata.json",
+    "videoPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\input-video-landscape.1b47edd6cf-mo2thocr.mp4",
+    "previewVideoPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\input-video-landscape.1b47edd6cf-mo2thocr.preview.mp4",
+    "motionMapPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\motion-map.longform.json",
+    "motionPlanPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\motion-plan.longform.json",
+    "ingestManifestPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\ingest.longform.json",
+    "missingAssetRegistryPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\missing-motion-asset-categories.local.json",
+    "nolanClipPlanPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\nolan-clips.longform.json"
+  },
+  "showcaseCatalog": {
+    "source": "cached",
+    "assetCount": 80,
+    "cachePath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\showcase-assets.remote.json"
+  },
+  "pipelineSequence": [
+    {
+      "step": "transcript",
+      "status": "completed",
+      "detail": "assemblyai transcript cache hit reused."
+    },
+    {
+      "step": "presentation-mode",
+      "status": "completed",
+      "detail": "Resolved long-form from 1920x1080."
+    },
+    {
+      "step": "typography-routing",
+      "status": "completed",
+      "detail": "Using Long-form SVG Typography v1 (longform_svg_typography_v1)."
+    },
+    {
+      "step": "motion-mapping",
+      "status": "completed",
+      "detail": "Resolved 2 selected, 0 flagged, 0 suppressed motion moments. Legacy showcase routing remained active."
+    },
+    {
+      "step": "nolan-clip-planning",
+      "status": "completed",
+      "detail": "Ranked 10 short-form candidates into 1 page(s) using 5 reference section(s)."
+    },
+    {
+      "step": "preview-proxy",
+      "status": "completed",
+      "detail": "Skipped browser preview proxy generation for the fast draft automation path."
+    },
+    {
+      "step": "sync-state",
+      "status": "completed",
+      "detail": "All long-form outputs were updated atomically for the active source via undefined."
+    }
+  ],
+  "stageTimingsMs": {
+    "videoProbe": 1194,
+    "transcriptMediaPrep": 3,
+    "transcription": 12,
+    "chunking": 2739,
+    "motionMapping": 868,
+    "clipPlanning": 798,
+    "proxyGeneration": 0,
+    "writeOutputs": 134,
+    "total": 5806
+  }
+}

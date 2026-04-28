@@ -1,0 +1,30 @@
+{
+  "zip_path": "C:\\Users\\HomePC\\Downloads\\PROME - images_no_bg_HQ.zip",
+  "generated_at": "2026-02-22T18:35:19.834520+00:00",
+  "selection_rules": {
+    "file_extension": ".png",
+    "ratio_rule": "width/height < 0.8",
+    "sort_order": "area desc, filename asc",
+    "selection_count": 2
+  },
+  "assets": [
+    {
+      "slot": "hero-a",
+      "output_file": "hero-a.png",
+      "source_name": "6db6591a8101ac6a04ec7ce7a9622179.png",
+      "width": 3186,
+      "height": 4096,
+      "area": 13049856,
+      "ratio": 0.777832
+    },
+    {
+      "slot": "hero-b",
+      "output_file": "hero-b.png",
+      "source_name": "89b6b46865da67327d4924cddc973bb8.png",
+      "width": 2995,
+      "height": 4096,
+      "area": 12267520,
+      "ratio": 0.731201
+    }
+  ]
+}

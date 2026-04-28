@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-03-26T09:47:14.583Z",
+  "sourceVideoPath": "C:\\Users\\HomePC\\Downloads\\TALKIN  HEAD VIDEO S\\MALE Head Video Raw.mp4",
+  "sourceVideoHash": "b6f0210efc00a3696ac259db528be6160aaa4441dd327bb193a488cfd00eb6d4",
+  "transcriptCacheKey": "4dd0cea6ce4afb1e6912e09cac7fee1217799f73054b73e64b80249a0370244e",
+  "transcriptSource": "cache",
+  "presentationMode": "long-form",
+  "captionProfileId": "longform_svg_typography_v1",
+  "captionProfileDisplayName": "Long-form SVG Typography v1",
+  "requestedMotionTier": "premium",
+  "resolvedMotionTier": "premium",
+  "jobId": null,
+  "description": null,
+  "outputs": {
+    "transcriptPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\transcript.longform.words.json",
+    "captionsPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\captions.longform.json",
+    "videoMetadataPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\video.longform.metadata.json",
+    "videoPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\input-video-landscape.mp4",
+    "motionMapPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\motion-map.longform.json",
+    "ingestManifestPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\ingest.longform.json"
+  },
+  "showcaseCatalog": {
+    "source": "cached",
+    "assetCount": 19,
+    "cachePath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\showcase-assets.remote.json"
+  },
+  "pipelineSequence": [
+    {
+      "step": "transcript",
+      "status": "completed",
+      "detail": "AssemblyAI cache hit reused."
+    },
+    {
+      "step": "presentation-mode",
+      "status": "completed",
+      "detail": "Resolved long-form from 1280x720."
+    },
+    {
+      "step": "typography-routing",
+      "status": "completed",
+      "detail": "Using Long-form SVG Typography v1 (longform_svg_typography_v1)."
+    },
+    {
+      "step": "motion-mapping",
+      "status": "completed",
+      "detail": "Resolved 4 selected, 11 flagged, 4 suppressed motion moments."
+    }
+  ]
+}

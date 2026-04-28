@@ -1,0 +1,1154 @@
+{
+  "version": "2026-04-15-pattern-memory-v1",
+  "generatedAt": "2026-04-27T09:02:03.918Z",
+  "rulesVersion": "2026-04-15-pattern-rules-v1",
+  "entries": [
+    {
+      "id": "pattern:core-replaceable-word",
+      "patternType": "motion-composite",
+      "semanticIntent": "replaceable-word",
+      "sceneType": "feature-highlight",
+      "triggerContext": [
+        "core words",
+        "syllabic break",
+        "word showcase",
+        "headline emphasis"
+      ],
+      "detectedMomentType": "word-emphasis",
+      "semanticRole": "primary",
+      "layoutUsed": "headline-lockup",
+      "effectStack": [
+        "primitive:highlight-word",
+        "primitive:circle-reveal",
+        "primitive:blur-underline"
+      ],
+      "animationStyle": [
+        "blur-slide-up",
+        "syllabic-break",
+        "word-showcase"
+      ],
+      "timingProfile": {
+        "entryMs": 480,
+        "holdMs": 900,
+        "exitMs": 560,
+        "totalMs": 1940,
+        "easing": "power3.out",
+        "loop": false
+      },
+      "entryBehavior": "Introduce the chosen word with blur, then lock it in with a readable hold.",
+      "exitBehavior": "Return the scene to rest scale instead of snapping away.",
+      "visualWeight": 0.74,
+      "redundancyRiskScore": 0.18,
+      "clutterRiskScore": 0.21,
+      "successScore": 0.92,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "pair-with-highlight-or-underline",
+        "prefer-single-dominant-word"
+      ],
+      "antiPatterns": [
+        "duplicate-literal-repetition",
+        "stacked-number-copy"
+      ],
+      "compatibleWith": [
+        "primitive:highlight-word",
+        "primitive:circle-reveal",
+        "primitive:blur-underline",
+        "primitive:typewriter"
+      ],
+      "assetRefs": [
+        "composite:core-replaceable-word"
+      ],
+      "tagSet": [
+        "core",
+        "replaceable",
+        "syllabic-break",
+        "word-showcase",
+        "emphasis"
+      ],
+      "confidenceScore": 0.93,
+      "reuseCount": 4,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Primary word showcase pathway for core phrases and syllabic break moments.",
+      "source": "seed",
+      "category": "emphasis"
+    },
+    {
+      "id": "pattern:comparison-side-by-side",
+      "patternType": "layout",
+      "semanticIntent": "comparison",
+      "sceneType": "comparison",
+      "triggerContext": [
+        "this versus that",
+        "compare two values",
+        "A/B",
+        "tradeoff",
+        "decision"
+      ],
+      "detectedMomentType": "contrast",
+      "semanticRole": "primary",
+      "layoutUsed": "split-screen comparison",
+      "effectStack": [
+        "template-family:graph-chart",
+        "primitive:highlight-word"
+      ],
+      "animationStyle": [
+        "lateral-sweep",
+        "split-reveal",
+        "editorial-compare"
+      ],
+      "timingProfile": {
+        "entryMs": 560,
+        "holdMs": 980,
+        "exitMs": 620,
+        "totalMs": 2160,
+        "easing": "ease-out",
+        "loop": false
+      },
+      "entryBehavior": "Bring the two ideas in with lateral separation.",
+      "exitBehavior": "Release by reducing the visual weight of the weaker side.",
+      "visualWeight": 0.78,
+      "redundancyRiskScore": 0.31,
+      "clutterRiskScore": 0.28,
+      "successScore": 0.89,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "single-comparison-per-window",
+        "pair-with-stat-if-number-heavy"
+      ],
+      "antiPatterns": [
+        "duplicate-contrast",
+        "triple-emphasis"
+      ],
+      "compatibleWith": [
+        "template-family:graph-chart",
+        "primitive:highlight-word",
+        "primitive:circle-reveal"
+      ],
+      "assetRefs": [
+        "bar-for-comparing-two-values"
+      ],
+      "tagSet": [
+        "comparison",
+        "vs",
+        "versus",
+        "contrast",
+        "tradeoff",
+        "choice",
+        "decision",
+        "dual-concept",
+        "side-by-side"
+      ],
+      "confidenceScore": 0.91,
+      "reuseCount": 5,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Side-by-side comparison moments should not duplicate the same concept twice.",
+      "source": "seed",
+      "category": "comparison"
+    },
+    {
+      "id": "pattern:call-outreach-contact",
+      "patternType": "motion-asset",
+      "semanticIntent": "call",
+      "sceneType": "call",
+      "triggerContext": [
+        "call",
+        "contact",
+        "reach out",
+        "outreach",
+        "make a call"
+      ],
+      "detectedMomentType": "callout",
+      "semanticRole": "secondary",
+      "layoutUsed": "floating card",
+      "effectStack": [
+        "motion-choreography-overlay",
+        "primitive:typewriter"
+      ],
+      "animationStyle": [
+        "editorial-card-rise",
+        "contact-call",
+        "soft-callout"
+      ],
+      "timingProfile": {
+        "entryMs": 420,
+        "holdMs": 820,
+        "exitMs": 500,
+        "totalMs": 1740,
+        "easing": "power3.out",
+        "loop": false
+      },
+      "entryBehavior": "Rise gently into a side card or contact plate.",
+      "exitBehavior": "Let the card dissolve instead of bouncing out.",
+      "visualWeight": 0.54,
+      "redundancyRiskScore": 0.26,
+      "clutterRiskScore": 0.22,
+      "successScore": 0.84,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "pair-with-call-or-outreach-language",
+        "avoid-repeat-in-short-window"
+      ],
+      "antiPatterns": [
+        "stacked-contact-cards",
+        "repeated-phone-icon"
+      ],
+      "compatibleWith": [
+        "host:motion-choreography-overlay",
+        "primitive:typewriter"
+      ],
+      "assetRefs": [
+        "calling-animation"
+      ],
+      "tagSet": [
+        "call",
+        "calling",
+        "contact",
+        "outreach",
+        "phone",
+        "reach-out",
+        "communication",
+        "connection"
+      ],
+      "confidenceScore": 0.86,
+      "reuseCount": 3,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Call and outreach moments should stay concise and visually low-friction.",
+      "source": "seed",
+      "category": "call"
+    },
+    {
+      "id": "pattern:list-stagger-steps",
+      "patternType": "layout",
+      "semanticIntent": "sequence",
+      "sceneType": "list",
+      "triggerContext": [
+        "step one",
+        "next",
+        "secondly",
+        "three points",
+        "ordered list"
+      ],
+      "detectedMomentType": "list-steps",
+      "semanticRole": "primary",
+      "layoutUsed": "stacked sequence cards",
+      "effectStack": [
+        "primitive:typewriter",
+        "primitive:highlight-word"
+      ],
+      "animationStyle": [
+        "blur-slide-up",
+        "staggered-list",
+        "ordered-reveal"
+      ],
+      "timingProfile": {
+        "entryMs": 360,
+        "holdMs": 1020,
+        "exitMs": 420,
+        "totalMs": 1800,
+        "easing": "power3.out",
+        "loop": false
+      },
+      "entryBehavior": "Reveal one item at a time in a clean vertical chain.",
+      "exitBehavior": "Keep the list readable while transitioning to the next step.",
+      "visualWeight": 0.62,
+      "redundancyRiskScore": 0.19,
+      "clutterRiskScore": 0.24,
+      "successScore": 0.9,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "respect-order",
+        "one-step-per-beat",
+        "avoid-dense-cards"
+      ],
+      "antiPatterns": [
+        "out-of-order-list",
+        "simultaneous-multi-step"
+      ],
+      "compatibleWith": [
+        "primitive:typewriter",
+        "primitive:highlight-word"
+      ],
+      "assetRefs": [
+        "check-mark-list-animation",
+        "number-for-STEPS-counting-animation",
+        "three-steps-list-animation",
+        "four-steps-animation"
+      ],
+      "tagSet": [
+        "list",
+        "steps",
+        "sequence",
+        "ordered",
+        "step-one",
+        "step-two",
+        "step-three",
+        "step-four",
+        "checkmark",
+        "numbered"
+      ],
+      "confidenceScore": 0.9,
+      "reuseCount": 4,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Ordered explanation beats should respect semantic order and not split the chain.",
+      "source": "seed",
+      "category": "list"
+    },
+    {
+      "id": "pattern:growth-progress-ramp",
+      "patternType": "motion-asset",
+      "semanticIntent": "growth",
+      "sceneType": "growth",
+      "triggerContext": [
+        "growth",
+        "increase",
+        "progress",
+        "ramp up",
+        "improve",
+        "scale"
+      ],
+      "detectedMomentType": "progress",
+      "semanticRole": "secondary",
+      "layoutUsed": "lower-third growth ramp",
+      "effectStack": [
+        "template-family:graph-chart",
+        "template-family:number-counter-kpi"
+      ],
+      "animationStyle": [
+        "graph-rise",
+        "progress-ramp",
+        "kinetic-growth"
+      ],
+      "timingProfile": {
+        "entryMs": 520,
+        "holdMs": 960,
+        "exitMs": 520,
+        "totalMs": 2000,
+        "easing": "ease-out",
+        "loop": true
+      },
+      "entryBehavior": "Introduce upward progress with a soft bottom-up lift.",
+      "exitBehavior": "Loop gently or settle at rest scale, never hard-cut.",
+      "visualWeight": 0.66,
+      "redundancyRiskScore": 0.24,
+      "clutterRiskScore": 0.23,
+      "successScore": 0.88,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "one-growth-idea-per-beat",
+        "prefer-graph-over-text-duplication"
+      ],
+      "antiPatterns": [
+        "duplicate-growth-label",
+        "stacked-progress-cards"
+      ],
+      "compatibleWith": [
+        "template-family:graph-chart",
+        "template-family:number-counter-kpi"
+      ],
+      "assetRefs": [
+        "growth-animation",
+        "percentage-graph-animation-animate-for-percentages"
+      ],
+      "tagSet": [
+        "growth",
+        "progress",
+        "increase",
+        "scale",
+        "improvement",
+        "upward",
+        "chart",
+        "graph",
+        "ramp"
+      ],
+      "confidenceScore": 0.88,
+      "reuseCount": 2,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Use for growth and progress beats with restrained motion variety.",
+      "source": "seed",
+      "category": "growth"
+    },
+    {
+      "id": "pattern:counter-stat-emphasis",
+      "patternType": "motion-primitive",
+      "semanticIntent": "numeric-emphasis",
+      "sceneType": "stat",
+      "triggerContext": [
+        "percent",
+        "number",
+        "stat",
+        "count up",
+        "metric"
+      ],
+      "detectedMomentType": "counter",
+      "semanticRole": "primary",
+      "layoutUsed": "stat lockup",
+      "effectStack": [
+        "primitive:highlight-word",
+        "primitive:blur-underline"
+      ],
+      "animationStyle": [
+        "count-up",
+        "stat-pop",
+        "numeric-lockup"
+      ],
+      "timingProfile": {
+        "entryMs": 360,
+        "holdMs": 780,
+        "exitMs": 420,
+        "totalMs": 1560,
+        "easing": "power3.out",
+        "loop": false
+      },
+      "entryBehavior": "Animate numbers with clarity, not spectacle.",
+      "exitBehavior": "Reduce the number back into the sentence without duplicating it.",
+      "visualWeight": 0.68,
+      "redundancyRiskScore": 0.44,
+      "clutterRiskScore": 0.26,
+      "successScore": 0.87,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "suppress-duplicate-literal-number",
+        "prefer-italic-percent-signal"
+      ],
+      "antiPatterns": [
+        "double-number-copy",
+        "counter-plus-written-duplicate"
+      ],
+      "compatibleWith": [
+        "primitive:highlight-word",
+        "primitive:blur-underline"
+      ],
+      "assetRefs": [
+        "number-counter",
+        "number-counter-kpi"
+      ],
+      "tagSet": [
+        "counter",
+        "stat",
+        "number",
+        "percentage",
+        "metric",
+        "count-up",
+        "numeric",
+        "kpi"
+      ],
+      "confidenceScore": 0.9,
+      "reuseCount": 6,
+      "failureCount": 1,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Numeric emphasis should not be duplicated in a second literal caption.",
+      "source": "seed",
+      "category": "stat"
+    },
+    {
+      "id": "pattern:quote-lifted-hold",
+      "patternType": "svg-variant",
+      "semanticIntent": "quote",
+      "sceneType": "quote",
+      "triggerContext": [
+        "quote",
+        "said",
+        "told me",
+        "quoted",
+        "speech"
+      ],
+      "detectedMomentType": "quote",
+      "semanticRole": "primary",
+      "layoutUsed": "quote plate",
+      "effectStack": [
+        "host:svg-caption-overlay",
+        "primitive:blur-reveal"
+      ],
+      "animationStyle": [
+        "editorial-quote",
+        "soft-lift",
+        "paper-hold"
+      ],
+      "timingProfile": {
+        "entryMs": 460,
+        "holdMs": 1020,
+        "exitMs": 560,
+        "totalMs": 2040,
+        "easing": "ease-out",
+        "loop": false
+      },
+      "entryBehavior": "Lift the quote into view with strong hierarchy and low noise.",
+      "exitBehavior": "Fade the quote without extra punctuation copies.",
+      "visualWeight": 0.61,
+      "redundancyRiskScore": 0.21,
+      "clutterRiskScore": 0.2,
+      "successScore": 0.86,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "one-quote-dominant-visual",
+        "prefer-clean-hold"
+      ],
+      "antiPatterns": [
+        "stacked-quote-boxes",
+        "duplicate-quotation-render"
+      ],
+      "compatibleWith": [
+        "host:svg-caption-overlay",
+        "primitive:blur-reveal"
+      ],
+      "assetRefs": [
+        "quote-animation"
+      ],
+      "tagSet": [
+        "quote",
+        "said",
+        "speech",
+        "quoted",
+        "statement",
+        "lift",
+        "editorial"
+      ],
+      "confidenceScore": 0.85,
+      "reuseCount": 3,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Quotes should feel editorial and compact, not like a second caption stream.",
+      "source": "seed",
+      "category": "quote"
+    },
+    {
+      "id": "pattern:cta-resolved-hold",
+      "patternType": "overlay",
+      "semanticIntent": "cta",
+      "sceneType": "cta",
+      "triggerContext": [
+        "subscribe",
+        "follow",
+        "join",
+        "click",
+        "call to action"
+      ],
+      "detectedMomentType": "cta",
+      "semanticRole": "secondary",
+      "layoutUsed": "call-to-action plate",
+      "effectStack": [
+        "host:motion-showcase-overlay",
+        "primitive:typewriter"
+      ],
+      "animationStyle": [
+        "resolved-hold",
+        "quiet-cta",
+        "editorial-push"
+      ],
+      "timingProfile": {
+        "entryMs": 420,
+        "holdMs": 820,
+        "exitMs": 520,
+        "totalMs": 1760,
+        "easing": "ease-out",
+        "loop": false
+      },
+      "entryBehavior": "Enter with confidence and leave enough visual breathing room.",
+      "exitBehavior": "Release cleanly after the action is understood.",
+      "visualWeight": 0.58,
+      "redundancyRiskScore": 0.23,
+      "clutterRiskScore": 0.24,
+      "successScore": 0.85,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "single-cta-per-window",
+        "avoid-piling-into-overlay-stack"
+      ],
+      "antiPatterns": [
+        "duplicate-cta-badges",
+        "repeated-join-follow-copy"
+      ],
+      "compatibleWith": [
+        "host:motion-showcase-overlay",
+        "primitive:typewriter"
+      ],
+      "assetRefs": [
+        "cta-animation"
+      ],
+      "tagSet": [
+        "cta",
+        "subscribe",
+        "follow",
+        "join",
+        "click",
+        "call-to-action",
+        "action",
+        "conversion"
+      ],
+      "confidenceScore": 0.86,
+      "reuseCount": 4,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "CTA beats should be restrained and not compete with the spoken close.",
+      "source": "seed",
+      "category": "cta"
+    },
+    {
+      "id": "pattern:bubble-card-rare-accent",
+      "patternType": "motion-asset",
+      "semanticIntent": "bubble-card",
+      "sceneType": "bubble-card",
+      "triggerContext": [
+        "bubble",
+        "card",
+        "glass",
+        "callout",
+        "rare accent"
+      ],
+      "detectedMomentType": "accent-card",
+      "semanticRole": "decorative",
+      "layoutUsed": "floating bubble card",
+      "effectStack": [
+        "motion-choreography-overlay"
+      ],
+      "animationStyle": [
+        "glass-accent",
+        "floating-card",
+        "rare-accent"
+      ],
+      "timingProfile": {
+        "entryMs": 520,
+        "holdMs": 780,
+        "exitMs": 540,
+        "totalMs": 1840,
+        "easing": "ease-out",
+        "loop": false
+      },
+      "entryBehavior": "Use as a one-off accent, not as a recurring caption stream.",
+      "exitBehavior": "Return to calm before the next visual idea.",
+      "visualWeight": 0.44,
+      "redundancyRiskScore": 0.48,
+      "clutterRiskScore": 0.34,
+      "successScore": 0.79,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "max-two-per-five-minutes",
+        "avoid-after-heavy-zoom"
+      ],
+      "antiPatterns": [
+        "bubble-card-stacking",
+        "persistent-accent-loop"
+      ],
+      "compatibleWith": [
+        "host:motion-choreography-overlay"
+      ],
+      "assetRefs": [
+        "glass-bubble-card",
+        "bubble-card"
+      ],
+      "tagSet": [
+        "bubble",
+        "card",
+        "glass",
+        "accent",
+        "floating",
+        "rare",
+        "supporting",
+        "callout"
+      ],
+      "confidenceScore": 0.75,
+      "reuseCount": 1,
+      "failureCount": 0,
+      "lastUsedAt": null,
+      "sourceVideoId": null,
+      "active": true,
+      "notes": "Bubble/card looks should be rare accents, not a new caption layer.",
+      "source": "seed",
+      "category": "card"
+    },
+    {
+      "id": "pattern:restraint-high-density",
+      "patternType": "constraint",
+      "semanticIntent": "restraint-needed",
+      "sceneType": "restraint",
+      "triggerContext": [
+        "dense scene",
+        "avoid clutter",
+        "repeated underline",
+        "caption overload"
+      ],
+      "detectedMomentType": "suppression",
+      "semanticRole": "primary",
+      "layoutUsed": "no-new-layer",
+      "effectStack": [],
+      "animationStyle": [
+        "minimal-hold",
+        "restraint"
+      ],
+      "timingProfile": {
+        "entryMs": 0,
+        "holdMs": 0,
+        "exitMs": 0,
+        "totalMs": 0,
+        "easing": "linear",
+        "loop": false
+      },
+      "entryBehavior": "Prefer silence and hierarchy instead of stacking more motion.",
+      "exitBehavior": "Keep the composition stable.",
+      "visualWeight": 0.08,
+      "redundancyRiskScore": 0,
+      "clutterRiskScore": 0,
+      "successScore": 1,
+      "rejectionReasons": [],
+      "compatibilityRules": [
+        "suppress-additional-emphasis",
+        "prefer-single-dominant-visual"
+      ],
+      "antiPatterns": [
+        "dense-layering",
+        "more-is-more"
+      ],
+      "compatibleWith": [],
+      "assetRefs": [],
+      "tagSet": [
+        "restraint",
+        "density",
+        "minimal",
+        "suppression",
+        "hierarchy",
+        "quiet",
+        "disciplined"
+      ],
+      "confidenceScore": 0.98,
+      "reuseCount": 226,
+      "failureCount": 0,
+      "lastUsedAt": "source_video_78dafcd5-63e5-4b30-a333-3d015a085e4d",
+      "sourceVideoId": "source_video_78dafcd5-63e5-4b30-a333-3d015a085e4d",
+      "active": true,
+      "notes": "Active governance pattern that blocks extra emphasis in dense scenes. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection. | Motion plan was reinforced as a successful pattern selection.",
+      "source": "seed",
+      "category": "constraint"
+    }
+  ],
+  "index": {
+    "byId": {
+      "pattern:core-replaceable-word": 0,
+      "pattern:comparison-side-by-side": 1,
+      "pattern:call-outreach-contact": 2,
+      "pattern:list-stagger-steps": 3,
+      "pattern:growth-progress-ramp": 4,
+      "pattern:counter-stat-emphasis": 5,
+      "pattern:quote-lifted-hold": 6,
+      "pattern:cta-resolved-hold": 7,
+      "pattern:bubble-card-rare-accent": 8,
+      "pattern:restraint-high-density": 9
+    },
+    "bySemanticIntent": {
+      "replaceable-word": [
+        "pattern:core-replaceable-word"
+      ],
+      "comparison": [
+        "pattern:comparison-side-by-side"
+      ],
+      "call": [
+        "pattern:call-outreach-contact"
+      ],
+      "sequence": [
+        "pattern:list-stagger-steps"
+      ],
+      "growth": [
+        "pattern:growth-progress-ramp"
+      ],
+      "numeric-emphasis": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "quote": [
+        "pattern:quote-lifted-hold"
+      ],
+      "cta": [
+        "pattern:cta-resolved-hold"
+      ],
+      "bubble-card": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "restraint-needed": [
+        "pattern:restraint-high-density"
+      ]
+    },
+    "bySceneType": {
+      "feature-highlight": [
+        "pattern:core-replaceable-word"
+      ],
+      "comparison": [
+        "pattern:comparison-side-by-side"
+      ],
+      "call": [
+        "pattern:call-outreach-contact"
+      ],
+      "list": [
+        "pattern:list-stagger-steps"
+      ],
+      "growth": [
+        "pattern:growth-progress-ramp"
+      ],
+      "stat": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "quote": [
+        "pattern:quote-lifted-hold"
+      ],
+      "cta": [
+        "pattern:cta-resolved-hold"
+      ],
+      "bubble-card": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "restraint": [
+        "pattern:restraint-high-density"
+      ]
+    },
+    "byEffectId": {
+      "primitive:highlight-word": [
+        "pattern:core-replaceable-word",
+        "pattern:comparison-side-by-side",
+        "pattern:list-stagger-steps",
+        "pattern:counter-stat-emphasis"
+      ],
+      "primitive:circle-reveal": [
+        "pattern:core-replaceable-word"
+      ],
+      "primitive:blur-underline": [
+        "pattern:core-replaceable-word",
+        "pattern:counter-stat-emphasis"
+      ],
+      "template-family:graph-chart": [
+        "pattern:comparison-side-by-side",
+        "pattern:growth-progress-ramp"
+      ],
+      "motion-choreography-overlay": [
+        "pattern:call-outreach-contact",
+        "pattern:bubble-card-rare-accent"
+      ],
+      "primitive:typewriter": [
+        "pattern:call-outreach-contact",
+        "pattern:list-stagger-steps",
+        "pattern:cta-resolved-hold"
+      ],
+      "template-family:number-counter-kpi": [
+        "pattern:growth-progress-ramp"
+      ],
+      "host:svg-caption-overlay": [
+        "pattern:quote-lifted-hold"
+      ],
+      "primitive:blur-reveal": [
+        "pattern:quote-lifted-hold"
+      ],
+      "host:motion-showcase-overlay": [
+        "pattern:cta-resolved-hold"
+      ]
+    },
+    "byAssetId": {
+      "primitive:highlight-word": [
+        "pattern:core-replaceable-word",
+        "pattern:comparison-side-by-side",
+        "pattern:list-stagger-steps",
+        "pattern:counter-stat-emphasis"
+      ],
+      "primitive:circle-reveal": [
+        "pattern:core-replaceable-word",
+        "pattern:comparison-side-by-side"
+      ],
+      "primitive:blur-underline": [
+        "pattern:core-replaceable-word",
+        "pattern:counter-stat-emphasis"
+      ],
+      "primitive:typewriter": [
+        "pattern:core-replaceable-word",
+        "pattern:call-outreach-contact",
+        "pattern:list-stagger-steps",
+        "pattern:cta-resolved-hold"
+      ],
+      "template-family:graph-chart": [
+        "pattern:comparison-side-by-side",
+        "pattern:growth-progress-ramp"
+      ],
+      "host:motion-choreography-overlay": [
+        "pattern:call-outreach-contact",
+        "pattern:bubble-card-rare-accent"
+      ],
+      "template-family:number-counter-kpi": [
+        "pattern:growth-progress-ramp"
+      ],
+      "host:svg-caption-overlay": [
+        "pattern:quote-lifted-hold"
+      ],
+      "primitive:blur-reveal": [
+        "pattern:quote-lifted-hold"
+      ],
+      "host:motion-showcase-overlay": [
+        "pattern:cta-resolved-hold"
+      ]
+    },
+    "byTag": {
+      "core": [
+        "pattern:core-replaceable-word"
+      ],
+      "replaceable": [
+        "pattern:core-replaceable-word"
+      ],
+      "syllabic-break": [
+        "pattern:core-replaceable-word"
+      ],
+      "word-showcase": [
+        "pattern:core-replaceable-word"
+      ],
+      "emphasis": [
+        "pattern:core-replaceable-word"
+      ],
+      "comparison": [
+        "pattern:comparison-side-by-side"
+      ],
+      "vs": [
+        "pattern:comparison-side-by-side"
+      ],
+      "versus": [
+        "pattern:comparison-side-by-side"
+      ],
+      "contrast": [
+        "pattern:comparison-side-by-side"
+      ],
+      "tradeoff": [
+        "pattern:comparison-side-by-side"
+      ],
+      "choice": [
+        "pattern:comparison-side-by-side"
+      ],
+      "decision": [
+        "pattern:comparison-side-by-side"
+      ],
+      "dual-concept": [
+        "pattern:comparison-side-by-side"
+      ],
+      "side-by-side": [
+        "pattern:comparison-side-by-side"
+      ],
+      "call": [
+        "pattern:call-outreach-contact"
+      ],
+      "calling": [
+        "pattern:call-outreach-contact"
+      ],
+      "contact": [
+        "pattern:call-outreach-contact"
+      ],
+      "outreach": [
+        "pattern:call-outreach-contact"
+      ],
+      "phone": [
+        "pattern:call-outreach-contact"
+      ],
+      "reach-out": [
+        "pattern:call-outreach-contact"
+      ],
+      "communication": [
+        "pattern:call-outreach-contact"
+      ],
+      "connection": [
+        "pattern:call-outreach-contact"
+      ],
+      "list": [
+        "pattern:list-stagger-steps"
+      ],
+      "steps": [
+        "pattern:list-stagger-steps"
+      ],
+      "sequence": [
+        "pattern:list-stagger-steps"
+      ],
+      "ordered": [
+        "pattern:list-stagger-steps"
+      ],
+      "step-one": [
+        "pattern:list-stagger-steps"
+      ],
+      "step-two": [
+        "pattern:list-stagger-steps"
+      ],
+      "step-three": [
+        "pattern:list-stagger-steps"
+      ],
+      "step-four": [
+        "pattern:list-stagger-steps"
+      ],
+      "checkmark": [
+        "pattern:list-stagger-steps"
+      ],
+      "numbered": [
+        "pattern:list-stagger-steps"
+      ],
+      "growth": [
+        "pattern:growth-progress-ramp"
+      ],
+      "progress": [
+        "pattern:growth-progress-ramp"
+      ],
+      "increase": [
+        "pattern:growth-progress-ramp"
+      ],
+      "scale": [
+        "pattern:growth-progress-ramp"
+      ],
+      "improvement": [
+        "pattern:growth-progress-ramp"
+      ],
+      "upward": [
+        "pattern:growth-progress-ramp"
+      ],
+      "chart": [
+        "pattern:growth-progress-ramp"
+      ],
+      "graph": [
+        "pattern:growth-progress-ramp"
+      ],
+      "ramp": [
+        "pattern:growth-progress-ramp"
+      ],
+      "counter": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "stat": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "number": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "percentage": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "metric": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "count-up": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "numeric": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "kpi": [
+        "pattern:counter-stat-emphasis"
+      ],
+      "quote": [
+        "pattern:quote-lifted-hold"
+      ],
+      "said": [
+        "pattern:quote-lifted-hold"
+      ],
+      "speech": [
+        "pattern:quote-lifted-hold"
+      ],
+      "quoted": [
+        "pattern:quote-lifted-hold"
+      ],
+      "statement": [
+        "pattern:quote-lifted-hold"
+      ],
+      "lift": [
+        "pattern:quote-lifted-hold"
+      ],
+      "editorial": [
+        "pattern:quote-lifted-hold"
+      ],
+      "cta": [
+        "pattern:cta-resolved-hold"
+      ],
+      "subscribe": [
+        "pattern:cta-resolved-hold"
+      ],
+      "follow": [
+        "pattern:cta-resolved-hold"
+      ],
+      "join": [
+        "pattern:cta-resolved-hold"
+      ],
+      "click": [
+        "pattern:cta-resolved-hold"
+      ],
+      "call-to-action": [
+        "pattern:cta-resolved-hold"
+      ],
+      "action": [
+        "pattern:cta-resolved-hold"
+      ],
+      "conversion": [
+        "pattern:cta-resolved-hold"
+      ],
+      "bubble": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "card": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "glass": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "accent": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "floating": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "rare": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "supporting": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "callout": [
+        "pattern:bubble-card-rare-accent"
+      ],
+      "restraint": [
+        "pattern:restraint-high-density"
+      ],
+      "density": [
+        "pattern:restraint-high-density"
+      ],
+      "minimal": [
+        "pattern:restraint-high-density"
+      ],
+      "suppression": [
+        "pattern:restraint-high-density"
+      ],
+      "hierarchy": [
+        "pattern:restraint-high-density"
+      ],
+      "quiet": [
+        "pattern:restraint-high-density"
+      ],
+      "disciplined": [
+        "pattern:restraint-high-density"
+      ]
+    },
+    "bySourceVideoId": {
+      "source_video_78dafcd5-63e5-4b30-a333-3d015a085e4d": [
+        "pattern:restraint-high-density"
+      ]
+    }
+  },
+  "notes": [
+    "Seeded from the current motion registry and structured animation families.",
+    "Pattern Memory favors restraint when density or redundancy rises."
+  ],
+  "fingerprint": "pm-9599392919d7"
+}

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSAP Cinematic Motion Engine</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/stage.css">
+  <link rel="stylesheet" href="css/debug-panel.css">
+</head>
+<body class="clean-ui">
+  <main class="app-shell">
+    <section class="stage-frame" id="stageFrame" aria-label="Cinematic stage">
+      <div class="stage-light stage-light-a"></div>
+      <div class="stage-light stage-light-b"></div>
+      <div class="stage-grain"></div>
+
+      <div class="stage" id="stage">
+        <section class="motion-object text-compartment text-compartment-back" id="textCompartmentBack" aria-hidden="true">
+          <div class="text-word-layer text-word-current text-word-back-current" id="textWordBackCurrent"></div>
+          <div class="text-word-layer text-word-next text-word-back-next" id="textWordBackNext"></div>
+        </section>
+
+        <div class="motion-object hero hero-a" id="heroA" data-motion-id="hero-a" data-from-rule="left">
+          <img src="assets/hero-a.png" alt="Primary hero asset">
+        </div>
+        <div class="motion-object hero hero-b" id="heroB" data-motion-id="hero-b" data-from-rule="right">
+          <img src="assets/hero-b.png" alt="Secondary hero asset">
+        </div>
+        <section class="motion-object text-compartment" id="textCompartment" data-motion-id="text-compartment" data-from-rule="top">
+          <div class="text-word-layer text-word-current" id="textWordCurrent"></div>
+          <div class="text-word-layer text-word-next" id="textWordNext"></div>
+          <div class="text-focus-frame" id="textFocusFrame" aria-hidden="true">
+            <span class="focus-corner top-left"></span>
+            <span class="focus-corner top-right"></span>
+            <span class="focus-corner bottom-left"></span>
+            <span class="focus-corner bottom-right"></span>
+          </div>
+        </section>
+        <p class="motion-object accent-tag" id="accentTag" data-motion-id="accent-tag" data-from-rule="bottom">
+          Word templates: 1-7 + composed 8+
+        </p>
+      </div>
+
+      <div class="guide-overlay" id="guideOverlay" aria-hidden="true">
+        <div class="guide bounds"></div>
+        <div class="guide left-zone"></div>
+        <div class="guide right-zone"></div>
+        <div class="guide top-zone"></div>
+        <div class="guide bottom-zone"></div>
+        <div class="guide diag-left-zone"></div>
+        <div class="guide diag-right-zone"></div>
+      </div>
+    </section>
+
+    <aside class="debug-panel" id="debugPanel">
+      <h2 class="panel-title">Motion Debug Panel</h2>
+      <p class="panel-note">Run <code>python scripts/select_assets.py</code> any time you want to refresh assets from your ZIP.</p>
+
+      <label class="control">
+        Target
+        <select id="targetSelect">
+          <option value="all">All objects</option>
+          <option value="hero-a">hero-a</option>
+          <option value="hero-b">hero-b</option>
+          <option value="text-compartment">text-compartment</option>
+          <option value="accent-tag">accent-tag</option>
+        </select>
+      </label>
+
+      <label class="control">
+        Preset
+        <select id="presetSelect"></select>
+      </label>
+
+      <div class="control-inline">
+        <button id="replayBtn" type="button">Replay Timeline</button>
+      </div>
+
+      <label class="control">
+        Global Speed <span id="speedValue">1.00x</span>
+        <input id="speedRange" type="range" min="0.5" max="1.5" step="0.05" value="1">
+      </label>
+
+      <label class="control-toggle">
+        <input id="guidesToggle" type="checkbox">
+        Show off-frame guides
+      </label>
+
+      <section class="text-controls" id="textControls">
+        <h3 class="readout-title">Text Compartment</h3>
+        <label class="control">
+          Word Count Filter
+          <select id="wordCountFilterSelect">
+            <option value="all">All Words</option>
+            <option value="1">1 Word</option>
+            <option value="2">2 Words</option>
+            <option value="3">3 Words</option>
+            <option value="4">4 Words</option>
+            <option value="5">5 Words</option>
+            <option value="6">6 Words</option>
+            <option value="7">7 Words</option>
+            <option value="8+">8+ Words</option>
+          </select>
+        </label>
+
+        <label class="control">
+          Word Bank
+          <select id="wordBankSelect"></select>
+        </label>
+
+        <label class="control">
+          Custom Word
+          <input id="customWordInput" type="text" placeholder="Type a word and press Apply" maxlength="42">
+        </label>
+
+        <div class="control-inline control-inline-dual">
+          <button id="applyWordBtn" type="button">Apply Word</button>
+          <button id="replayWordBtn" type="button">Replay Word</button>
+        </div>
+
+        <label class="control-toggle">
+          <input id="autoRotateToggle" type="checkbox" checked>
+          Auto rotate words
+        </label>
+
+        <label class="control">
+          Cycle Interval <span id="cycleValue">3200ms</span>
+          <input id="cycleRange" type="range" min="1600" max="7000" step="100" value="3200">
+        </label>
+
+        <h3 class="readout-title">Active Word Mapping</h3>
+        <pre id="textMappingReadout" class="runtime-readout mapping-readout">Loading text mappings...</pre>
+      </section>
+
+      <p class="status-line" id="statusLine">Initializing scene...</p>
+
+      <h3 class="readout-title">Active Runtime</h3>
+      <pre id="runtimeReadout" class="runtime-readout">No timeline data yet.</pre>
+    </aside>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+
+  <script src="js/engine/easing-registry.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/engine/offscreen-rules.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/engine/motion-presets.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/engine/motion-engine.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/text/text-splitter.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/text/font-catalog.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/text/word-count-templates.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/text/text-motion-presets.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/text/text-typography-presets.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/text/text-template-engine.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/demo/scene-build.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/demo/text-compartment.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/demo/debug-panel.js?v=phase4-v1.3-descriptor-rule"></script>
+  <script src="js/demo/bootstrap.js?v=phase4-v1.3-descriptor-rule"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+# OS and editor noise
+Thumbs.db
+.DS_Store
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build, cache, and test output
+dist/
+build/
+coverage/
+out/
+out-runtime/
+.cache/
+**/.cache/
+.logs/
+test-results/
+tmp/
+tmp-live/
+tmp-sound-debug/
+**/tmp/
+**/tmp-live/
+
+# Logs
+*.log
+
+# Runtime backend data and local render state
+backend/data/
+backend/out/
+backend/out-runtime/
+
+# Remotion local artifacts
+remotion-app/dist/
+remotion-app/out/
+remotion-app/test-results/
+remotion-app/.cache/
+remotion-app/retrieval-assets/
+remotion-app/public/audio/
+remotion-app/public/background-overlays/
+remotion-app/public/draft-previews/
+remotion-app/public/nolan-clips/
+remotion-app/public/talking-head-chunks/
+remotion-app/public/transitions/
+remotion-app/public/datasets/
+remotion-app/public/input-video*.mp4
+
+# Large local media libraries not required for code review or backend source
+BACKGROUND VIDEOS FOR PROMETHEUS OVERLAY/
+GSAP STORIES/
+GSAP THREE JS ANIMATIONS/
+LOTTIE JSON ANIMATION/
+PROME - images_no_bg/
+PROME - images_no_bg_HQ/
+prometheus CONCRETE assets/
+PROMETHEUS_SONGS/
+SOUND FX/
+STATIC ASSETS/
+static, motion, gsap MANHUNTER/
+STRUCTURED ANIMATION/
+SVG animations/
+TEXT SVG ANIMATIONS/
+TRANSITION/

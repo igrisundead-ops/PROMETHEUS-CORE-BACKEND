@@ -1,0 +1,2420 @@
+[
+  {
+    "id": "chunk-0001",
+    "text": "Allow people",
+    "startMs": 320,
+    "endMs": 960,
+    "words": [
+      {
+        "text": "Allow",
+        "startMs": 320,
+        "endMs": 560,
+        "confidence": 0.984375
+      },
+      {
+        "text": "people",
+        "startMs": 560,
+        "endMs": 960,
+        "confidence": 0.99902344
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0002",
+    "text": "experience you.",
+    "startMs": 960,
+    "endMs": 2000,
+    "words": [
+      {
+        "text": "experience",
+        "startMs": 960,
+        "endMs": 1360,
+        "confidence": 0.97265625
+      },
+      {
+        "text": "you.",
+        "startMs": 1600,
+        "endMs": 2000,
+        "confidence": 0.9946289
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "punch-emphasis",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0003",
+    "text": "This video is",
+    "startMs": 2320,
+    "endMs": 3200,
+    "words": [
+      {
+        "text": "This",
+        "startMs": 2320,
+        "endMs": 2640,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "video",
+        "startMs": 2640,
+        "endMs": 2920,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "is",
+        "startMs": 2920,
+        "endMs": 3200,
+        "confidence": 0.99853516
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0004",
+    "text": "for coaches, trainers,",
+    "startMs": 3200,
+    "endMs": 4960,
+    "words": [
+      {
+        "text": "for",
+        "startMs": 3200,
+        "endMs": 3440,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "coaches,",
+        "startMs": 3440,
+        "endMs": 4000,
+        "confidence": 0.9992676
+      },
+      {
+        "text": "trainers,",
+        "startMs": 4240,
+        "endMs": 4960,
+        "confidence": 0.87841797
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0005",
+    "text": "industry experts and",
+    "startMs": 5440,
+    "endMs": 6920,
+    "words": [
+      {
+        "text": "industry",
+        "startMs": 5440,
+        "endMs": 5840,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "experts",
+        "startMs": 6000,
+        "endMs": 6640,
+        "confidence": 0.9987793
+      },
+      {
+        "text": "and",
+        "startMs": 6640,
+        "endMs": 6920,
+        "confidence": 0.8354492
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0,
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0006",
+    "text": "thought leaders.",
+    "startMs": 6920,
+    "endMs": 7680,
+    "words": [
+      {
+        "text": "thought",
+        "startMs": 6920,
+        "endMs": 7280,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "leaders.",
+        "startMs": 7280,
+        "endMs": 7680,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0,
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0007",
+    "text": "If you",
+    "startMs": 7920,
+    "endMs": 8320,
+    "words": [
+      {
+        "text": "If",
+        "startMs": 7920,
+        "endMs": 8160,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "you",
+        "startMs": 8160,
+        "endMs": 8320,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "punch-emphasis",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0008",
+    "text": "see yourself as",
+    "startMs": 8320,
+    "endMs": 9080,
+    "words": [
+      {
+        "text": "see",
+        "startMs": 8320,
+        "endMs": 8520,
+        "confidence": 1
+      },
+      {
+        "text": "yourself",
+        "startMs": 8520,
+        "endMs": 8880,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "as",
+        "startMs": 8880,
+        "endMs": 9080,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0009",
+    "text": "one of those,",
+    "startMs": 9080,
+    "endMs": 9600,
+    "words": [
+      {
+        "text": "one",
+        "startMs": 9080,
+        "endMs": 9240,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "of",
+        "startMs": 9240,
+        "endMs": 9360,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "those,",
+        "startMs": 9360,
+        "endMs": 9600,
+        "confidence": 0.9951172
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0010",
+    "text": "listen attentively.",
+    "startMs": 9680,
+    "endMs": 10600,
+    "words": [
+      {
+        "text": "listen",
+        "startMs": 9680,
+        "endMs": 10120,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "attentively.",
+        "startMs": 10120,
+        "endMs": 10600,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "punch-emphasis",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0011",
+    "text": "This video is",
+    "startMs": 10600,
+    "endMs": 11360,
+    "words": [
+      {
+        "text": "This",
+        "startMs": 10600,
+        "endMs": 10880,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "video",
+        "startMs": 10880,
+        "endMs": 11120,
+        "confidence": 1
+      },
+      {
+        "text": "is",
+        "startMs": 11120,
+        "endMs": 11360,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0012",
+    "text": "for you.",
+    "startMs": 11360,
+    "endMs": 11920,
+    "words": [
+      {
+        "text": "for",
+        "startMs": 11360,
+        "endMs": 11600,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "you.",
+        "startMs": 11600,
+        "endMs": 11920,
+        "confidence": 0.9980469
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "punch-emphasis",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0013",
+    "text": "When you watch",
+    "startMs": 12320,
+    "endMs": 13000,
+    "words": [
+      {
+        "text": "When",
+        "startMs": 12320,
+        "endMs": 12600,
+        "confidence": 1
+      },
+      {
+        "text": "you",
+        "startMs": 12600,
+        "endMs": 12760,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "watch",
+        "startMs": 12760,
+        "endMs": 13000,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0014",
+    "text": "videos from someone",
+    "startMs": 13000,
+    "endMs": 13840,
+    "words": [
+      {
+        "text": "videos",
+        "startMs": 13000,
+        "endMs": 13400,
+        "confidence": 0.9992676
+      },
+      {
+        "text": "from",
+        "startMs": 13400,
+        "endMs": 13600,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "someone",
+        "startMs": 13600,
+        "endMs": 13840,
+        "confidence": 0.99902344
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0015",
+    "text": "like a Paul Fo,",
+    "startMs": 13840,
+    "endMs": 15040,
+    "words": [
+      {
+        "text": "like",
+        "startMs": 13840,
+        "endMs": 14080,
+        "confidence": 0.9970703
+      },
+      {
+        "text": "a",
+        "startMs": 14080,
+        "endMs": 14280,
+        "confidence": 0.87939453
+      },
+      {
+        "text": "Paul",
+        "startMs": 14280,
+        "endMs": 14560,
+        "confidence": 0.54418945
+      },
+      {
+        "text": "Fo,",
+        "startMs": 14560,
+        "endMs": 15040,
+        "confidence": 0.50512695
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 2,
+          "endWord": 3,
+          "text": "Paul Fo,"
+        }
+      ],
+      "isVariation": true,
+      "suppressDefault": true
+    },
+    "suppressDefault": true
+  },
+  {
+    "id": "chunk-0016",
+    "text": "like a Vuzit Mbakwayo,",
+    "startMs": 15440,
+    "endMs": 17280,
+    "words": [
+      {
+        "text": "like",
+        "startMs": 15440,
+        "endMs": 15760,
+        "confidence": 0.9814453
+      },
+      {
+        "text": "a",
+        "startMs": 15760,
+        "endMs": 15999,
+        "confidence": 0.6381836
+      },
+      {
+        "text": "Vuzit",
+        "startMs": 15999,
+        "endMs": 16440,
+        "confidence": 0.64123535
+      },
+      {
+        "text": "Mbakwayo,",
+        "startMs": 16440,
+        "endMs": 17280,
+        "confidence": 0.73706055
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 2,
+          "endWord": 3,
+          "text": "Vuzit Mbakwayo,"
+        }
+      ],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0017",
+    "text": "like a Trevor Newer,",
+    "startMs": 17280,
+    "endMs": 18280,
+    "words": [
+      {
+        "text": "like",
+        "startMs": 17280,
+        "endMs": 17440,
+        "confidence": 0.99316406
+      },
+      {
+        "text": "a",
+        "startMs": 17440,
+        "endMs": 17560,
+        "confidence": 0.9716797
+      },
+      {
+        "text": "Trevor",
+        "startMs": 17560,
+        "endMs": 17920,
+        "confidence": 0.94059247
+      },
+      {
+        "text": "Newer,",
+        "startMs": 17920,
+        "endMs": 18280,
+        "confidence": 0.46801758
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 2,
+          "endWord": 3,
+          "text": "Trevor Newer,"
+        }
+      ],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0018",
+    "text": "like a Trisha Baze,",
+    "startMs": 18280,
+    "endMs": 19440,
+    "words": [
+      {
+        "text": "like",
+        "startMs": 18280,
+        "endMs": 18400,
+        "confidence": 0.97998047
+      },
+      {
+        "text": "a",
+        "startMs": 18400,
+        "endMs": 18520,
+        "confidence": 0.89453125
+      },
+      {
+        "text": "Trisha",
+        "startMs": 18520,
+        "endMs": 18920,
+        "confidence": 0.9557292
+      },
+      {
+        "text": "Baze,",
+        "startMs": 18920,
+        "endMs": 19440,
+        "confidence": 0.53719074
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_1",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_1",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 2,
+          "endWord": 3,
+          "text": "Trisha Baze,"
+        }
+      ],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0019",
+    "text": "like a coach",
+    "startMs": 20160,
+    "endMs": 20880,
+    "words": [
+      {
+        "text": "like",
+        "startMs": 20160,
+        "endMs": 20440,
+        "confidence": 0.9916992
+      },
+      {
+        "text": "a",
+        "startMs": 20440,
+        "endMs": 20600,
+        "confidence": 0.9916992
+      },
+      {
+        "text": "coach",
+        "startMs": 20600,
+        "endMs": 20880,
+        "confidence": 0.99121094
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0020",
+    "text": "Joyce Daniels,",
+    "startMs": 21040,
+    "endMs": 22320,
+    "words": [
+      {
+        "text": "Joyce",
+        "startMs": 21040,
+        "endMs": 21520,
+        "confidence": 0.80826825
+      },
+      {
+        "text": "Daniels,",
+        "startMs": 21520,
+        "endMs": 22320,
+        "confidence": 0.99243164
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 0,
+          "endWord": 1,
+          "text": "Joyce Daniels,"
+        }
+      ],
+      "isVariation": true,
+      "suppressDefault": true
+    },
+    "suppressDefault": true
+  },
+  {
+    "id": "chunk-0021",
+    "text": "what are the",
+    "startMs": 22640,
+    "endMs": 23240,
+    "words": [
+      {
+        "text": "what",
+        "startMs": 22640,
+        "endMs": 22920,
+        "confidence": 0.99609375
+      },
+      {
+        "text": "are",
+        "startMs": 22920,
+        "endMs": 23080,
+        "confidence": 0.9838867
+      },
+      {
+        "text": "the",
+        "startMs": 23080,
+        "endMs": 23240,
+        "confidence": 0.9926758
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0022",
+    "text": "things that",
+    "startMs": 23240,
+    "endMs": 23560,
+    "words": [
+      {
+        "text": "things",
+        "startMs": 23240,
+        "endMs": 23400,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "that",
+        "startMs": 23400,
+        "endMs": 23560,
+        "confidence": 0.9975586
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0023",
+    "text": "comes to your",
+    "startMs": 23560,
+    "endMs": 24280,
+    "words": [
+      {
+        "text": "comes",
+        "startMs": 23560,
+        "endMs": 23800,
+        "confidence": 0.81689453
+      },
+      {
+        "text": "to",
+        "startMs": 23800,
+        "endMs": 24080,
+        "confidence": 0.9970703
+      },
+      {
+        "text": "your",
+        "startMs": 24080,
+        "endMs": 24280,
+        "confidence": 0.99560547
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0024",
+    "text": "mind with",
+    "startMs": 24280,
+    "endMs": 24720,
+    "words": [
+      {
+        "text": "mind",
+        "startMs": 24280,
+        "endMs": 24480,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "with",
+        "startMs": 24480,
+        "endMs": 24720,
+        "confidence": 0.98583984
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0025",
+    "text": "Their Those videos",
+    "startMs": 24720,
+    "endMs": 26290,
+    "words": [
+      {
+        "text": "Their",
+        "startMs": 24720,
+        "endMs": 25040,
+        "confidence": 0.87646484
+      },
+      {
+        "text": "Those",
+        "startMs": 25690,
+        "endMs": 25850,
+        "confidence": 0.99316406
+      },
+      {
+        "text": "videos",
+        "startMs": 25850,
+        "endMs": 26290,
+        "confidence": 0.9975586
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 0,
+          "endWord": 1,
+          "text": "their those"
+        }
+      ],
+      "isVariation": true,
+      "suppressDefault": true
+    },
+    "suppressDefault": true
+  },
+  {
+    "id": "chunk-0026",
+    "text": "where they just",
+    "startMs": 26290,
+    "endMs": 26850,
+    "words": [
+      {
+        "text": "where",
+        "startMs": 26290,
+        "endMs": 26450,
+        "confidence": 0.9921875
+      },
+      {
+        "text": "they",
+        "startMs": 26450,
+        "endMs": 26650,
+        "confidence": 0.9921875
+      },
+      {
+        "text": "just",
+        "startMs": 26650,
+        "endMs": 26850,
+        "confidence": 0.99609375
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0027",
+    "text": "sit and they",
+    "startMs": 26850,
+    "endMs": 27690,
+    "words": [
+      {
+        "text": "sit",
+        "startMs": 26850,
+        "endMs": 27130,
+        "confidence": 0.70166016
+      },
+      {
+        "text": "and",
+        "startMs": 27210,
+        "endMs": 27490,
+        "confidence": 0.9970703
+      },
+      {
+        "text": "they",
+        "startMs": 27490,
+        "endMs": 27690,
+        "confidence": 0.9321289
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_1",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_1",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0028",
+    "text": "talk to the camera,",
+    "startMs": 27690,
+    "endMs": 28890,
+    "words": [
+      {
+        "text": "talk",
+        "startMs": 27690,
+        "endMs": 27970,
+        "confidence": 1
+      },
+      {
+        "text": "to",
+        "startMs": 27970,
+        "endMs": 28210,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "the",
+        "startMs": 28210,
+        "endMs": 28370,
+        "confidence": 0.9975586
+      },
+      {
+        "text": "camera,",
+        "startMs": 28370,
+        "endMs": 28890,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0029",
+    "text": "they get stuck",
+    "startMs": 30010,
+    "endMs": 31050,
+    "words": [
+      {
+        "text": "they",
+        "startMs": 30010,
+        "endMs": 30330,
+        "confidence": 0.9921875
+      },
+      {
+        "text": "get",
+        "startMs": 30330,
+        "endMs": 30610,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "stuck",
+        "startMs": 30610,
+        "endMs": 31050,
+        "confidence": 0.7915039
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0030",
+    "text": "in your head",
+    "startMs": 31050,
+    "endMs": 31610,
+    "words": [
+      {
+        "text": "in",
+        "startMs": 31050,
+        "endMs": 31250,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "your",
+        "startMs": 31250,
+        "endMs": 31410,
+        "confidence": 0.9975586
+      },
+      {
+        "text": "head",
+        "startMs": 31410,
+        "endMs": 31610,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_1",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_1",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0031",
+    "text": "the topic they're",
+    "startMs": 31610,
+    "endMs": 32370,
+    "words": [
+      {
+        "text": "the",
+        "startMs": 31610,
+        "endMs": 31810,
+        "confidence": 0.99658203
+      },
+      {
+        "text": "topic",
+        "startMs": 31810,
+        "endMs": 32090,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "they're",
+        "startMs": 32090,
+        "endMs": 32370,
+        "confidence": 0.8432617
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0032",
+    "text": "talking about.",
+    "startMs": 32370,
+    "endMs": 32970,
+    "words": [
+      {
+        "text": "talking",
+        "startMs": 32370,
+        "endMs": 32650,
+        "confidence": 0.8881836
+      },
+      {
+        "text": "about.",
+        "startMs": 32650,
+        "endMs": 32970,
+        "confidence": 0.99853516
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0033",
+    "text": "You just",
+    "startMs": 32970,
+    "endMs": 33490,
+    "words": [
+      {
+        "text": "You",
+        "startMs": 32970,
+        "endMs": 33250,
+        "confidence": 0.9980469
+      },
+      {
+        "text": "just",
+        "startMs": 33250,
+        "endMs": 33490,
+        "confidence": 0.9980469
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "punch-emphasis",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0034",
+    "text": "keep remembering them.",
+    "startMs": 33490,
+    "endMs": 34570,
+    "words": [
+      {
+        "text": "keep",
+        "startMs": 33490,
+        "endMs": 33730,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "remembering",
+        "startMs": 33730,
+        "endMs": 34290,
+        "confidence": 0.9996745
+      },
+      {
+        "text": "them.",
+        "startMs": 34290,
+        "endMs": 34570,
+        "confidence": 0.9975586
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0035",
+    "text": "You hear them",
+    "startMs": 34650,
+    "endMs": 35410,
+    "words": [
+      {
+        "text": "You",
+        "startMs": 34650,
+        "endMs": 34970,
+        "confidence": 0.9975586
+      },
+      {
+        "text": "hear",
+        "startMs": 34970,
+        "endMs": 35210,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "them",
+        "startMs": 35210,
+        "endMs": 35410,
+        "confidence": 0.9975586
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0036",
+    "text": "in your subconscious",
+    "startMs": 35410,
+    "endMs": 36410,
+    "words": [
+      {
+        "text": "in",
+        "startMs": 35410,
+        "endMs": 35530,
+        "confidence": 0.99365234
+      },
+      {
+        "text": "your",
+        "startMs": 35530,
+        "endMs": 35690,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "subconscious",
+        "startMs": 35690,
+        "endMs": 36410,
+        "confidence": 0.9996338
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0037",
+    "text": "over and over again.",
+    "startMs": 36410,
+    "endMs": 37610,
+    "words": [
+      {
+        "text": "over",
+        "startMs": 36410,
+        "endMs": 36770,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "and",
+        "startMs": 36770,
+        "endMs": 37010,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "over",
+        "startMs": 37010,
+        "endMs": 37250,
+        "confidence": 1
+      },
+      {
+        "text": "again.",
+        "startMs": 37250,
+        "endMs": 37610,
+        "confidence": 0.9980469
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0038",
+    "text": "Those videos are",
+    "startMs": 38250,
+    "endMs": 39570,
+    "words": [
+      {
+        "text": "Those",
+        "startMs": 38250,
+        "endMs": 38650,
+        "confidence": 0.9975586
+      },
+      {
+        "text": "videos",
+        "startMs": 38730,
+        "endMs": 39290,
+        "confidence": 0.998291
+      },
+      {
+        "text": "are",
+        "startMs": 39290,
+        "endMs": 39570,
+        "confidence": 0.99902344
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_1",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_1",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0039",
+    "text": "called Talking Head",
+    "startMs": 39570,
+    "endMs": 40890,
+    "words": [
+      {
+        "text": "called",
+        "startMs": 39570,
+        "endMs": 39930,
+        "confidence": 0.9980469
+      },
+      {
+        "text": "Talking",
+        "startMs": 40090,
+        "endMs": 40610,
+        "confidence": 0.99658203
+      },
+      {
+        "text": "Head",
+        "startMs": 40610,
+        "endMs": 40890,
+        "confidence": 0.7050781
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "name-callout",
+      "nameSpans": [
+        {
+          "startWord": 1,
+          "endWord": 2,
+          "text": "talking head"
+        }
+      ],
+      "isVariation": true,
+      "suppressDefault": true
+    },
+    "suppressDefault": true
+  },
+  {
+    "id": "chunk-0040",
+    "text": "videos and it's",
+    "startMs": 40890,
+    "endMs": 42050,
+    "words": [
+      {
+        "text": "videos",
+        "startMs": 40890,
+        "endMs": 41530,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "and",
+        "startMs": 41530,
+        "endMs": 41809,
+        "confidence": 0.98535156
+      },
+      {
+        "text": "it's",
+        "startMs": 41809,
+        "endMs": 42050,
+        "confidence": 0.9916992
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0041",
+    "text": "one video that",
+    "startMs": 42050,
+    "endMs": 42730,
+    "words": [
+      {
+        "text": "one",
+        "startMs": 42050,
+        "endMs": 42250,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "video",
+        "startMs": 42250,
+        "endMs": 42490,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "that",
+        "startMs": 42490,
+        "endMs": 42730,
+        "confidence": 0.9970703
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0042",
+    "text": "as a thought",
+    "startMs": 42730,
+    "endMs": 43250,
+    "words": [
+      {
+        "text": "as",
+        "startMs": 42730,
+        "endMs": 42930,
+        "confidence": 0.95996094
+      },
+      {
+        "text": "a",
+        "startMs": 42930,
+        "endMs": 43050,
+        "confidence": 0.99609375
+      },
+      {
+        "text": "thought",
+        "startMs": 43050,
+        "endMs": 43250,
+        "confidence": 0.99121094
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0043",
+    "text": "leader, a coach",
+    "startMs": 43250,
+    "endMs": 44050,
+    "words": [
+      {
+        "text": "leader,",
+        "startMs": 43250,
+        "endMs": 43570,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "a",
+        "startMs": 43570,
+        "endMs": 43810,
+        "confidence": 0.98876953
+      },
+      {
+        "text": "coach",
+        "startMs": 43810,
+        "endMs": 44050,
+        "confidence": 0.9995117
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0044",
+    "text": "or a trainer",
+    "startMs": 44050,
+    "endMs": 44970,
+    "words": [
+      {
+        "text": "or",
+        "startMs": 44050,
+        "endMs": 44290,
+        "confidence": 0.9975586
+      },
+      {
+        "text": "a",
+        "startMs": 44290,
+        "endMs": 44450,
+        "confidence": 0.95703125
+      },
+      {
+        "text": "trainer",
+        "startMs": 44450,
+        "endMs": 44970,
+        "confidence": 0.98876953
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0045",
+    "text": "you have to",
+    "startMs": 45050,
+    "endMs": 45730,
+    "words": [
+      {
+        "text": "you",
+        "startMs": 45050,
+        "endMs": 45370,
+        "confidence": 0.99902344
+      },
+      {
+        "text": "have",
+        "startMs": 45370,
+        "endMs": 45570,
+        "confidence": 0.99853516
+      },
+      {
+        "text": "to",
+        "startMs": 45570,
+        "endMs": 45730,
+        "confidence": 0.99853516
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0046",
+    "text": "start leaning into",
+    "startMs": 45730,
+    "endMs": 46810,
+    "words": [
+      {
+        "text": "start",
+        "startMs": 45730,
+        "endMs": 45970,
+        "confidence": 0.9980469
+      },
+      {
+        "text": "leaning",
+        "startMs": 45970,
+        "endMs": 46490,
+        "confidence": 0.99869794
+      },
+      {
+        "text": "into",
+        "startMs": 46490,
+        "endMs": 46810,
+        "confidence": 0.9926758
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_1",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_1",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0047",
+    "text": "fully in this season",
+    "startMs": 47130,
+    "endMs": 49210,
+    "words": [
+      {
+        "text": "fully",
+        "startMs": 47130,
+        "endMs": 47770,
+        "confidence": 0.9987793
+      },
+      {
+        "text": "in",
+        "startMs": 48170,
+        "endMs": 48530,
+        "confidence": 0.9951172
+      },
+      {
+        "text": "this",
+        "startMs": 48530,
+        "endMs": 48850,
+        "confidence": 0.9375
+      },
+      {
+        "text": "season",
+        "startMs": 48850,
+        "endMs": 49210,
+        "confidence": 0.98339844
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0048",
+    "text": "so that the",
+    "startMs": 49770,
+    "endMs": 50650,
+    "words": [
+      {
+        "text": "so",
+        "startMs": 49770,
+        "endMs": 50050,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "that",
+        "startMs": 50050,
+        "endMs": 50330,
+        "confidence": 0.9980469
+      },
+      {
+        "text": "the",
+        "startMs": 50330,
+        "endMs": 50650,
+        "confidence": 0.9980469
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0049",
+    "text": "people who are",
+    "startMs": 50650,
+    "endMs": 51330,
+    "words": [
+      {
+        "text": "people",
+        "startMs": 50650,
+        "endMs": 50930,
+        "confidence": 0.9995117
+      },
+      {
+        "text": "who",
+        "startMs": 50930,
+        "endMs": 51170,
+        "confidence": 0.9970703
+      },
+      {
+        "text": "are",
+        "startMs": 51170,
+        "endMs": 51330,
+        "confidence": 0.9941406
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0050",
+    "text": "supposed to",
+    "startMs": 51330,
+    "endMs": 52010,
+    "words": [
+      {
+        "text": "supposed",
+        "startMs": 51330,
+        "endMs": 51730,
+        "confidence": 0.9958496
+      },
+      {
+        "text": "to",
+        "startMs": 51730,
+        "endMs": 52010,
+        "confidence": 0.9873047
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0051",
+    "text": "come to you",
+    "startMs": 52440,
+    "endMs": 53000,
+    "words": [
+      {
+        "text": "come",
+        "startMs": 52440,
+        "endMs": 52600,
+        "confidence": 1
+      },
+      {
+        "text": "to",
+        "startMs": 52600,
+        "endMs": 52800,
+        "confidence": 1
+      },
+      {
+        "text": "you",
+        "startMs": 52800,
+        "endMs": 53000,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0052",
+    "text": "because of your",
+    "startMs": 53000,
+    "endMs": 53600,
+    "words": [
+      {
+        "text": "because",
+        "startMs": 53000,
+        "endMs": 53240,
+        "confidence": 1
+      },
+      {
+        "text": "of",
+        "startMs": 53240,
+        "endMs": 53440,
+        "confidence": 1
+      },
+      {
+        "text": "your",
+        "startMs": 53440,
+        "endMs": 53600,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0053",
+    "text": "messaging",
+    "startMs": 53600,
+    "endMs": 54280,
+    "words": [
+      {
+        "text": "messaging",
+        "startMs": 53600,
+        "endMs": 54280,
+        "confidence": 0.91829425
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      0
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0054",
+    "text": "have you in",
+    "startMs": 54760,
+    "endMs": 55640,
+    "words": [
+      {
+        "text": "have",
+        "startMs": 54760,
+        "endMs": 55080,
+        "confidence": 1
+      },
+      {
+        "text": "you",
+        "startMs": 55080,
+        "endMs": 55360,
+        "confidence": 1
+      },
+      {
+        "text": "in",
+        "startMs": 55360,
+        "endMs": 55640,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0055",
+    "text": "their heads.",
+    "startMs": 55640,
+    "endMs": 56360,
+    "words": [
+      {
+        "text": "their",
+        "startMs": 55640,
+        "endMs": 55840,
+        "confidence": 1
+      },
+      {
+        "text": "heads.",
+        "startMs": 55840,
+        "endMs": 56360,
+        "confidence": 0.97753906
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0056",
+    "text": "All right?",
+    "startMs": 56360,
+    "endMs": 56760,
+    "words": [
+      {
+        "text": "All",
+        "startMs": 56360,
+        "endMs": 56520,
+        "confidence": 0.7294922
+      },
+      {
+        "text": "right?",
+        "startMs": 56520,
+        "endMs": 56760,
+        "confidence": 0.7548828
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset",
+    "motionKey": "svg_typography_v1:cinematic_text_preset",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "punch-emphasis",
+      "nameSpans": [],
+      "isVariation": true,
+      "suppressDefault": true
+    },
+    "suppressDefault": true
+  },
+  {
+    "id": "chunk-0057",
+    "text": "So get stuck",
+    "startMs": 57000,
+    "endMs": 57920,
+    "words": [
+      {
+        "text": "So",
+        "startMs": 57000,
+        "endMs": 57320,
+        "confidence": 1
+      },
+      {
+        "text": "get",
+        "startMs": 57320,
+        "endMs": 57560,
+        "confidence": 1
+      },
+      {
+        "text": "stuck",
+        "startMs": 57560,
+        "endMs": 57920,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1,
+      2
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0058",
+    "text": "in people's minds,",
+    "startMs": 57920,
+    "endMs": 59080,
+    "words": [
+      {
+        "text": "in",
+        "startMs": 57920,
+        "endMs": 58120,
+        "confidence": 1
+      },
+      {
+        "text": "people's",
+        "startMs": 58120,
+        "endMs": 58560,
+        "confidence": 1
+      },
+      {
+        "text": "minds,",
+        "startMs": 58560,
+        "endMs": 59080,
+        "confidence": 0.9904785
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_6",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_6",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0059",
+    "text": "in their",
+    "startMs": 59080,
+    "endMs": 59400,
+    "words": [
+      {
+        "text": "in",
+        "startMs": 59080,
+        "endMs": 59240,
+        "confidence": 1
+      },
+      {
+        "text": "their",
+        "startMs": 59240,
+        "endMs": 59400,
+        "confidence": 1
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_2",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_2",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      1
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  },
+  {
+    "id": "chunk-0060",
+    "text": "heads and their thoughts.",
+    "startMs": 59400,
+    "endMs": 60050,
+    "words": [
+      {
+        "text": "heads",
+        "startMs": 59400,
+        "endMs": 59720,
+        "confidence": 1
+      },
+      {
+        "text": "and",
+        "startMs": 59720,
+        "endMs": 59840,
+        "confidence": 0.77490234
+      },
+      {
+        "text": "their",
+        "startMs": 59840,
+        "endMs": 60000,
+        "confidence": 0.9760742
+      },
+      {
+        "text": "thoughts.",
+        "startMs": 60000,
+        "endMs": 60050,
+        "confidence": 0.64404297
+      }
+    ],
+    "styleKey": "svg_typography_v1:cinematic_text_preset_8",
+    "motionKey": "svg_typography_v1:cinematic_text_preset_8",
+    "layoutVariant": "inline",
+    "emphasisWordIndices": [
+      3
+    ],
+    "profileId": "svg_typography_v1",
+    "semantic": {
+      "intent": "default",
+      "nameSpans": [],
+      "isVariation": false,
+      "suppressDefault": false
+    },
+    "suppressDefault": false
+  }
+]

@@ -1,0 +1,602 @@
+{
+  "generatedAt": "2026-03-26T09:47:14.579Z",
+  "sourceVideoPath": "C:\\Users\\HomePC\\Downloads\\TALKIN  HEAD VIDEO S\\MALE Head Video Raw.mp4",
+  "presentationMode": "long-form",
+  "typography": {
+    "captionProfileId": "longform_svg_typography_v1",
+    "captionProfileDisplayName": "Long-form SVG Typography v1",
+    "captionBias": "bottom"
+  },
+  "requestedMotionTier": "premium",
+  "resolvedMotionTier": "premium",
+  "showcaseCatalog": {
+    "source": "cached",
+    "assetCount": 19,
+    "cachePath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\showcase-assets.remote.json"
+  },
+  "selectedMoments": [
+    {
+      "conceptLabel": "purchase",
+      "matchedText": "purchased",
+      "startMs": 2360,
+      "endMs": 2800,
+      "timecode": "0:02.36 - 0:02.80",
+      "placementHint": "center",
+      "matchedAssetId": "money-roll-purchase",
+      "matchedAssetLabel": "money",
+      "reasoning": "purchase intent from \"purchased\" | matched money"
+    },
+    {
+      "conceptLabel": "profit",
+      "matchedText": "profit.",
+      "startMs": 9960,
+      "endMs": 10520,
+      "timecode": "0:09.96 - 0:10.52",
+      "placementHint": "center",
+      "matchedAssetId": "money-bag-profit",
+      "matchedAssetLabel": "money",
+      "reasoning": "profit intent from \"profit.\" | matched money"
+    },
+    {
+      "conceptLabel": "decision",
+      "matchedText": "choice",
+      "startMs": 17880,
+      "endMs": 18160,
+      "timecode": "0:17.88 - 0:18.16",
+      "placementHint": "center",
+      "matchedAssetId": "thinking-choice",
+      "matchedAssetLabel": "thinking",
+      "reasoning": "decision intent from \"choice\" | matched thinking"
+    },
+    {
+      "conceptLabel": "home",
+      "matchedText": "house",
+      "startMs": 59870,
+      "endMs": 60070,
+      "timecode": "0:59.87 - 1:00.07",
+      "placementHint": "center",
+      "matchedAssetId": "home-luxury-driveway",
+      "matchedAssetLabel": "home",
+      "reasoning": "home intent from \"house\" | matched home"
+    }
+  ],
+  "flaggedMoments": [
+    {
+      "conceptLabel": "marketplace",
+      "matchedText": "ebay",
+      "startMs": 37150,
+      "endMs": 37510,
+      "timecode": "0:37.15 - 0:37.51",
+      "recommendedLabels": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront"
+      ],
+      "assetSearchTerms": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront",
+        "website",
+        "store",
+        "marketplace"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "marketplace",
+      "matchedText": "Amazon",
+      "startMs": 37630,
+      "endMs": 38030,
+      "timecode": "0:37.63 - 0:38.03",
+      "recommendedLabels": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront"
+      ],
+      "assetSearchTerms": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront",
+        "website",
+        "store",
+        "marketplace"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "purchase",
+      "matchedText": "purchase",
+      "startMs": 41950,
+      "endMs": 42270,
+      "timecode": "0:41.95 - 0:42.27",
+      "recommendedLabels": [
+        "money",
+        "bill",
+        "coin"
+      ],
+      "assetSearchTerms": [
+        "purchase",
+        "purchased",
+        "pay",
+        "payment",
+        "money",
+        "cash",
+        "currency",
+        "bill"
+      ],
+      "unresolvedReason": "The closest matching asset variant was already used earlier, so this cue needs a different image variant."
+    },
+    {
+      "conceptLabel": "marketplace",
+      "matchedText": "ebay",
+      "startMs": 42430,
+      "endMs": 42870,
+      "timecode": "0:42.43 - 0:42.87",
+      "recommendedLabels": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront"
+      ],
+      "assetSearchTerms": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront",
+        "website",
+        "store",
+        "marketplace"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "marketplace",
+      "matchedText": "Amazon",
+      "startMs": 43390,
+      "endMs": 43830,
+      "timecode": "0:43.39 - 0:43.83",
+      "recommendedLabels": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront"
+      ],
+      "assetSearchTerms": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront",
+        "website",
+        "store",
+        "marketplace"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "tracking",
+      "matchedText": "system to track",
+      "startMs": 56190,
+      "endMs": 56870,
+      "timecode": "0:56.19 - 0:56.87",
+      "recommendedLabels": [
+        "notepad",
+        "pen",
+        "checklist"
+      ],
+      "assetSearchTerms": [
+        "notepad",
+        "pen",
+        "checklist",
+        "track",
+        "budget",
+        "notes"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "marketplace",
+      "matchedText": "ebay",
+      "startMs": 57070,
+      "endMs": 57470,
+      "timecode": "0:57.07 - 0:57.47",
+      "recommendedLabels": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront"
+      ],
+      "assetSearchTerms": [
+        "ebay",
+        "amazon",
+        "shopify",
+        "storefront",
+        "website",
+        "store",
+        "marketplace"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "obstacle",
+      "matchedText": "obstacles",
+      "startMs": 33990,
+      "endMs": 34550,
+      "timecode": "0:33.99 - 0:34.55",
+      "recommendedLabels": [
+        "obstacle",
+        "barrier",
+        "hurdle"
+      ],
+      "assetSearchTerms": [
+        "obstacle",
+        "barrier",
+        "hurdle",
+        "wall",
+        "challenge"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "growth",
+      "matchedText": "growing",
+      "startMs": 25200,
+      "endMs": 25600,
+      "timecode": "0:25.20 - 0:25.60",
+      "recommendedLabels": [
+        "graph",
+        "chart",
+        "growth"
+      ],
+      "assetSearchTerms": [
+        "graph",
+        "chart",
+        "growth",
+        "upward",
+        "scale"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "growth",
+      "matchedText": "grow",
+      "startMs": 43070,
+      "endMs": 43230,
+      "timecode": "0:43.07 - 0:43.23",
+      "recommendedLabels": [
+        "graph",
+        "chart",
+        "growth"
+      ],
+      "assetSearchTerms": [
+        "graph",
+        "chart",
+        "growth",
+        "upward",
+        "scale"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "sunshine",
+      "matchedText": "sunshine",
+      "startMs": 26880,
+      "endMs": 27400,
+      "timecode": "0:26.88 - 0:27.40",
+      "recommendedLabels": [
+        "sun",
+        "sunshine"
+      ],
+      "assetSearchTerms": [
+        "sun",
+        "sunshine",
+        "bright"
+      ],
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    }
+  ],
+  "suppressedMoments": [
+    {
+      "conceptLabel": "purchase",
+      "matchedText": "resold",
+      "startMs": 6960,
+      "endMs": 7440,
+      "timecode": "0:06.96 - 0:07.44",
+      "unresolvedReason": "A similar semantic category was already used nearby, so this cue was held back."
+    },
+    {
+      "conceptLabel": "marketplace",
+      "matchedText": "Amazon",
+      "startMs": 7640,
+      "endMs": 8120,
+      "timecode": "0:07.64 - 0:08.12",
+      "unresolvedReason": "No suitable showcase asset is currently available for this semantic moment."
+    },
+    {
+      "conceptLabel": "calendar",
+      "matchedText": "12 months,",
+      "startMs": 1320,
+      "endMs": 2000,
+      "timecode": "0:01.32 - 0:02.00",
+      "unresolvedReason": "A nearby cue already occupies this moment, so the engine skipped this one for readability."
+    },
+    {
+      "conceptLabel": "home",
+      "matchedText": "home.",
+      "startMs": 12960,
+      "endMs": 13280,
+      "timecode": "0:12.96 - 0:13.28",
+      "unresolvedReason": "A nearby cue already occupies this moment, so the engine skipped this one for readability."
+    }
+  ],
+  "showcaseCues": [
+    {
+      "id": "showcase-money-roll-purchase-6",
+      "assetId": "money-roll-purchase",
+      "asset": {
+        "id": "money-roll-purchase",
+        "assetRole": "showcase",
+        "canonicalLabel": "money",
+        "showcasePlacementHint": "center",
+        "family": "foreground-element",
+        "tier": "premium",
+        "src": "showcase-assets/money-roll-purchase.png",
+        "alphaMode": "straight",
+        "placementZone": "foreground-cross",
+        "durationPolicy": "scene-span",
+        "themeTags": [
+          "neutral",
+          "cool",
+          "authority",
+          "heroic"
+        ],
+        "searchTerms": [
+          "money",
+          "purchase",
+          "purchased",
+          "pay",
+          "payment",
+          "cash",
+          "bill",
+          "currency",
+          "expense",
+          "money roll cutout purchase payment language",
+          "money roll",
+          "roll",
+          "roll cutout",
+          "cutout",
+          "cutout purchase",
+          "purchase payment",
+          "payment language",
+          "language"
+        ],
+        "safeArea": "full-frame",
+        "loopable": false,
+        "blendMode": "normal",
+        "opacity": 1,
+        "source": "local",
+        "sourceId": "money-roll-purchase",
+        "remoteUrl": "showcase-source/money-roll-purchase.png",
+        "score": 87
+      },
+      "canonicalLabel": "money",
+      "matchedText": "purchased",
+      "matchedWordIndex": 6,
+      "matchedStartMs": 2360,
+      "matchedEndMs": 2800,
+      "startMs": 2240,
+      "peakStartMs": 2360,
+      "peakEndMs": 2980,
+      "endMs": 3200,
+      "leadMs": 120,
+      "holdMs": 620,
+      "exitMs": 220,
+      "placement": "landscape-left",
+      "showLabelPlate": false,
+      "score": 246,
+      "matchKind": "exact",
+      "reason": "purchase intent from \"purchased\" | matched money"
+    },
+    {
+      "id": "showcase-money-bag-profit-27",
+      "assetId": "money-bag-profit",
+      "asset": {
+        "id": "money-bag-profit",
+        "assetRole": "showcase",
+        "canonicalLabel": "money",
+        "showcasePlacementHint": "center",
+        "family": "foreground-element",
+        "tier": "premium",
+        "src": "showcase-assets/money-bag-profit.png",
+        "alphaMode": "straight",
+        "placementZone": "foreground-cross",
+        "durationPolicy": "scene-span",
+        "themeTags": [
+          "neutral",
+          "cool",
+          "authority",
+          "heroic"
+        ],
+        "searchTerms": [
+          "money",
+          "profit",
+          "revenue",
+          "income",
+          "cash",
+          "currency",
+          "financial",
+          "success",
+          "money bag cutout profit cash language",
+          "money bag",
+          "bag",
+          "bag cutout",
+          "cutout",
+          "cutout profit",
+          "profit cash",
+          "cash language",
+          "language"
+        ],
+        "safeArea": "full-frame",
+        "loopable": false,
+        "blendMode": "normal",
+        "opacity": 1,
+        "source": "local",
+        "sourceId": "money-bag-profit",
+        "remoteUrl": "showcase-source/money-bag-profit.png",
+        "score": 13
+      },
+      "canonicalLabel": "money",
+      "matchedText": "profit.",
+      "matchedWordIndex": 27,
+      "matchedStartMs": 9960,
+      "matchedEndMs": 10520,
+      "startMs": 9840,
+      "peakStartMs": 9960,
+      "peakEndMs": 10700,
+      "endMs": 10920,
+      "leadMs": 120,
+      "holdMs": 740,
+      "exitMs": 220,
+      "placement": "landscape-left",
+      "showLabelPlate": false,
+      "score": 212,
+      "matchKind": "exact",
+      "reason": "profit intent from \"profit.\" | matched money"
+    },
+    {
+      "id": "showcase-thinking-choice-52",
+      "assetId": "thinking-choice",
+      "asset": {
+        "id": "thinking-choice",
+        "assetRole": "showcase",
+        "canonicalLabel": "thinking",
+        "showcasePlacementHint": "center",
+        "family": "foreground-element",
+        "tier": "premium",
+        "src": "showcase-assets/thinking-choice.png",
+        "alphaMode": "straight",
+        "placementZone": "foreground-cross",
+        "durationPolicy": "scene-span",
+        "themeTags": [
+          "neutral",
+          "cool",
+          "authority",
+          "calm"
+        ],
+        "searchTerms": [
+          "thinking",
+          "choice",
+          "choose",
+          "question",
+          "decision",
+          "idea",
+          "thinking emoji cutout decision language",
+          "thinking emoji",
+          "emoji",
+          "emoji cutout",
+          "cutout",
+          "cutout decision",
+          "decision language",
+          "language"
+        ],
+        "safeArea": "full-frame",
+        "loopable": false,
+        "blendMode": "normal",
+        "opacity": 1,
+        "source": "local",
+        "sourceId": "thinking-choice",
+        "remoteUrl": "showcase-source/thinking-choice-emoji.png",
+        "score": 77
+      },
+      "canonicalLabel": "thinking",
+      "matchedText": "choice",
+      "matchedWordIndex": 52,
+      "matchedStartMs": 17880,
+      "matchedEndMs": 18160,
+      "startMs": 17760,
+      "peakStartMs": 17880,
+      "peakEndMs": 18340,
+      "endMs": 18560,
+      "leadMs": 120,
+      "holdMs": 460,
+      "exitMs": 220,
+      "placement": "landscape-left",
+      "showLabelPlate": false,
+      "score": 192,
+      "matchKind": "exact",
+      "reason": "decision intent from \"choice\" | matched thinking"
+    },
+    {
+      "id": "showcase-home-luxury-driveway-179",
+      "assetId": "home-luxury-driveway",
+      "asset": {
+        "id": "home-luxury-driveway",
+        "assetRole": "showcase",
+        "canonicalLabel": "home",
+        "showcasePlacementHint": "center",
+        "family": "foreground-element",
+        "tier": "hero",
+        "src": "showcase-assets/home-luxury-driveway.png",
+        "alphaMode": "straight",
+        "placementZone": "foreground-cross",
+        "durationPolicy": "scene-span",
+        "themeTags": [
+          "neutral",
+          "authority",
+          "heroic"
+        ],
+        "searchTerms": [
+          "home",
+          "house",
+          "property",
+          "mansion",
+          "luxury house",
+          "luxury",
+          "home exterior",
+          "exterior",
+          "luxury house exterior cutout",
+          "house exterior",
+          "exterior cutout",
+          "cutout"
+        ],
+        "safeArea": "full-frame",
+        "loopable": false,
+        "blendMode": "normal",
+        "opacity": 1,
+        "source": "local",
+        "sourceId": "home-luxury-driveway",
+        "remoteUrl": "showcase-source/home-luxury-driveway.png",
+        "score": 27
+      },
+      "canonicalLabel": "home",
+      "matchedText": "house",
+      "matchedWordIndex": 179,
+      "matchedStartMs": 59870,
+      "matchedEndMs": 60070,
+      "startMs": 59750,
+      "peakStartMs": 59870,
+      "peakEndMs": 60250,
+      "endMs": 60470,
+      "leadMs": 120,
+      "holdMs": 400,
+      "exitMs": 220,
+      "placement": "landscape-left",
+      "showLabelPlate": false,
+      "score": 144,
+      "matchKind": "exact",
+      "reason": "home intent from \"house\" | matched home"
+    }
+  ],
+  "reasons": [
+    "tier=premium",
+    "catalog=19 showcase assets",
+    "selected=4/5 target",
+    "flagged=11",
+    "suppressed=4",
+    "min-gap=5600ms",
+    "ratio=0.12 target / 0.18 max"
+  ]
+}

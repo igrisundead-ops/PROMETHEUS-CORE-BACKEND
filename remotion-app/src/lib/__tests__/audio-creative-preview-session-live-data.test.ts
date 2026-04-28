@@ -1,0 +1,51 @@
+import {describe, expect, it} from "vitest";
+
+import {buildAudioCreativePreviewSession} from "../../web-preview/audio-creative-preview-session";
+
+describe("audio creative preview session from live data", () => {
+  it("builds a usable timeline from transcript words returned by the live edit session", async () => {
+    const session = await buildAudioCreativePreviewSession({
+      jobId: "live-audio-session-transcript",
+      captionProfileId: "longform_eve_typography_v1",
+      motionTier: "premium",
+      presentationMode: "long-form",
+      allowFallbackDemoData: false,
+      transcriptWords: [
+        {text: "Build", start_ms: 0, end_ms: 180},
+        {text: "systems", start_ms: 180, end_ms: 420},
+        {text: "that", start_ms: 420, end_ms: 560},
+        {text: "scale", start_ms: 560, end_ms: 860}
+      ]
+    });
+
+    expect(session.captionChunks.length).toBeGreaterThan(0);
+    expect(session.creativeTimeline.moments.length).toBeGreaterThan(0);
+    expect(session.creativeTimeline.tracks.length).toBeGreaterThan(0);
+    expect(session.motionModel.scenes.length).toBeGreaterThan(0);
+  }, 15000);
+
+  it("can still build an early motion timeline from preview cues before the full transcript lands", async () => {
+    const session = await buildAudioCreativePreviewSession({
+      jobId: "live-audio-session-preview-cues",
+      captionProfileId: "longform_eve_typography_v1",
+      motionTier: "premium",
+      presentationMode: "long-form",
+      allowFallbackDemoData: false,
+      previewLines: ["Build systems that scale"],
+      previewMotionSequence: [
+        {
+          cueId: "cue-1",
+          text: "Build systems that scale",
+          startMs: 0,
+          durationMs: 900,
+          lineIndex: 0
+        }
+      ]
+    });
+
+    expect(session.captionChunks.length).toBeGreaterThan(0);
+    expect(session.creativeTimeline.moments.length).toBeGreaterThan(0);
+    expect(session.creativeTimeline.tracks.length).toBeGreaterThan(0);
+    expect(session.motionModel.showcasePlan.cues.length + session.motionModel.scenes.flatMap((scene) => scene.assets).length).toBeGreaterThan(0);
+  }, 15000);
+});

@@ -1,0 +1,734 @@
+{
+  "batch": "promethues-with-bg",
+  "inputDir": "C:\\Users\\HomePC\\Downloads\\Promethues With bg",
+  "stagedSourceDir": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\showcase-source\\imports\\promethues-with-bg",
+  "outputDir": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\showcase-assets\\imports\\promethues-with-bg",
+  "createdAt": "2026-03-27T04:26:23.097Z",
+  "dryRun": false,
+  "totalFiles": 58,
+  "supportedFiles": 55,
+  "skippedFiles": 3,
+  "processedFiles": 49,
+  "cachedFiles": 0,
+  "failedFiles": 2,
+  "items": [
+    {
+      "originalName": "Doing The Impossible The 25 Laws for Doing The Impossible (Patrick Bet-David) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "status": "skipped",
+      "reason": "Unsupported extension: .pdf",
+      "assetId": "doing-impossible-25-laws-patrick-bet-david-library-sk-1lib-lib",
+      "searchTerms": [
+        "doing",
+        "impossible",
+        "25",
+        "laws",
+        "patrick",
+        "bet",
+        "david",
+        "library",
+        "sk",
+        "1lib",
+        "lib"
+      ],
+      "suggestedCanonicalLabel": "25"
+    },
+    {
+      "originalName": "instagram.mp4",
+      "status": "skipped",
+      "reason": "Unsupported extension: .mp4",
+      "assetId": "instagram",
+      "searchTerms": [
+        "instagram"
+      ],
+      "suggestedCanonicalLabel": "instagram"
+    },
+    {
+      "originalName": "notification,  alarm.gif",
+      "status": "skipped",
+      "reason": "Unsupported extension: .gif",
+      "assetId": "notification-alarm",
+      "searchTerms": [
+        "notification",
+        "alarm"
+      ],
+      "suggestedCanonicalLabel": "notification"
+    },
+    {
+      "originalName": "airplane, flight, fly.jpg",
+      "status": "processed",
+      "assetId": "airplane-flight-fly",
+      "searchTerms": [
+        "airplane",
+        "flight",
+        "fly"
+      ],
+      "suggestedCanonicalLabel": "airplane",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/airplane-flight-fly.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/airplane-flight-fly.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "arrogance, ego, narcissism.jpg",
+      "status": "processed",
+      "assetId": "arrogance-ego-narcissism",
+      "searchTerms": [
+        "arrogance",
+        "ego",
+        "narcissism"
+      ],
+      "suggestedCanonicalLabel": "ego",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/arrogance-ego-narcissism.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/arrogance-ego-narcissism.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "authority, power.jpg",
+      "status": "processed",
+      "assetId": "authority-power",
+      "searchTerms": [
+        "authority",
+        "power"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/authority-power.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/authority-power.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "best,    star.jpg",
+      "status": "processed",
+      "assetId": "best-star",
+      "searchTerms": [
+        "best",
+        "star"
+      ],
+      "suggestedCanonicalLabel": "best",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/best-star.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/best-star.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "best,  star.jpg",
+      "status": "processed",
+      "assetId": "best-star-02",
+      "searchTerms": [
+        "best",
+        "star"
+      ],
+      "suggestedCanonicalLabel": "best",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/best-star-02.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/best-star-02.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "best, star.jpg",
+      "status": "processed",
+      "assetId": "best-star-03",
+      "searchTerms": [
+        "best",
+        "star"
+      ],
+      "suggestedCanonicalLabel": "best",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/best-star-03.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/best-star-03.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "book , read, reading.jpg",
+      "status": "processed",
+      "assetId": "book-read-reading",
+      "searchTerms": [
+        "book",
+        "read",
+        "reading"
+      ],
+      "suggestedCanonicalLabel": "book",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/book-read-reading.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/book-read-reading.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "book, read.jpg",
+      "status": "processed",
+      "assetId": "book-read",
+      "searchTerms": [
+        "book",
+        "read"
+      ],
+      "suggestedCanonicalLabel": "book",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/book-read.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/book-read.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "burn, fire,.jpg",
+      "status": "processed",
+      "assetId": "burn-fire",
+      "searchTerms": [
+        "burn",
+        "fire"
+      ],
+      "suggestedCanonicalLabel": "burn",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/burn-fire.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/burn-fire.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "calender, schedule.jpg",
+      "status": "processed",
+      "assetId": "calender-schedule",
+      "searchTerms": [
+        "calender",
+        "schedule"
+      ],
+      "suggestedCanonicalLabel": "calender",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/calender-schedule.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/calender-schedule.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "calender.jpg",
+      "status": "processed",
+      "assetId": "calender",
+      "searchTerms": [
+        "calender"
+      ],
+      "suggestedCanonicalLabel": "calender",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/calender.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/calender.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "coffee.jpg",
+      "status": "processed",
+      "assetId": "coffee",
+      "searchTerms": [
+        "coffee"
+      ],
+      "suggestedCanonicalLabel": "coffee",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/coffee.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/coffee.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "content, gift.jpg",
+      "status": "processed",
+      "assetId": "content-gift",
+      "searchTerms": [
+        "content",
+        "gift"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/content-gift.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/content-gift.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "discount,.jpg",
+      "status": "processed",
+      "assetId": "discount",
+      "searchTerms": [
+        "discount"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/discount.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/discount.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "dumbell, work out, excersise.jpg",
+      "status": "processed",
+      "assetId": "dumbell-work-out-excersise",
+      "searchTerms": [
+        "dumbell",
+        "work",
+        "out",
+        "excersise"
+      ],
+      "suggestedCanonicalLabel": "dumbell",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/dumbell-work-out-excersise.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/dumbell-work-out-excersise.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "energy.jpg",
+      "status": "processed",
+      "assetId": "energy",
+      "searchTerms": [
+        "energy"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/energy.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/energy.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "escape.jpg",
+      "status": "processed",
+      "assetId": "escape",
+      "searchTerms": [
+        "escape"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/escape.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/escape.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "file, manual, blueprint.jpg",
+      "status": "processed",
+      "assetId": "file-manual-blueprint",
+      "searchTerms": [
+        "file",
+        "manual",
+        "blueprint"
+      ],
+      "suggestedCanonicalLabel": "file",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/file-manual-blueprint.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/file-manual-blueprint.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "file, manual.jpg",
+      "status": "processed",
+      "assetId": "file-manual",
+      "searchTerms": [
+        "file",
+        "manual"
+      ],
+      "suggestedCanonicalLabel": "file",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/file-manual.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/file-manual.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "file, safe.jpg",
+      "status": "processed",
+      "assetId": "file-safe",
+      "searchTerms": [
+        "file",
+        "safe"
+      ],
+      "suggestedCanonicalLabel": "file",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/file-safe.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/file-safe.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "game.jpg",
+      "status": "processed",
+      "assetId": "game",
+      "searchTerms": [
+        "game"
+      ],
+      "suggestedCanonicalLabel": "game",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/game.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/game.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "growth, improvement.jpg",
+      "status": "processed",
+      "assetId": "growth-improvement",
+      "searchTerms": [
+        "growth",
+        "improvement"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/growth-improvement.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/growth-improvement.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "help,.jpg",
+      "status": "processed",
+      "assetId": "help",
+      "searchTerms": [
+        "help"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/help.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/help.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "house, home.jpg",
+      "status": "processed",
+      "assetId": "house-home",
+      "searchTerms": [
+        "house",
+        "home"
+      ],
+      "suggestedCanonicalLabel": "house",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/house-home.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/house-home.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "hurry, time , important.jpg",
+      "status": "processed",
+      "assetId": "hurry-time-important",
+      "searchTerms": [
+        "hurry",
+        "time",
+        "important"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/hurry-time-important.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/hurry-time-important.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "improve, increase.jpg",
+      "status": "processed",
+      "assetId": "improve-increase",
+      "searchTerms": [
+        "improve",
+        "increase"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/improve-increase.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/improve-increase.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "money, assets.jpg",
+      "status": "processed",
+      "assetId": "money-assets",
+      "searchTerms": [
+        "money",
+        "assets"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/money-assets.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/money-assets.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "money, paycheck.jpg",
+      "status": "processed",
+      "assetId": "money-paycheck",
+      "searchTerms": [
+        "money",
+        "paycheck"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/money-paycheck.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/money-paycheck.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "money, resources, assets.jpg",
+      "status": "processed",
+      "assetId": "money-resources-assets",
+      "searchTerms": [
+        "money",
+        "resources",
+        "assets"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/money-resources-assets.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/money-resources-assets.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "money.jpg",
+      "status": "failed",
+      "assetId": "money",
+      "searchTerms": [
+        "money"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/money.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/money.png",
+      "apiKeySlotsTried": [
+        1
+      ],
+      "errorStatus": 400,
+      "error": "{\"errors\":[{\"title\":\"Could not identify foreground in image. For details and recommendations see https://www.remove.bg/supported-images.\",\"code\":\"unknown_foreground\"}]}"
+    },
+    {
+      "originalName": "notification, alarm.jpg",
+      "status": "processed",
+      "assetId": "notification-alarm-02",
+      "searchTerms": [
+        "notification",
+        "alarm"
+      ],
+      "suggestedCanonicalLabel": "notification",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/notification-alarm-02.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/notification-alarm-02.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "payment, success, money (hand).jpg",
+      "status": "processed",
+      "assetId": "payment-success-money-hand",
+      "searchTerms": [
+        "payment",
+        "success",
+        "money",
+        "hand"
+      ],
+      "suggestedCanonicalLabel": "money",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/payment-success-money-hand.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/payment-success-money-hand.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "plan, code.jpg",
+      "status": "processed",
+      "assetId": "plan-code",
+      "searchTerms": [
+        "plan",
+        "code"
+      ],
+      "suggestedCanonicalLabel": "plan",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/plan-code.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/plan-code.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "plan, strategy.jpg",
+      "status": "processed",
+      "assetId": "plan-strategy",
+      "searchTerms": [
+        "plan",
+        "strategy"
+      ],
+      "suggestedCanonicalLabel": "plan",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/plan-strategy.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/plan-strategy.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "price, gift.jpg",
+      "status": "processed",
+      "assetId": "price-gift",
+      "searchTerms": [
+        "price",
+        "gift"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/price-gift.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/price-gift.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "safe, secure.jpg",
+      "status": "processed",
+      "assetId": "safe-secure",
+      "searchTerms": [
+        "safe",
+        "secure"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/safe-secure.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/safe-secure.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "secure finance.jpg",
+      "status": "processed",
+      "assetId": "secure-finance",
+      "searchTerms": [
+        "secure",
+        "finance"
+      ],
+      "suggestedCanonicalLabel": "finance",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/secure-finance.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/secure-finance.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "security, safe.jpg",
+      "status": "processed",
+      "assetId": "security-safe",
+      "searchTerms": [
+        "security",
+        "safe"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/security-safe.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/security-safe.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "sell, cards.jpg",
+      "status": "processed",
+      "assetId": "sell-cards",
+      "searchTerms": [
+        "sell",
+        "cards"
+      ],
+      "suggestedCanonicalLabel": "cards",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/sell-cards.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/sell-cards.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "sell, improve, growth.jpg",
+      "status": "processed",
+      "assetId": "sell-improve-growth",
+      "searchTerms": [
+        "sell",
+        "improve",
+        "growth"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/sell-improve-growth.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/sell-improve-growth.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "sell, vetrified.jpg",
+      "status": "processed",
+      "assetId": "sell-vetrified",
+      "searchTerms": [
+        "sell",
+        "vetrified"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/sell-vetrified.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/sell-vetrified.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "sell.jpg",
+      "status": "processed",
+      "assetId": "sell",
+      "searchTerms": [
+        "sell"
+      ],
+      "suggestedCanonicalLabel": null,
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/sell.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/sell.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "send, messagea.jpg",
+      "status": "processed",
+      "assetId": "send-messagea",
+      "searchTerms": [
+        "send",
+        "messagea"
+      ],
+      "suggestedCanonicalLabel": "messagea",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/send-messagea.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/send-messagea.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "speed, rocket..fast.jpg",
+      "status": "processed",
+      "assetId": "speed-rocket-fast",
+      "searchTerms": [
+        "speed",
+        "rocket",
+        "fast"
+      ],
+      "suggestedCanonicalLabel": "speed",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/speed-rocket-fast.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/speed-rocket-fast.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "strategy, plan,.jpg",
+      "status": "processed",
+      "assetId": "strategy-plan",
+      "searchTerms": [
+        "strategy",
+        "plan"
+      ],
+      "suggestedCanonicalLabel": "plan",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/strategy-plan.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/strategy-plan.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "strategy, plan.jpg",
+      "status": "processed",
+      "assetId": "strategy-plan-02",
+      "searchTerms": [
+        "strategy",
+        "plan"
+      ],
+      "suggestedCanonicalLabel": "plan",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/strategy-plan-02.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/strategy-plan-02.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "strong, powerful.jpg",
+      "status": "processed",
+      "assetId": "strong-powerful",
+      "searchTerms": [
+        "strong",
+        "powerful"
+      ],
+      "suggestedCanonicalLabel": "powerful",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/strong-powerful.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/strong-powerful.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "telephone,   call, outreach.jpg",
+      "status": "processed",
+      "assetId": "telephone-call-outreach",
+      "searchTerms": [
+        "telephone",
+        "call",
+        "outreach"
+      ],
+      "suggestedCanonicalLabel": "telephone",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/telephone-call-outreach.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/telephone-call-outreach.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "telephone, call,.jpg",
+      "status": "processed",
+      "assetId": "telephone-call",
+      "searchTerms": [
+        "telephone",
+        "call"
+      ],
+      "suggestedCanonicalLabel": "telephone",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/telephone-call.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/telephone-call.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "time, clock, hourglass.jpg",
+      "status": "processed",
+      "assetId": "time-clock-hourglass",
+      "searchTerms": [
+        "time",
+        "clock",
+        "hourglass"
+      ],
+      "suggestedCanonicalLabel": "clock",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/time-clock-hourglass.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/time-clock-hourglass.png",
+      "apiKeySlot": 1
+    },
+    {
+      "originalName": "time, hourglass,.jpg",
+      "status": "failed",
+      "assetId": "time-hourglass",
+      "searchTerms": [
+        "time",
+        "hourglass"
+      ],
+      "suggestedCanonicalLabel": "hourglass",
+      "stagedSourcePath": "public/showcase-source/imports/promethues-with-bg/time-hourglass.jpg",
+      "outputPath": "public/showcase-assets/imports/promethues-with-bg/time-hourglass.png",
+      "apiKeySlotsTried": [
+        1
+      ],
+      "errorStatus": 429,
+      "error": "{\"errors\":[{\"title\":\"Rate limit exceeded\",\"code\":\"rate_limit_exceeded\"}]}"
+    }
+  ],
+  "completedAt": "2026-03-27T04:27:22.639Z"
+}

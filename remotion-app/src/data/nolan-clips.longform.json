@@ -1,0 +1,1525 @@
+{
+  "engineId": "nolan-clip-cutting-engine",
+  "version": "1.0.0",
+  "generatedAt": "2026-04-17T11:20:56.569Z",
+  "sourceVideoPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\.cache\\local-preview-uploads\\1776424837161-Dan-Martell--Scared-of-Achieving-SHORT-VER.mp4",
+  "sourceVideoHash": "6323a195cef1f3bf1aabb33a6368a5f49a80f4dc8d167f33d88eb17737a53bc8",
+  "durationSeconds": 69.34,
+  "chunkCount": 47,
+  "sourceCaptionPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\captions.longform.json",
+  "settings": {
+    "minClipSeconds": 10,
+    "maxClipSeconds": 25,
+    "targetClipSeconds": 17,
+    "maxCandidates": 30,
+    "pageSize": 10,
+    "duplicateOverlapRatio": 0.82,
+    "duplicateStartSeparationMs": 3500
+  },
+  "referenceScript": {
+    "provided": true,
+    "sourcePath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\src\\data\\nolan.reference-script.txt",
+    "sectionCount": 5,
+    "sections": [
+      {
+        "id": "reference-1",
+        "label": "Hook",
+        "text": "Open with a concrete payoff, result, or surprising lesson in the first breath."
+      },
+      {
+        "id": "reference-2",
+        "label": "Retention",
+        "text": "Highlight where editing, structure, or pacing changed audience retention."
+      },
+      {
+        "id": "reference-3",
+        "label": "Transformation",
+        "text": "Show a before-and-after shift in skill, business, confidence, or results."
+      },
+      {
+        "id": "reference-4",
+        "label": "Specificity",
+        "text": "Favor numbers, timelines, percentages, or concrete details over generic claims."
+      },
+      {
+        "id": "reference-5",
+        "label": "Payoff",
+        "text": "End right after the key lesson lands so the clip feels complete and leaves curiosity."
+      }
+    ]
+  },
+  "summary": {
+    "candidateCount": 10,
+    "pageCount": 1,
+    "recommendedClipIds": [
+      "nolan-0053320-0069000",
+      "nolan-0041100-0060200",
+      "nolan-0047940-0064520"
+    ],
+    "averageScore": 41.16,
+    "strongestTags": [
+      "time",
+      "direct-address",
+      "specificity",
+      "transformation",
+      "steps"
+    ]
+  },
+  "pages": [
+    {
+      "page": 1,
+      "pageSize": 10,
+      "itemCount": 10,
+      "items": [
+        {
+          "id": "nolan-0053320-0069000",
+          "title": "2 minute rule gets me to default / That action is less",
+          "slug": "2-minute-rule-gets-me-to-default-that-action-is-less",
+          "startMs": 53320,
+          "endMs": 69000,
+          "durationMs": 15680,
+          "startTimecode": "0:53.32",
+          "endTimecode": "1:09.00",
+          "openingHook": "2 minute rule gets me to default to action,",
+          "closingBeat": "That action is less painful than anticipation.",
+          "transcript": "2 minute rule gets me to default to action, not slow down, not overthink it. Move it forward. And then for me, it's the whole reframe. That action is less painful than anticipation.",
+          "chunkIds": [
+            "chunk-0040",
+            "chunk-0041",
+            "chunk-0042",
+            "chunk-0043",
+            "chunk-0044",
+            "chunk-0045",
+            "chunk-0046",
+            "chunk-0047"
+          ],
+          "chunkCount": 8,
+          "score": 45.19,
+          "grade": "explore",
+          "tags": [
+            "specificity",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 34.8,
+            "viralitySignals": 24,
+            "coherence": 26.58,
+            "boundaryClarity": 100,
+            "endingStrength": 80,
+            "referenceAlignment": 13,
+            "emotionalIntensity": 1.39,
+            "durationFit": 83.5,
+            "contentDensity": 61.67,
+            "fillerPenalty": 0
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.13
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-2",
+              "label": "Retention",
+              "similarity": 0.12
+            }
+          ],
+          "rank": 1,
+          "page": 1,
+          "pageIndex": 1,
+          "recommended": true
+        },
+        {
+          "id": "nolan-0041100-0060200",
+          "title": "I say yes? I just want to / not slow down, not",
+          "slug": "i-say-yes-i-just-want-to-not-slow-down-not",
+          "startMs": 41100,
+          "endMs": 60200,
+          "durationMs": 19100,
+          "startTimecode": "0:41.10",
+          "endTimecode": "1:00.20",
+          "openingHook": "I say yes? I just want to use",
+          "closingBeat": "not slow down, not overthink it. Move it forward.",
+          "transcript": "I say yes? I just want to use a two minute rule to move it forward. What's the smallest possible action I could do to move it forward? Okay, sometimes I call it the mins. Most important next step, that 2 minute rule gets me to default to action, not slow down, not overthink it. Move it forward.",
+          "chunkIds": [
+            "chunk-0030",
+            "chunk-0031",
+            "chunk-0032",
+            "chunk-0033",
+            "chunk-0034",
+            "chunk-0035",
+            "chunk-0036",
+            "chunk-0037",
+            "chunk-0038",
+            "chunk-0039",
+            "chunk-0040",
+            "chunk-0041",
+            "chunk-0042",
+            "chunk-0043"
+          ],
+          "chunkCount": 14,
+          "score": 43.63,
+          "grade": "explore",
+          "tags": [
+            "time",
+            "steps",
+            "specificity"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 16,
+            "viralitySignals": 32,
+            "coherence": 33.21,
+            "boundaryClarity": 90.72,
+            "endingStrength": 70.5,
+            "referenceAlignment": 12,
+            "emotionalIntensity": 41.95,
+            "durationFit": 73.75,
+            "contentDensity": 58.57,
+            "fillerPenalty": 0
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-4",
+              "label": "Specificity",
+              "similarity": 0.12
+            }
+          ],
+          "rank": 2,
+          "page": 1,
+          "pageIndex": 2,
+          "recommended": true
+        },
+        {
+          "id": "nolan-0047940-0064520",
+          "title": "to move it forward? Okay, sometimes I / And then for me,",
+          "slug": "to-move-it-forward-okay-sometimes-i-and-then-for-me",
+          "startMs": 47940,
+          "endMs": 64520,
+          "durationMs": 16580,
+          "startTimecode": "0:47.94",
+          "endTimecode": "1:04.52",
+          "openingHook": "to move it forward? Okay, sometimes I call",
+          "closingBeat": "And then for me, it's the whole reframe.",
+          "transcript": "to move it forward? Okay, sometimes I call it the mins. Most important next step, that 2 minute rule gets me to default to action, not slow down, not overthink it. Move it forward. And then for me, it's the whole reframe.",
+          "chunkIds": [
+            "chunk-0036",
+            "chunk-0037",
+            "chunk-0038",
+            "chunk-0039",
+            "chunk-0040",
+            "chunk-0041",
+            "chunk-0042",
+            "chunk-0043",
+            "chunk-0044",
+            "chunk-0045"
+          ],
+          "chunkCount": 10,
+          "score": 42.68,
+          "grade": "explore",
+          "tags": [
+            "steps",
+            "specificity",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 12,
+            "viralitySignals": 32,
+            "coherence": 26.14,
+            "boundaryClarity": 96.98,
+            "endingStrength": 73.72,
+            "referenceAlignment": 12,
+            "emotionalIntensity": 19.67,
+            "durationFit": 94.75,
+            "contentDensity": 58.17,
+            "fillerPenalty": 0
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-4",
+              "label": "Specificity",
+              "similarity": 0.12
+            }
+          ],
+          "rank": 3,
+          "page": 1,
+          "pageIndex": 3,
+          "recommended": true
+        },
+        {
+          "id": "nolan-0024880-0041780",
+          "title": "Again, most people think, well, no, I'll / anxiety around, like, should",
+          "slug": "again-most-people-think-well-no-i-ll-anxiety-around-like-should",
+          "startMs": 24880,
+          "endMs": 41780,
+          "durationMs": 16900,
+          "startTimecode": "0:24.88",
+          "endTimecode": "0:41.78",
+          "openingHook": "Again, most people think, well, no, I'll get to it.",
+          "closingBeat": "anxiety around, like, should I say yes?",
+          "transcript": "Again, most people think, well, no, I'll get to it. I'm just, you know, I'm trying to get it better. No, no. There's something about it that scares you. Use this thing called The Two minute rule. My philosophy is that if I get an email, a text message, something that gives me anxiety around, like, should I say yes?",
+          "chunkIds": [
+            "chunk-0016",
+            "chunk-0017",
+            "chunk-0018",
+            "chunk-0019",
+            "chunk-0020",
+            "chunk-0021",
+            "chunk-0022",
+            "chunk-0023",
+            "chunk-0024",
+            "chunk-0025",
+            "chunk-0026",
+            "chunk-0027",
+            "chunk-0028",
+            "chunk-0029",
+            "chunk-0030"
+          ],
+          "chunkCount": 15,
+          "score": 42.63,
+          "grade": "explore",
+          "tags": [
+            "direct-address",
+            "transformation",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 8,
+            "viralitySignals": 34,
+            "coherence": 28.15,
+            "boundaryClarity": 100,
+            "endingStrength": 74.18,
+            "referenceAlignment": 12,
+            "emotionalIntensity": 28,
+            "durationFit": 98.75,
+            "contentDensity": 55.97,
+            "fillerPenalty": 1.08
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.11
+            },
+            {
+              "sectionId": "reference-2",
+              "label": "Retention",
+              "similarity": 0.11
+            }
+          ],
+          "rank": 4,
+          "page": 1,
+          "pageIndex": 4,
+          "recommended": false
+        },
+        {
+          "id": "nolan-0017200-0033380",
+          "title": "whatever scares you about it, I need / Use this thing called",
+          "slug": "whatever-scares-you-about-it-i-need-use-this-thing-called",
+          "startMs": 17200,
+          "endMs": 33380,
+          "durationMs": 16180,
+          "startTimecode": "0:17.20",
+          "endTimecode": "0:33.38",
+          "openingHook": "whatever scares you about it, I need you to give",
+          "closingBeat": "Use this thing called The Two minute rule.",
+          "transcript": "whatever scares you about it, I need you to give it a name, give it a label, be clear about it. Again, most people think, well, no, I'll get to it. I'm just, you know, I'm trying to get it better. No, no. There's something about it that scares you. Use this thing called The Two minute rule.",
+          "chunkIds": [
+            "chunk-0011",
+            "chunk-0012",
+            "chunk-0013",
+            "chunk-0014",
+            "chunk-0015",
+            "chunk-0016",
+            "chunk-0017",
+            "chunk-0018",
+            "chunk-0019",
+            "chunk-0020",
+            "chunk-0021",
+            "chunk-0022",
+            "chunk-0023",
+            "chunk-0024"
+          ],
+          "chunkCount": 14,
+          "score": 42.62,
+          "grade": "explore",
+          "tags": [
+            "direct-address",
+            "transformation",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 13.6,
+            "viralitySignals": 34,
+            "coherence": 29.14,
+            "boundaryClarity": 95.52,
+            "endingStrength": 76.58,
+            "referenceAlignment": 12,
+            "emotionalIntensity": 12.7,
+            "durationFit": 89.75,
+            "contentDensity": 50.32,
+            "fillerPenalty": 0.51
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-4",
+              "label": "Specificity",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.11
+            }
+          ],
+          "rank": 5,
+          "page": 1,
+          "pageIndex": 5,
+          "recommended": false
+        },
+        {
+          "id": "nolan-0028620-0048820",
+          "title": "I'm trying to get it better. No, / action I could do",
+          "slug": "i-m-trying-to-get-it-better-no-action-i-could-do",
+          "startMs": 28620,
+          "endMs": 48820,
+          "durationMs": 20200,
+          "startTimecode": "0:28.62",
+          "endTimecode": "0:48.82",
+          "openingHook": "I'm trying to get it better. No, no.",
+          "closingBeat": "action I could do to move it forward?",
+          "transcript": "I'm trying to get it better. No, no. There's something about it that scares you. Use this thing called The Two minute rule. My philosophy is that if I get an email, a text message, something that gives me anxiety around, like, should I say yes? I just want to use a two minute rule to move it forward. What's the smallest possible action I could do to move it forward?",
+          "chunkIds": [
+            "chunk-0019",
+            "chunk-0020",
+            "chunk-0021",
+            "chunk-0022",
+            "chunk-0023",
+            "chunk-0024",
+            "chunk-0025",
+            "chunk-0026",
+            "chunk-0027",
+            "chunk-0028",
+            "chunk-0029",
+            "chunk-0030",
+            "chunk-0031",
+            "chunk-0032",
+            "chunk-0033",
+            "chunk-0034",
+            "chunk-0035",
+            "chunk-0036"
+          ],
+          "chunkCount": 18,
+          "score": 42.42,
+          "grade": "explore",
+          "tags": [
+            "transformation",
+            "direct-address",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 20.6,
+            "viralitySignals": 34,
+            "coherence": 33.07,
+            "boundaryClarity": 77.24,
+            "endingStrength": 72.26,
+            "referenceAlignment": 12,
+            "emotionalIntensity": 47.11,
+            "durationFit": 60,
+            "contentDensity": 54.14,
+            "fillerPenalty": 0.5
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-2",
+              "label": "Retention",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.11
+            }
+          ],
+          "rank": 6,
+          "page": 1,
+          "pageIndex": 6,
+          "recommended": false
+        },
+        {
+          "id": "nolan-0011680-0029820",
+          "title": "fear behind it today. Whatever that decision / I'm trying to get",
+          "slug": "fear-behind-it-today-whatever-that-decision-i-m-trying-to-get",
+          "startMs": 11680,
+          "endMs": 29820,
+          "durationMs": 18140,
+          "startTimecode": "0:11.68",
+          "endTimecode": "0:29.82",
+          "openingHook": "fear behind it today. Whatever that decision you're",
+          "closingBeat": "I'm trying to get it better. No, no.",
+          "transcript": "fear behind it today. Whatever that decision you're looking to make, whatever scares you about it, I need you to give it a name, give it a label, be clear about it. Again, most people think, well, no, I'll get to it. I'm just, you know, I'm trying to get it better. No, no.",
+          "chunkIds": [
+            "chunk-0008",
+            "chunk-0009",
+            "chunk-0010",
+            "chunk-0011",
+            "chunk-0012",
+            "chunk-0013",
+            "chunk-0014",
+            "chunk-0015",
+            "chunk-0016",
+            "chunk-0017",
+            "chunk-0018",
+            "chunk-0019",
+            "chunk-0020"
+          ],
+          "chunkCount": 13,
+          "score": 40.26,
+          "grade": "explore",
+          "tags": [
+            "time",
+            "direct-address",
+            "transformation"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 13.6,
+            "viralitySignals": 34,
+            "coherence": 29.87,
+            "boundaryClarity": 72.92,
+            "endingStrength": 80,
+            "referenceAlignment": 13,
+            "emotionalIntensity": 9.4,
+            "durationFit": 85.75,
+            "contentDensity": 54.07,
+            "fillerPenalty": 0.55
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-4",
+              "label": "Specificity",
+              "similarity": 0.13
+            },
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-2",
+              "label": "Retention",
+              "similarity": 0.12
+            }
+          ],
+          "rank": 7,
+          "page": 1,
+          "pageIndex": 7,
+          "recommended": false
+        },
+        {
+          "id": "nolan-0006720-0024320",
+          "title": "Think about it. I want you to / it a label, be",
+          "slug": "think-about-it-i-want-you-to-it-a-label-be",
+          "startMs": 6720,
+          "endMs": 24320,
+          "durationMs": 17600,
+          "startTimecode": "0:06.72",
+          "endTimecode": "0:24.32",
+          "openingHook": "Think about it. I want you to do",
+          "closingBeat": "it a label, be clear about it.",
+          "transcript": "Think about it. I want you to do a few things. Number one, I want you to identify the real fear behind it today. Whatever that decision you're looking to make, whatever scares you about it, I need you to give it a name, give it a label, be clear about it.",
+          "chunkIds": [
+            "chunk-0003",
+            "chunk-0004",
+            "chunk-0005",
+            "chunk-0006",
+            "chunk-0007",
+            "chunk-0008",
+            "chunk-0009",
+            "chunk-0010",
+            "chunk-0011",
+            "chunk-0012",
+            "chunk-0013",
+            "chunk-0014",
+            "chunk-0015"
+          ],
+          "chunkCount": 13,
+          "score": 39.16,
+          "grade": "explore",
+          "tags": [
+            "direct-address",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 14.8,
+            "viralitySignals": 16,
+            "coherence": 26.45,
+            "boundaryClarity": 100,
+            "endingStrength": 67.6,
+            "referenceAlignment": 15,
+            "emotionalIntensity": 11.11,
+            "durationFit": 92.5,
+            "contentDensity": 47.69,
+            "fillerPenalty": 0
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-4",
+              "label": "Specificity",
+              "similarity": 0.15
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            }
+          ],
+          "rank": 8,
+          "page": 1,
+          "pageIndex": 8,
+          "recommended": false
+        },
+        {
+          "id": "nolan-0000320-0013680",
+          "title": "Because you're actually scared of achieving, not / to identify the real",
+          "slug": "because-you-re-actually-scared-of-achieving-not-to-identify-the-real",
+          "startMs": 320,
+          "endMs": 13680,
+          "durationMs": 13360,
+          "startTimecode": "0:00.32",
+          "endTimecode": "0:13.68",
+          "openingHook": "Because you're actually scared of achieving, not failing.",
+          "closingBeat": "to identify the real fear behind it today.",
+          "transcript": "Because you're actually scared of achieving, not failing. Think about it. I want you to do a few things. Number one, I want you to identify the real fear behind it today.",
+          "chunkIds": [
+            "chunk-0001",
+            "chunk-0002",
+            "chunk-0003",
+            "chunk-0004",
+            "chunk-0005",
+            "chunk-0006",
+            "chunk-0007",
+            "chunk-0008"
+          ],
+          "chunkCount": 8,
+          "score": 37.39,
+          "grade": "explore",
+          "tags": [
+            "direct-address",
+            "time"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction.",
+            "Ends on a payoff beat instead of trailing away."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 13.6,
+            "viralitySignals": 16,
+            "coherence": 23.17,
+            "boundaryClarity": 100,
+            "endingStrength": 76.33,
+            "referenceAlignment": 16,
+            "emotionalIntensity": 15.28,
+            "durationFit": 54.5,
+            "contentDensity": 55,
+            "fillerPenalty": 0.9
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-4",
+              "label": "Specificity",
+              "similarity": 0.16
+            },
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.13
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.12
+            }
+          ],
+          "rank": 9,
+          "page": 1,
+          "pageIndex": 9,
+          "recommended": false
+        },
+        {
+          "id": "nolan-0036660-0055040",
+          "title": "a text message, something that gives me",
+          "slug": "a-text-message-something-that-gives-me",
+          "startMs": 36660,
+          "endMs": 55040,
+          "durationMs": 18380,
+          "startTimecode": "0:36.66",
+          "endTimecode": "0:55.04",
+          "openingHook": "a text message, something that gives me",
+          "closingBeat": "Most important next step, that 2 minute rule gets me",
+          "transcript": "a text message, something that gives me anxiety around, like, should I say yes? I just want to use a two minute rule to move it forward. What's the smallest possible action I could do to move it forward? Okay, sometimes I call it the mins. Most important next step, that 2 minute rule gets me",
+          "chunkIds": [
+            "chunk-0027",
+            "chunk-0028",
+            "chunk-0029",
+            "chunk-0030",
+            "chunk-0031",
+            "chunk-0032",
+            "chunk-0033",
+            "chunk-0034",
+            "chunk-0035",
+            "chunk-0036",
+            "chunk-0037",
+            "chunk-0038",
+            "chunk-0039",
+            "chunk-0040"
+          ],
+          "chunkCount": 14,
+          "score": 35.59,
+          "grade": "explore",
+          "tags": [
+            "time",
+            "steps",
+            "specificity"
+          ],
+          "reasoning": [
+            "Has clean cut boundaries on both sides for extraction."
+          ],
+          "scoreBreakdown": {
+            "hookStrength": 4,
+            "viralitySignals": 32,
+            "coherence": 27.78,
+            "boundaryClarity": 73.29,
+            "endingStrength": 50.44,
+            "referenceAlignment": 12,
+            "emotionalIntensity": 43.54,
+            "durationFit": 82.75,
+            "contentDensity": 57.98,
+            "fillerPenalty": 0.64
+          },
+          "referenceMatches": [
+            {
+              "sectionId": "reference-5",
+              "label": "Payoff",
+              "similarity": 0.12
+            },
+            {
+              "sectionId": "reference-1",
+              "label": "Hook",
+              "similarity": 0.11
+            },
+            {
+              "sectionId": "reference-2",
+              "label": "Retention",
+              "similarity": 0.11
+            }
+          ],
+          "rank": 10,
+          "page": 1,
+          "pageIndex": 10,
+          "recommended": false
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "id": "nolan-0053320-0069000",
+      "title": "2 minute rule gets me to default / That action is less",
+      "slug": "2-minute-rule-gets-me-to-default-that-action-is-less",
+      "startMs": 53320,
+      "endMs": 69000,
+      "durationMs": 15680,
+      "startTimecode": "0:53.32",
+      "endTimecode": "1:09.00",
+      "openingHook": "2 minute rule gets me to default to action,",
+      "closingBeat": "That action is less painful than anticipation.",
+      "transcript": "2 minute rule gets me to default to action, not slow down, not overthink it. Move it forward. And then for me, it's the whole reframe. That action is less painful than anticipation.",
+      "chunkIds": [
+        "chunk-0040",
+        "chunk-0041",
+        "chunk-0042",
+        "chunk-0043",
+        "chunk-0044",
+        "chunk-0045",
+        "chunk-0046",
+        "chunk-0047"
+      ],
+      "chunkCount": 8,
+      "score": 45.19,
+      "grade": "explore",
+      "tags": [
+        "specificity",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 34.8,
+        "viralitySignals": 24,
+        "coherence": 26.58,
+        "boundaryClarity": 100,
+        "endingStrength": 80,
+        "referenceAlignment": 13,
+        "emotionalIntensity": 1.39,
+        "durationFit": 83.5,
+        "contentDensity": 61.67,
+        "fillerPenalty": 0
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.13
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-2",
+          "label": "Retention",
+          "similarity": 0.12
+        }
+      ],
+      "rank": 1,
+      "page": 1,
+      "pageIndex": 1,
+      "recommended": true
+    },
+    {
+      "id": "nolan-0041100-0060200",
+      "title": "I say yes? I just want to / not slow down, not",
+      "slug": "i-say-yes-i-just-want-to-not-slow-down-not",
+      "startMs": 41100,
+      "endMs": 60200,
+      "durationMs": 19100,
+      "startTimecode": "0:41.10",
+      "endTimecode": "1:00.20",
+      "openingHook": "I say yes? I just want to use",
+      "closingBeat": "not slow down, not overthink it. Move it forward.",
+      "transcript": "I say yes? I just want to use a two minute rule to move it forward. What's the smallest possible action I could do to move it forward? Okay, sometimes I call it the mins. Most important next step, that 2 minute rule gets me to default to action, not slow down, not overthink it. Move it forward.",
+      "chunkIds": [
+        "chunk-0030",
+        "chunk-0031",
+        "chunk-0032",
+        "chunk-0033",
+        "chunk-0034",
+        "chunk-0035",
+        "chunk-0036",
+        "chunk-0037",
+        "chunk-0038",
+        "chunk-0039",
+        "chunk-0040",
+        "chunk-0041",
+        "chunk-0042",
+        "chunk-0043"
+      ],
+      "chunkCount": 14,
+      "score": 43.63,
+      "grade": "explore",
+      "tags": [
+        "time",
+        "steps",
+        "specificity"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 16,
+        "viralitySignals": 32,
+        "coherence": 33.21,
+        "boundaryClarity": 90.72,
+        "endingStrength": 70.5,
+        "referenceAlignment": 12,
+        "emotionalIntensity": 41.95,
+        "durationFit": 73.75,
+        "contentDensity": 58.57,
+        "fillerPenalty": 0
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-4",
+          "label": "Specificity",
+          "similarity": 0.12
+        }
+      ],
+      "rank": 2,
+      "page": 1,
+      "pageIndex": 2,
+      "recommended": true
+    },
+    {
+      "id": "nolan-0047940-0064520",
+      "title": "to move it forward? Okay, sometimes I / And then for me,",
+      "slug": "to-move-it-forward-okay-sometimes-i-and-then-for-me",
+      "startMs": 47940,
+      "endMs": 64520,
+      "durationMs": 16580,
+      "startTimecode": "0:47.94",
+      "endTimecode": "1:04.52",
+      "openingHook": "to move it forward? Okay, sometimes I call",
+      "closingBeat": "And then for me, it's the whole reframe.",
+      "transcript": "to move it forward? Okay, sometimes I call it the mins. Most important next step, that 2 minute rule gets me to default to action, not slow down, not overthink it. Move it forward. And then for me, it's the whole reframe.",
+      "chunkIds": [
+        "chunk-0036",
+        "chunk-0037",
+        "chunk-0038",
+        "chunk-0039",
+        "chunk-0040",
+        "chunk-0041",
+        "chunk-0042",
+        "chunk-0043",
+        "chunk-0044",
+        "chunk-0045"
+      ],
+      "chunkCount": 10,
+      "score": 42.68,
+      "grade": "explore",
+      "tags": [
+        "steps",
+        "specificity",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 12,
+        "viralitySignals": 32,
+        "coherence": 26.14,
+        "boundaryClarity": 96.98,
+        "endingStrength": 73.72,
+        "referenceAlignment": 12,
+        "emotionalIntensity": 19.67,
+        "durationFit": 94.75,
+        "contentDensity": 58.17,
+        "fillerPenalty": 0
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-4",
+          "label": "Specificity",
+          "similarity": 0.12
+        }
+      ],
+      "rank": 3,
+      "page": 1,
+      "pageIndex": 3,
+      "recommended": true
+    },
+    {
+      "id": "nolan-0024880-0041780",
+      "title": "Again, most people think, well, no, I'll / anxiety around, like, should",
+      "slug": "again-most-people-think-well-no-i-ll-anxiety-around-like-should",
+      "startMs": 24880,
+      "endMs": 41780,
+      "durationMs": 16900,
+      "startTimecode": "0:24.88",
+      "endTimecode": "0:41.78",
+      "openingHook": "Again, most people think, well, no, I'll get to it.",
+      "closingBeat": "anxiety around, like, should I say yes?",
+      "transcript": "Again, most people think, well, no, I'll get to it. I'm just, you know, I'm trying to get it better. No, no. There's something about it that scares you. Use this thing called The Two minute rule. My philosophy is that if I get an email, a text message, something that gives me anxiety around, like, should I say yes?",
+      "chunkIds": [
+        "chunk-0016",
+        "chunk-0017",
+        "chunk-0018",
+        "chunk-0019",
+        "chunk-0020",
+        "chunk-0021",
+        "chunk-0022",
+        "chunk-0023",
+        "chunk-0024",
+        "chunk-0025",
+        "chunk-0026",
+        "chunk-0027",
+        "chunk-0028",
+        "chunk-0029",
+        "chunk-0030"
+      ],
+      "chunkCount": 15,
+      "score": 42.63,
+      "grade": "explore",
+      "tags": [
+        "direct-address",
+        "transformation",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 8,
+        "viralitySignals": 34,
+        "coherence": 28.15,
+        "boundaryClarity": 100,
+        "endingStrength": 74.18,
+        "referenceAlignment": 12,
+        "emotionalIntensity": 28,
+        "durationFit": 98.75,
+        "contentDensity": 55.97,
+        "fillerPenalty": 1.08
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.11
+        },
+        {
+          "sectionId": "reference-2",
+          "label": "Retention",
+          "similarity": 0.11
+        }
+      ],
+      "rank": 4,
+      "page": 1,
+      "pageIndex": 4,
+      "recommended": false
+    },
+    {
+      "id": "nolan-0017200-0033380",
+      "title": "whatever scares you about it, I need / Use this thing called",
+      "slug": "whatever-scares-you-about-it-i-need-use-this-thing-called",
+      "startMs": 17200,
+      "endMs": 33380,
+      "durationMs": 16180,
+      "startTimecode": "0:17.20",
+      "endTimecode": "0:33.38",
+      "openingHook": "whatever scares you about it, I need you to give",
+      "closingBeat": "Use this thing called The Two minute rule.",
+      "transcript": "whatever scares you about it, I need you to give it a name, give it a label, be clear about it. Again, most people think, well, no, I'll get to it. I'm just, you know, I'm trying to get it better. No, no. There's something about it that scares you. Use this thing called The Two minute rule.",
+      "chunkIds": [
+        "chunk-0011",
+        "chunk-0012",
+        "chunk-0013",
+        "chunk-0014",
+        "chunk-0015",
+        "chunk-0016",
+        "chunk-0017",
+        "chunk-0018",
+        "chunk-0019",
+        "chunk-0020",
+        "chunk-0021",
+        "chunk-0022",
+        "chunk-0023",
+        "chunk-0024"
+      ],
+      "chunkCount": 14,
+      "score": 42.62,
+      "grade": "explore",
+      "tags": [
+        "direct-address",
+        "transformation",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 13.6,
+        "viralitySignals": 34,
+        "coherence": 29.14,
+        "boundaryClarity": 95.52,
+        "endingStrength": 76.58,
+        "referenceAlignment": 12,
+        "emotionalIntensity": 12.7,
+        "durationFit": 89.75,
+        "contentDensity": 50.32,
+        "fillerPenalty": 0.51
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-4",
+          "label": "Specificity",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.11
+        }
+      ],
+      "rank": 5,
+      "page": 1,
+      "pageIndex": 5,
+      "recommended": false
+    },
+    {
+      "id": "nolan-0028620-0048820",
+      "title": "I'm trying to get it better. No, / action I could do",
+      "slug": "i-m-trying-to-get-it-better-no-action-i-could-do",
+      "startMs": 28620,
+      "endMs": 48820,
+      "durationMs": 20200,
+      "startTimecode": "0:28.62",
+      "endTimecode": "0:48.82",
+      "openingHook": "I'm trying to get it better. No, no.",
+      "closingBeat": "action I could do to move it forward?",
+      "transcript": "I'm trying to get it better. No, no. There's something about it that scares you. Use this thing called The Two minute rule. My philosophy is that if I get an email, a text message, something that gives me anxiety around, like, should I say yes? I just want to use a two minute rule to move it forward. What's the smallest possible action I could do to move it forward?",
+      "chunkIds": [
+        "chunk-0019",
+        "chunk-0020",
+        "chunk-0021",
+        "chunk-0022",
+        "chunk-0023",
+        "chunk-0024",
+        "chunk-0025",
+        "chunk-0026",
+        "chunk-0027",
+        "chunk-0028",
+        "chunk-0029",
+        "chunk-0030",
+        "chunk-0031",
+        "chunk-0032",
+        "chunk-0033",
+        "chunk-0034",
+        "chunk-0035",
+        "chunk-0036"
+      ],
+      "chunkCount": 18,
+      "score": 42.42,
+      "grade": "explore",
+      "tags": [
+        "transformation",
+        "direct-address",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 20.6,
+        "viralitySignals": 34,
+        "coherence": 33.07,
+        "boundaryClarity": 77.24,
+        "endingStrength": 72.26,
+        "referenceAlignment": 12,
+        "emotionalIntensity": 47.11,
+        "durationFit": 60,
+        "contentDensity": 54.14,
+        "fillerPenalty": 0.5
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-2",
+          "label": "Retention",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.11
+        }
+      ],
+      "rank": 6,
+      "page": 1,
+      "pageIndex": 6,
+      "recommended": false
+    },
+    {
+      "id": "nolan-0011680-0029820",
+      "title": "fear behind it today. Whatever that decision / I'm trying to get",
+      "slug": "fear-behind-it-today-whatever-that-decision-i-m-trying-to-get",
+      "startMs": 11680,
+      "endMs": 29820,
+      "durationMs": 18140,
+      "startTimecode": "0:11.68",
+      "endTimecode": "0:29.82",
+      "openingHook": "fear behind it today. Whatever that decision you're",
+      "closingBeat": "I'm trying to get it better. No, no.",
+      "transcript": "fear behind it today. Whatever that decision you're looking to make, whatever scares you about it, I need you to give it a name, give it a label, be clear about it. Again, most people think, well, no, I'll get to it. I'm just, you know, I'm trying to get it better. No, no.",
+      "chunkIds": [
+        "chunk-0008",
+        "chunk-0009",
+        "chunk-0010",
+        "chunk-0011",
+        "chunk-0012",
+        "chunk-0013",
+        "chunk-0014",
+        "chunk-0015",
+        "chunk-0016",
+        "chunk-0017",
+        "chunk-0018",
+        "chunk-0019",
+        "chunk-0020"
+      ],
+      "chunkCount": 13,
+      "score": 40.26,
+      "grade": "explore",
+      "tags": [
+        "time",
+        "direct-address",
+        "transformation"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 13.6,
+        "viralitySignals": 34,
+        "coherence": 29.87,
+        "boundaryClarity": 72.92,
+        "endingStrength": 80,
+        "referenceAlignment": 13,
+        "emotionalIntensity": 9.4,
+        "durationFit": 85.75,
+        "contentDensity": 54.07,
+        "fillerPenalty": 0.55
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-4",
+          "label": "Specificity",
+          "similarity": 0.13
+        },
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-2",
+          "label": "Retention",
+          "similarity": 0.12
+        }
+      ],
+      "rank": 7,
+      "page": 1,
+      "pageIndex": 7,
+      "recommended": false
+    },
+    {
+      "id": "nolan-0006720-0024320",
+      "title": "Think about it. I want you to / it a label, be",
+      "slug": "think-about-it-i-want-you-to-it-a-label-be",
+      "startMs": 6720,
+      "endMs": 24320,
+      "durationMs": 17600,
+      "startTimecode": "0:06.72",
+      "endTimecode": "0:24.32",
+      "openingHook": "Think about it. I want you to do",
+      "closingBeat": "it a label, be clear about it.",
+      "transcript": "Think about it. I want you to do a few things. Number one, I want you to identify the real fear behind it today. Whatever that decision you're looking to make, whatever scares you about it, I need you to give it a name, give it a label, be clear about it.",
+      "chunkIds": [
+        "chunk-0003",
+        "chunk-0004",
+        "chunk-0005",
+        "chunk-0006",
+        "chunk-0007",
+        "chunk-0008",
+        "chunk-0009",
+        "chunk-0010",
+        "chunk-0011",
+        "chunk-0012",
+        "chunk-0013",
+        "chunk-0014",
+        "chunk-0015"
+      ],
+      "chunkCount": 13,
+      "score": 39.16,
+      "grade": "explore",
+      "tags": [
+        "direct-address",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 14.8,
+        "viralitySignals": 16,
+        "coherence": 26.45,
+        "boundaryClarity": 100,
+        "endingStrength": 67.6,
+        "referenceAlignment": 15,
+        "emotionalIntensity": 11.11,
+        "durationFit": 92.5,
+        "contentDensity": 47.69,
+        "fillerPenalty": 0
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-4",
+          "label": "Specificity",
+          "similarity": 0.15
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        }
+      ],
+      "rank": 8,
+      "page": 1,
+      "pageIndex": 8,
+      "recommended": false
+    },
+    {
+      "id": "nolan-0000320-0013680",
+      "title": "Because you're actually scared of achieving, not / to identify the real",
+      "slug": "because-you-re-actually-scared-of-achieving-not-to-identify-the-real",
+      "startMs": 320,
+      "endMs": 13680,
+      "durationMs": 13360,
+      "startTimecode": "0:00.32",
+      "endTimecode": "0:13.68",
+      "openingHook": "Because you're actually scared of achieving, not failing.",
+      "closingBeat": "to identify the real fear behind it today.",
+      "transcript": "Because you're actually scared of achieving, not failing. Think about it. I want you to do a few things. Number one, I want you to identify the real fear behind it today.",
+      "chunkIds": [
+        "chunk-0001",
+        "chunk-0002",
+        "chunk-0003",
+        "chunk-0004",
+        "chunk-0005",
+        "chunk-0006",
+        "chunk-0007",
+        "chunk-0008"
+      ],
+      "chunkCount": 8,
+      "score": 37.39,
+      "grade": "explore",
+      "tags": [
+        "direct-address",
+        "time"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction.",
+        "Ends on a payoff beat instead of trailing away."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 13.6,
+        "viralitySignals": 16,
+        "coherence": 23.17,
+        "boundaryClarity": 100,
+        "endingStrength": 76.33,
+        "referenceAlignment": 16,
+        "emotionalIntensity": 15.28,
+        "durationFit": 54.5,
+        "contentDensity": 55,
+        "fillerPenalty": 0.9
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-4",
+          "label": "Specificity",
+          "similarity": 0.16
+        },
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.13
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.12
+        }
+      ],
+      "rank": 9,
+      "page": 1,
+      "pageIndex": 9,
+      "recommended": false
+    },
+    {
+      "id": "nolan-0036660-0055040",
+      "title": "a text message, something that gives me",
+      "slug": "a-text-message-something-that-gives-me",
+      "startMs": 36660,
+      "endMs": 55040,
+      "durationMs": 18380,
+      "startTimecode": "0:36.66",
+      "endTimecode": "0:55.04",
+      "openingHook": "a text message, something that gives me",
+      "closingBeat": "Most important next step, that 2 minute rule gets me",
+      "transcript": "a text message, something that gives me anxiety around, like, should I say yes? I just want to use a two minute rule to move it forward. What's the smallest possible action I could do to move it forward? Okay, sometimes I call it the mins. Most important next step, that 2 minute rule gets me",
+      "chunkIds": [
+        "chunk-0027",
+        "chunk-0028",
+        "chunk-0029",
+        "chunk-0030",
+        "chunk-0031",
+        "chunk-0032",
+        "chunk-0033",
+        "chunk-0034",
+        "chunk-0035",
+        "chunk-0036",
+        "chunk-0037",
+        "chunk-0038",
+        "chunk-0039",
+        "chunk-0040"
+      ],
+      "chunkCount": 14,
+      "score": 35.59,
+      "grade": "explore",
+      "tags": [
+        "time",
+        "steps",
+        "specificity"
+      ],
+      "reasoning": [
+        "Has clean cut boundaries on both sides for extraction."
+      ],
+      "scoreBreakdown": {
+        "hookStrength": 4,
+        "viralitySignals": 32,
+        "coherence": 27.78,
+        "boundaryClarity": 73.29,
+        "endingStrength": 50.44,
+        "referenceAlignment": 12,
+        "emotionalIntensity": 43.54,
+        "durationFit": 82.75,
+        "contentDensity": 57.98,
+        "fillerPenalty": 0.64
+      },
+      "referenceMatches": [
+        {
+          "sectionId": "reference-5",
+          "label": "Payoff",
+          "similarity": 0.12
+        },
+        {
+          "sectionId": "reference-1",
+          "label": "Hook",
+          "similarity": 0.11
+        },
+        {
+          "sectionId": "reference-2",
+          "label": "Retention",
+          "similarity": 0.11
+        }
+      ],
+      "rank": 10,
+      "page": 1,
+      "pageIndex": 10,
+      "recommended": false
+    }
+  ]
+}

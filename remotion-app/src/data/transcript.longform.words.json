@@ -1,0 +1,1142 @@
+[
+  {
+    "text": "Because",
+    "startMs": 320,
+    "endMs": 480,
+    "confidence": 0.9980469
+  },
+  {
+    "text": "you're",
+    "startMs": 480,
+    "endMs": 880,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "actually",
+    "startMs": 880,
+    "endMs": 1200,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "scared",
+    "startMs": 1440,
+    "endMs": 1960,
+    "confidence": 1
+  },
+  {
+    "text": "of",
+    "startMs": 1960,
+    "endMs": 2240,
+    "confidence": 1
+  },
+  {
+    "text": "achieving,",
+    "startMs": 2240,
+    "endMs": 2880,
+    "confidence": 0.9842122
+  },
+  {
+    "text": "not",
+    "startMs": 4160,
+    "endMs": 4560,
+    "confidence": 1
+  },
+  {
+    "text": "failing.",
+    "startMs": 4560,
+    "endMs": 5200,
+    "confidence": 0.9987793
+  },
+  {
+    "text": "Think",
+    "startMs": 6720,
+    "endMs": 7000,
+    "confidence": 0.99853516
+  },
+  {
+    "text": "about",
+    "startMs": 7000,
+    "endMs": 7200,
+    "confidence": 1
+  },
+  {
+    "text": "it.",
+    "startMs": 7200,
+    "endMs": 7400,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "I",
+    "startMs": 7400,
+    "endMs": 7560,
+    "confidence": 1
+  },
+  {
+    "text": "want",
+    "startMs": 7560,
+    "endMs": 7720,
+    "confidence": 1
+  },
+  {
+    "text": "you",
+    "startMs": 7720,
+    "endMs": 7840,
+    "confidence": 1
+  },
+  {
+    "text": "to",
+    "startMs": 7840,
+    "endMs": 8000,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "do",
+    "startMs": 8000,
+    "endMs": 8160,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "a",
+    "startMs": 8160,
+    "endMs": 8240,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "few",
+    "startMs": 8240,
+    "endMs": 8400,
+    "confidence": 1
+  },
+  {
+    "text": "things.",
+    "startMs": 8400,
+    "endMs": 8680,
+    "confidence": 0.99609375
+  },
+  {
+    "text": "Number",
+    "startMs": 8680,
+    "endMs": 9000,
+    "confidence": 0.98291016
+  },
+  {
+    "text": "one,",
+    "startMs": 9000,
+    "endMs": 9360,
+    "confidence": 0.99658203
+  },
+  {
+    "text": "I",
+    "startMs": 9600,
+    "endMs": 9880,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "want",
+    "startMs": 9880,
+    "endMs": 10040,
+    "confidence": 1
+  },
+  {
+    "text": "you",
+    "startMs": 10040,
+    "endMs": 10200,
+    "confidence": 1
+  },
+  {
+    "text": "to",
+    "startMs": 10200,
+    "endMs": 10400,
+    "confidence": 1
+  },
+  {
+    "text": "identify",
+    "startMs": 10400,
+    "endMs": 10920,
+    "confidence": 0.99975586
+  },
+  {
+    "text": "the",
+    "startMs": 10920,
+    "endMs": 11240,
+    "confidence": 1
+  },
+  {
+    "text": "real",
+    "startMs": 11240,
+    "endMs": 11600,
+    "confidence": 1
+  },
+  {
+    "text": "fear",
+    "startMs": 11680,
+    "endMs": 12240,
+    "confidence": 1
+  },
+  {
+    "text": "behind",
+    "startMs": 12240,
+    "endMs": 12640,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 12720,
+    "endMs": 13120,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "today.",
+    "startMs": 13280,
+    "endMs": 13680,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "Whatever",
+    "startMs": 14160,
+    "endMs": 14640,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "that",
+    "startMs": 14640,
+    "endMs": 14880,
+    "confidence": 0.99853516
+  },
+  {
+    "text": "decision",
+    "startMs": 14880,
+    "endMs": 15200,
+    "confidence": 1
+  },
+  {
+    "text": "you're",
+    "startMs": 15280,
+    "endMs": 15600,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "looking",
+    "startMs": 15600,
+    "endMs": 15760,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "to",
+    "startMs": 15760,
+    "endMs": 16040,
+    "confidence": 1
+  },
+  {
+    "text": "make,",
+    "startMs": 16040,
+    "endMs": 16399,
+    "confidence": 0.99853516
+  },
+  {
+    "text": "whatever",
+    "startMs": 17200,
+    "endMs": 17720,
+    "confidence": 0.99975586
+  },
+  {
+    "text": "scares",
+    "startMs": 17720,
+    "endMs": 18360,
+    "confidence": 0.98811847
+  },
+  {
+    "text": "you",
+    "startMs": 18360,
+    "endMs": 18520,
+    "confidence": 1
+  },
+  {
+    "text": "about",
+    "startMs": 18520,
+    "endMs": 18760,
+    "confidence": 0.79833984
+  },
+  {
+    "text": "it,",
+    "startMs": 18760,
+    "endMs": 19120,
+    "confidence": 0.9980469
+  },
+  {
+    "text": "I",
+    "startMs": 19520,
+    "endMs": 19800,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "need",
+    "startMs": 19800,
+    "endMs": 20000,
+    "confidence": 1
+  },
+  {
+    "text": "you",
+    "startMs": 20000,
+    "endMs": 20200,
+    "confidence": 1
+  },
+  {
+    "text": "to",
+    "startMs": 20200,
+    "endMs": 20360,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "give",
+    "startMs": 20360,
+    "endMs": 20520,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 20520,
+    "endMs": 20680,
+    "confidence": 1
+  },
+  {
+    "text": "a",
+    "startMs": 20680,
+    "endMs": 20880,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "name,",
+    "startMs": 20880,
+    "endMs": 21200,
+    "confidence": 1
+  },
+  {
+    "text": "give",
+    "startMs": 21360,
+    "endMs": 21640,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 21640,
+    "endMs": 21800,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "a",
+    "startMs": 21800,
+    "endMs": 22000,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "label,",
+    "startMs": 22000,
+    "endMs": 22560,
+    "confidence": 0.9980469
+  },
+  {
+    "text": "be",
+    "startMs": 22880,
+    "endMs": 23240,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "clear",
+    "startMs": 23240,
+    "endMs": 23520,
+    "confidence": 1
+  },
+  {
+    "text": "about",
+    "startMs": 23520,
+    "endMs": 23840,
+    "confidence": 0.8173828
+  },
+  {
+    "text": "it.",
+    "startMs": 23920,
+    "endMs": 24320,
+    "confidence": 0.99853516
+  },
+  {
+    "text": "Again,",
+    "startMs": 24880,
+    "endMs": 25280,
+    "confidence": 0.9946289
+  },
+  {
+    "text": "most",
+    "startMs": 25860,
+    "endMs": 26060,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "people",
+    "startMs": 26060,
+    "endMs": 26420,
+    "confidence": 1
+  },
+  {
+    "text": "think,",
+    "startMs": 26420,
+    "endMs": 26820,
+    "confidence": 0.99609375
+  },
+  {
+    "text": "well,",
+    "startMs": 26900,
+    "endMs": 27180,
+    "confidence": 0.99609375
+  },
+  {
+    "text": "no,",
+    "startMs": 27180,
+    "endMs": 27380,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "I'll",
+    "startMs": 27380,
+    "endMs": 27620,
+    "confidence": 0.9998372
+  },
+  {
+    "text": "get",
+    "startMs": 27620,
+    "endMs": 27740,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "to",
+    "startMs": 27740,
+    "endMs": 27900,
+    "confidence": 0.99853516
+  },
+  {
+    "text": "it.",
+    "startMs": 27900,
+    "endMs": 28060,
+    "confidence": 0.9267578
+  },
+  {
+    "text": "I'm",
+    "startMs": 28060,
+    "endMs": 28260,
+    "confidence": 0.98876953
+  },
+  {
+    "text": "just,",
+    "startMs": 28260,
+    "endMs": 28380,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "you",
+    "startMs": 28380,
+    "endMs": 28500,
+    "confidence": 0.91308594
+  },
+  {
+    "text": "know,",
+    "startMs": 28500,
+    "endMs": 28620,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "I'm",
+    "startMs": 28620,
+    "endMs": 28820,
+    "confidence": 0.9946289
+  },
+  {
+    "text": "trying",
+    "startMs": 28820,
+    "endMs": 28940,
+    "confidence": 0.9970703
+  },
+  {
+    "text": "to",
+    "startMs": 28940,
+    "endMs": 29060,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "get",
+    "startMs": 29060,
+    "endMs": 29140,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 29140,
+    "endMs": 29260,
+    "confidence": 0.98291016
+  },
+  {
+    "text": "better.",
+    "startMs": 29260,
+    "endMs": 29460,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "No,",
+    "startMs": 29460,
+    "endMs": 29660,
+    "confidence": 0.99121094
+  },
+  {
+    "text": "no.",
+    "startMs": 29660,
+    "endMs": 29820,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "There's",
+    "startMs": 29820,
+    "endMs": 30060,
+    "confidence": 0.9983724
+  },
+  {
+    "text": "something",
+    "startMs": 30060,
+    "endMs": 30260,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "about",
+    "startMs": 30260,
+    "endMs": 30460,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "it",
+    "startMs": 30460,
+    "endMs": 30620,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "that",
+    "startMs": 30620,
+    "endMs": 30780,
+    "confidence": 0.9941406
+  },
+  {
+    "text": "scares",
+    "startMs": 30780,
+    "endMs": 31180,
+    "confidence": 0.8925781
+  },
+  {
+    "text": "you.",
+    "startMs": 31180,
+    "endMs": 31460,
+    "confidence": 0.9951172
+  },
+  {
+    "text": "Use",
+    "startMs": 31620,
+    "endMs": 31940,
+    "confidence": 0.9926758
+  },
+  {
+    "text": "this",
+    "startMs": 31940,
+    "endMs": 32140,
+    "confidence": 1
+  },
+  {
+    "text": "thing",
+    "startMs": 32140,
+    "endMs": 32340,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "called",
+    "startMs": 32340,
+    "endMs": 32540,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "the",
+    "startMs": 32540,
+    "endMs": 32660,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "two",
+    "startMs": 32660,
+    "endMs": 32780,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "minute",
+    "startMs": 32780,
+    "endMs": 33060,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "rule.",
+    "startMs": 33060,
+    "endMs": 33380,
+    "confidence": 0.9890137
+  },
+  {
+    "text": "My",
+    "startMs": 33540,
+    "endMs": 33860,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "philosophy",
+    "startMs": 33860,
+    "endMs": 34380,
+    "confidence": 0.99990237
+  },
+  {
+    "text": "is",
+    "startMs": 34380,
+    "endMs": 34500,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "that",
+    "startMs": 34500,
+    "endMs": 34620,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "if",
+    "startMs": 34620,
+    "endMs": 34780,
+    "confidence": 1
+  },
+  {
+    "text": "I",
+    "startMs": 34780,
+    "endMs": 35060,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "get",
+    "startMs": 35060,
+    "endMs": 35380,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "an",
+    "startMs": 35380,
+    "endMs": 35580,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "email,",
+    "startMs": 35580,
+    "endMs": 35860,
+    "confidence": 0.99072266
+  },
+  {
+    "text": "a",
+    "startMs": 36660,
+    "endMs": 36980,
+    "confidence": 0.99121094
+  },
+  {
+    "text": "text",
+    "startMs": 36980,
+    "endMs": 37300,
+    "confidence": 0.99975586
+  },
+  {
+    "text": "message,",
+    "startMs": 37300,
+    "endMs": 37780,
+    "confidence": 0.9970703
+  },
+  {
+    "text": "something",
+    "startMs": 38260,
+    "endMs": 38620,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "that",
+    "startMs": 38620,
+    "endMs": 38860,
+    "confidence": 1
+  },
+  {
+    "text": "gives",
+    "startMs": 38860,
+    "endMs": 39180,
+    "confidence": 0.9992676
+  },
+  {
+    "text": "me",
+    "startMs": 39180,
+    "endMs": 39340,
+    "confidence": 1
+  },
+  {
+    "text": "anxiety",
+    "startMs": 39340,
+    "endMs": 39940,
+    "confidence": 0.9601237
+  },
+  {
+    "text": "around,",
+    "startMs": 39940,
+    "endMs": 40340,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "like,",
+    "startMs": 40340,
+    "endMs": 40740,
+    "confidence": 0.9794922
+  },
+  {
+    "text": "should",
+    "startMs": 40820,
+    "endMs": 41100,
+    "confidence": 1
+  },
+  {
+    "text": "I",
+    "startMs": 41100,
+    "endMs": 41260,
+    "confidence": 1
+  },
+  {
+    "text": "say",
+    "startMs": 41260,
+    "endMs": 41420,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "yes?",
+    "startMs": 41420,
+    "endMs": 41780,
+    "confidence": 0.99194336
+  },
+  {
+    "text": "I",
+    "startMs": 42100,
+    "endMs": 42420,
+    "confidence": 1
+  },
+  {
+    "text": "just",
+    "startMs": 42420,
+    "endMs": 42620,
+    "confidence": 1
+  },
+  {
+    "text": "want",
+    "startMs": 42620,
+    "endMs": 42780,
+    "confidence": 0.8515625
+  },
+  {
+    "text": "to",
+    "startMs": 42780,
+    "endMs": 42900,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "use",
+    "startMs": 42900,
+    "endMs": 43060,
+    "confidence": 1
+  },
+  {
+    "text": "a",
+    "startMs": 43060,
+    "endMs": 43220,
+    "confidence": 0.51464844
+  },
+  {
+    "text": "two",
+    "startMs": 43220,
+    "endMs": 43340,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "minute",
+    "startMs": 43340,
+    "endMs": 43620,
+    "confidence": 0.99975586
+  },
+  {
+    "text": "rule",
+    "startMs": 43620,
+    "endMs": 43940,
+    "confidence": 0.9975586
+  },
+  {
+    "text": "to",
+    "startMs": 43940,
+    "endMs": 44180,
+    "confidence": 1
+  },
+  {
+    "text": "move",
+    "startMs": 44180,
+    "endMs": 44420,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 44420,
+    "endMs": 44660,
+    "confidence": 0.99853516
+  },
+  {
+    "text": "forward.",
+    "startMs": 44660,
+    "endMs": 44980,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "What's",
+    "startMs": 45060,
+    "endMs": 45420,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "the",
+    "startMs": 45420,
+    "endMs": 45580,
+    "confidence": 1
+  },
+  {
+    "text": "smallest",
+    "startMs": 45580,
+    "endMs": 46020,
+    "confidence": 0.9992676
+  },
+  {
+    "text": "possible",
+    "startMs": 46020,
+    "endMs": 46340,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "action",
+    "startMs": 46500,
+    "endMs": 46900,
+    "confidence": 1
+  },
+  {
+    "text": "I",
+    "startMs": 47140,
+    "endMs": 47420,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "could",
+    "startMs": 47420,
+    "endMs": 47580,
+    "confidence": 0.99609375
+  },
+  {
+    "text": "do",
+    "startMs": 47580,
+    "endMs": 47860,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "to",
+    "startMs": 47940,
+    "endMs": 48220,
+    "confidence": 1
+  },
+  {
+    "text": "move",
+    "startMs": 48220,
+    "endMs": 48380,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 48380,
+    "endMs": 48540,
+    "confidence": 0.99121094
+  },
+  {
+    "text": "forward?",
+    "startMs": 48540,
+    "endMs": 48820,
+    "confidence": 0.9916992
+  },
+  {
+    "text": "Okay,",
+    "startMs": 48980,
+    "endMs": 49540,
+    "confidence": 0.9788411
+  },
+  {
+    "text": "sometimes",
+    "startMs": 49700,
+    "endMs": 50100,
+    "confidence": 0.9996745
+  },
+  {
+    "text": "I",
+    "startMs": 50100,
+    "endMs": 50180,
+    "confidence": 0.9980469
+  },
+  {
+    "text": "call",
+    "startMs": 50180,
+    "endMs": 50260,
+    "confidence": 0.97558594
+  },
+  {
+    "text": "it",
+    "startMs": 50260,
+    "endMs": 50380,
+    "confidence": 0.91796875
+  },
+  {
+    "text": "the",
+    "startMs": 50380,
+    "endMs": 50540,
+    "confidence": 0.9970703
+  },
+  {
+    "text": "mins.",
+    "startMs": 50540,
+    "endMs": 50940,
+    "confidence": 0.71362305
+  },
+  {
+    "text": "Most",
+    "startMs": 50940,
+    "endMs": 51220,
+    "confidence": 1
+  },
+  {
+    "text": "important",
+    "startMs": 51220,
+    "endMs": 51540,
+    "confidence": 1
+  },
+  {
+    "text": "next",
+    "startMs": 51620,
+    "endMs": 51940,
+    "confidence": 0.9970703
+  },
+  {
+    "text": "step,",
+    "startMs": 51940,
+    "endMs": 52260,
+    "confidence": 0.9980469
+  },
+  {
+    "text": "that",
+    "startMs": 52500,
+    "endMs": 52900,
+    "confidence": 0.9975586
+  },
+  {
+    "text": "2",
+    "startMs": 53320,
+    "endMs": 53480,
+    "confidence": 0.98926
+  },
+  {
+    "text": "minute",
+    "startMs": 53480,
+    "endMs": 53840,
+    "confidence": 0.99975586
+  },
+  {
+    "text": "rule",
+    "startMs": 53840,
+    "endMs": 54200,
+    "confidence": 0.9177246
+  },
+  {
+    "text": "gets",
+    "startMs": 54360,
+    "endMs": 54800,
+    "confidence": 1
+  },
+  {
+    "text": "me",
+    "startMs": 54800,
+    "endMs": 55040,
+    "confidence": 1
+  },
+  {
+    "text": "to",
+    "startMs": 55040,
+    "endMs": 55400,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "default",
+    "startMs": 55480,
+    "endMs": 56320,
+    "confidence": 0.73657227
+  },
+  {
+    "text": "to",
+    "startMs": 56320,
+    "endMs": 56600,
+    "confidence": 1
+  },
+  {
+    "text": "action,",
+    "startMs": 56600,
+    "endMs": 56920,
+    "confidence": 1
+  },
+  {
+    "text": "not",
+    "startMs": 57160,
+    "endMs": 57440,
+    "confidence": 1
+  },
+  {
+    "text": "slow",
+    "startMs": 57440,
+    "endMs": 57720,
+    "confidence": 0.9802246
+  },
+  {
+    "text": "down,",
+    "startMs": 57720,
+    "endMs": 58040,
+    "confidence": 0.99902344
+  },
+  {
+    "text": "not",
+    "startMs": 58200,
+    "endMs": 58480,
+    "confidence": 1
+  },
+  {
+    "text": "overthink",
+    "startMs": 58480,
+    "endMs": 58960,
+    "confidence": 1
+  },
+  {
+    "text": "it.",
+    "startMs": 58960,
+    "endMs": 59240,
+    "confidence": 1
+  },
+  {
+    "text": "Move",
+    "startMs": 59480,
+    "endMs": 59760,
+    "confidence": 1
+  },
+  {
+    "text": "it",
+    "startMs": 59760,
+    "endMs": 59920,
+    "confidence": 1
+  },
+  {
+    "text": "forward.",
+    "startMs": 59920,
+    "endMs": 60200,
+    "confidence": 1
+  },
+  {
+    "text": "And",
+    "startMs": 61240,
+    "endMs": 61600,
+    "confidence": 0.53125
+  },
+  {
+    "text": "then",
+    "startMs": 61600,
+    "endMs": 61920,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "for",
+    "startMs": 61920,
+    "endMs": 62200,
+    "confidence": 0.59277344
+  },
+  {
+    "text": "me,",
+    "startMs": 62200,
+    "endMs": 62440,
+    "confidence": 1
+  },
+  {
+    "text": "it's",
+    "startMs": 62440,
+    "endMs": 62920,
+    "confidence": 0.99869794
+  },
+  {
+    "text": "the",
+    "startMs": 63320,
+    "endMs": 63600,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "whole",
+    "startMs": 63600,
+    "endMs": 63840,
+    "confidence": 1
+  },
+  {
+    "text": "reframe.",
+    "startMs": 63840,
+    "endMs": 64520,
+    "confidence": 0.99869794
+  },
+  {
+    "text": "That",
+    "startMs": 64920,
+    "endMs": 65320,
+    "confidence": 0.9995117
+  },
+  {
+    "text": "action",
+    "startMs": 65320,
+    "endMs": 65720,
+    "confidence": 1
+  },
+  {
+    "text": "is",
+    "startMs": 66440,
+    "endMs": 66800,
+    "confidence": 1
+  },
+  {
+    "text": "less",
+    "startMs": 66800,
+    "endMs": 67120,
+    "confidence": 1
+  },
+  {
+    "text": "painful",
+    "startMs": 67120,
+    "endMs": 67720,
+    "confidence": 1
+  },
+  {
+    "text": "than",
+    "startMs": 67880,
+    "endMs": 68200,
+    "confidence": 1
+  },
+  {
+    "text": "anticipation.",
+    "startMs": 68200,
+    "endMs": 69000,
+    "confidence": 1
+  }
+]

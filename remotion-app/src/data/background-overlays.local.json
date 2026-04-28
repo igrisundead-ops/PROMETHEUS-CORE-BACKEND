@@ -1,0 +1,167 @@
+[
+  {
+    "id": "prome-bg-01",
+    "label": "Prome Background 01",
+    "src": "background-overlays/prome-bk-ground/prome-bg-01.mp4",
+    "originalFileName": "066ac39e8ffe757b3af67ae3d485a935_720w.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 20.65,
+    "themeTags": ["cool", "calm"]
+  },
+  {
+    "id": "prome-bg-02",
+    "label": "Prome Background 02",
+    "src": "background-overlays/prome-bk-ground/prome-bg-02.mp4",
+    "originalFileName": "28c84d4556db7eb0b62ac39d606d5f68_720w.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 5.866009,
+    "themeTags": ["cool", "kinetic"]
+  },
+  {
+    "id": "prome-bg-03",
+    "label": "Prome Background 03",
+    "src": "background-overlays/prome-bk-ground/prome-bg-03.mp4",
+    "originalFileName": "357048831e77dd19723c02683c858cba (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 60,
+    "durationSeconds": 59.372993,
+    "themeTags": ["cool", "authority"]
+  },
+  {
+    "id": "prome-bg-04",
+    "label": "Prome Background 04",
+    "src": "background-overlays/prome-bk-ground/prome-bg-04.mp4",
+    "originalFileName": "4522f7b6b2e1e23c8d6ecf9e018d61c8.mp4",
+    "width": 486,
+    "height": 864,
+    "fps": 30,
+    "durationSeconds": 92.346009,
+    "themeTags": ["cool", "calm"]
+  },
+  {
+    "id": "prome-bg-05",
+    "label": "Prome Background 05",
+    "src": "background-overlays/prome-bk-ground/prome-bg-05.mp4",
+    "originalFileName": "889dbb0d848cf44865ae490f7cd13e2d_720w (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 60,
+    "durationSeconds": 20.016667,
+    "themeTags": ["cool", "kinetic"]
+  },
+  {
+    "id": "prome-bg-06",
+    "label": "Prome Background 06",
+    "src": "background-overlays/prome-bk-ground/prome-bg-06.mp4",
+    "originalFileName": "a98442be2ea51f8988f990c6b77d0cd3_720w.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 5.033333,
+    "themeTags": ["warm", "kinetic"]
+  },
+  {
+    "id": "prome-bg-07",
+    "label": "Prome Background 07",
+    "src": "background-overlays/prome-bk-ground/prome-bg-07.mp4",
+    "originalFileName": "aa81a9cabeed4f6625a5a1ed6ad87d63 (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 59.9,
+    "themeTags": ["warm", "authority"]
+  },
+  {
+    "id": "prome-bg-08",
+    "label": "Prome Background 08",
+    "src": "background-overlays/prome-bk-ground/prome-bg-08.mp4",
+    "originalFileName": "c28d30d98fc642808fe665692ce40344.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 18.633333,
+    "themeTags": ["warm", "calm"]
+  },
+  {
+    "id": "prome-bg-09",
+    "label": "Prome Background 09",
+    "src": "background-overlays/prome-bk-ground/prome-bg-09.mp4",
+    "originalFileName": "c66e57ca7f7801f67616327d9c3934ae_720w (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 6.221995,
+    "themeTags": ["cool", "kinetic"]
+  },
+  {
+    "id": "prome-bg-10",
+    "label": "Prome Background 10",
+    "src": "background-overlays/prome-bk-ground/prome-bg-10.mp4",
+    "originalFileName": "c8ea803404674ac769ae58bd7bc03deb.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 29.97003,
+    "durationSeconds": 20.132993,
+    "themeTags": ["cool", "authority"]
+  },
+  {
+    "id": "prome-bg-11",
+    "label": "Prome Background 11",
+    "src": "background-overlays/prome-bk-ground/prome-bg-11.mp4",
+    "originalFileName": "c9a0a80d333ba3a911ed22614ac5a102_720w (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 60,
+    "durationSeconds": 8.106009,
+    "themeTags": ["warm", "kinetic"]
+  },
+  {
+    "id": "prome-bg-12",
+    "label": "Prome Background 12",
+    "src": "background-overlays/prome-bk-ground/prome-bg-12.mp4",
+    "originalFileName": "cd54fe0ee5657bab073c1ae9c8709a78_720w (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 8.033333,
+    "themeTags": ["cool", "kinetic"]
+  },
+  {
+    "id": "prome-bg-13",
+    "label": "Prome Background 13",
+    "src": "background-overlays/prome-bk-ground/prome-bg-13.mp4",
+    "originalFileName": "e784fe7b503488ba8917319e32320a86_720w.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 9.6,
+    "themeTags": ["cool", "calm"]
+  },
+  {
+    "id": "prome-bg-14",
+    "label": "Prome Background 14",
+    "src": "background-overlays/prome-bk-ground/prome-bg-14.mp4",
+    "originalFileName": "f6877b2095d5e1f375308590f2366741_720w (1).mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 9.466667,
+    "themeTags": ["warm", "calm"]
+  },
+  {
+    "id": "prome-bg-15",
+    "label": "Prome Background 15",
+    "src": "background-overlays/prome-bk-ground/prome-bg-15.mp4",
+    "originalFileName": "fd7a09ae56c34cce4980e9cbcd7052ae.mp4",
+    "width": 720,
+    "height": 1280,
+    "fps": 30,
+    "durationSeconds": 50,
+    "themeTags": ["cool", "authority"]
+  }
+]

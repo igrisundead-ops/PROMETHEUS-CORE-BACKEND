@@ -1,0 +1,162 @@
+.debug-panel {
+  width: min(360px, 100%);
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--panel-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0)),
+    var(--panel-bg);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  display: grid;
+  gap: 12px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 18px;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panel-note {
+  margin: 0;
+  color: rgba(236, 238, 247, 0.8);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.control {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.control select,
+.control input[type="range"],
+.control input[type="text"] {
+  width: 100%;
+}
+
+.control select {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0 10px;
+  color: #edf0ff;
+  background: rgba(12, 14, 25, 0.82);
+  font: inherit;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.control input[type="text"] {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0 10px;
+  color: #edf0ff;
+  background: rgba(12, 14, 25, 0.82);
+  font: inherit;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0.03em;
+}
+
+.control-inline {
+  display: flex;
+}
+
+.control-inline button {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background:
+    linear-gradient(170deg, rgba(255, 177, 95, 0.2), rgba(95, 126, 255, 0.18)),
+    rgba(12, 14, 25, 0.66);
+  color: #f8f9ff;
+  cursor: pointer;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.control-inline button:hover {
+  border-color: rgba(255, 255, 255, 0.46);
+  filter: brightness(1.08);
+}
+
+.control-inline-dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.control-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.control-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.status-line {
+  margin: 2px 0 0;
+  min-height: 18px;
+  color: rgba(234, 240, 255, 0.88);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.readout-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.runtime-readout {
+  margin: 0;
+  min-height: 136px;
+  max-height: 240px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(5, 7, 14, 0.76);
+  color: rgba(228, 238, 255, 0.94);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre;
+  overflow: auto;
+}
+
+.text-controls {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.mapping-readout {
+  min-height: 174px;
+  max-height: 260px;
+}
