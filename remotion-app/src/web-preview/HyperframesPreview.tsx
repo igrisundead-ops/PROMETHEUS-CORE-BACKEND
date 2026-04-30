@@ -7,6 +7,10 @@ import type {PreviewPerformanceMode} from "../lib/types";
 import type {DisplayTimeline, DisplayTimelineLayer} from "./display-god/display-timeline";
 import type {HyperframesPreviewManifest} from "./hyperframes/manifest-schema";
 import {useHyperframesGsapExecutor} from "./hyperframes/gsap-executor";
+import {
+  filterCompetingHyperframesTextLayers,
+  shouldSuppressNativeCaptionsForHyperframes
+} from "./hyperframes/text-governance";
 import {useHyperframesTimelineController} from "./hyperframes/timeline-controller";
 
 type HyperframesPreviewProps = {
@@ -295,10 +299,14 @@ export const HyperframesPreview: React.FC<HyperframesPreviewProps> = ({
     return displayTimeline.layers.filter((layer) => layer.kind === "creative-track" && layer.visual);
   }, [displayTimeline.layers]);
   const visibleTrackLayers = useMemo(() => {
-    return interactiveTrackLayers.filter((layer) => {
+    const activeLayers = interactiveTrackLayers.filter((layer) => {
       return timelineState.currentTimeMs >= layer.startMs - 260 && timelineState.currentTimeMs <= layer.endMs + 240;
     });
+    return filterCompetingHyperframesTextLayers(activeLayers);
   }, [interactiveTrackLayers, timelineState.currentTimeMs]);
+  const suppressNativeCaptions = useMemo(() => {
+    return shouldSuppressNativeCaptionsForHyperframes(visibleTrackLayers);
+  }, [visibleTrackLayers]);
   const videoMetadata = useMemo(() => {
     const durationSeconds = Math.max(1, displayTimeline.baseVideo.durationMs / 1000);
     return {
@@ -368,6 +376,7 @@ export const HyperframesPreview: React.FC<HyperframesPreviewProps> = ({
         model={displayTimeline.motionModel}
         captionProfileId={displayTimeline.captionProfileId}
         previewPerformanceMode={previewPerformanceMode}
+        suppressCaptions={suppressNativeCaptions}
       />
 
       <HyperframesThreeSceneOverlay

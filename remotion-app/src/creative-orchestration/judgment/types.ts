@@ -555,6 +555,174 @@ export const candidateTreatmentProfileSchema = z.object({
 
 export type CandidateTreatmentProfile = z.infer<typeof candidateTreatmentProfileSchema>;
 
+export const retrievalIntentSchema = z.enum([
+  "skip",
+  "reuse-existing",
+  "reuse-with-variation",
+  "search-deeper"
+]);
+
+export type RetrievalIntent = z.infer<typeof retrievalIntentSchema>;
+
+export const godEscalationIntentSchema = z.enum([
+  "forbidden",
+  "allowed-if-no-fit",
+  "preferred-for-precision"
+]);
+
+export type GodEscalationIntent = z.infer<typeof godEscalationIntentSchema>;
+
+export const doctrineBranchKindSchema = z.enum([
+  "primary",
+  "alternate-captain",
+  "alternate-reduction"
+]);
+
+export type DoctrineBranchKind = z.infer<typeof doctrineBranchKindSchema>;
+
+export const doctrineBranchSchema = z.object({
+  id: z.string(),
+  kind: doctrineBranchKindSchema,
+  label: z.string(),
+  priority: z.number().int().positive(),
+  editorialDoctrine: editorialDoctrineSchema,
+  rationale: z.array(z.string()).default([])
+});
+
+export type DoctrineBranch = z.infer<typeof doctrineBranchSchema>;
+
+export const observationSnapshotSchema = z.object({
+  id: z.string(),
+  segmentId: z.string(),
+  moment: judgmentMomentSchema,
+  speakerMetadata: speakerMetadataSchema.optional(),
+  sceneAnalysis: sceneAnalysisSchema.optional(),
+  subjectSegmentation: subjectSegmentationSchema.optional(),
+  spatialConstraints: spatialConstraintsSchema,
+  emphasisTargets: emphasisTargetsSchema,
+  recentDecisionPlans: z.array(z.lazy(() => sequenceDecisionSummarySchema)).default([]),
+  recentVisualPatterns: z.array(z.lazy(() => sequenceVisualPatternSchema)).default([]),
+  recentSequenceMetrics: z.lazy(() => sequenceMetricsSchema),
+  assetFingerprintCount: z.number().int().nonnegative().default(0),
+  retrievalResultCount: z.number().int().nonnegative().default(0)
+});
+
+export type ObservationSnapshot = z.infer<typeof observationSnapshotSchema>;
+
+export const archiveDimensionSchema = z.enum([
+  "intensity",
+  "visual-density",
+  "motion-energy",
+  "editorial-role"
+]);
+
+export type ArchiveDimension = z.infer<typeof archiveDimensionSchema>;
+
+export const motionEnergyProfileSchema = z.enum(["none", "subtle", "active"]);
+export type MotionEnergyProfile = z.infer<typeof motionEnergyProfileSchema>;
+
+export const archiveEditorialRoleSchema = z.enum(["setup", "explain", "tension", "payoff"]);
+export type ArchiveEditorialRole = z.infer<typeof archiveEditorialRoleSchema>;
+
+export const archiveCellSchema = z.object({
+  key: z.string(),
+  intensity: minimalismLevelSchema,
+  visualDensity: visualDensityProfileSchema,
+  motionEnergy: motionEnergyProfileSchema,
+  editorialRole: archiveEditorialRoleSchema
+});
+
+export type ArchiveCell = z.infer<typeof archiveCellSchema>;
+
+export const treatmentGenomeV1Schema = candidateTreatmentProfileSchema.extend({
+  doctrineBranchId: z.string(),
+  retrievalIntent: retrievalIntentSchema,
+  godEscalationIntent: godEscalationIntentSchema,
+  noveltyBias: z.number().min(0).max(1),
+  consistencyBias: z.number().min(0).max(1),
+  archiveCell: archiveCellSchema,
+  editorialRole: archiveEditorialRoleSchema
+});
+
+export type TreatmentGenomeV1 = z.infer<typeof treatmentGenomeV1Schema>;
+
+export const archiveEntrySchema = z.object({
+  cell: archiveCellSchema,
+  genome: treatmentGenomeV1Schema,
+  plannerScore: z.number().min(0).max(1),
+  source: z.enum(["generated", "archive"])
+});
+
+export type ArchiveEntry = z.infer<typeof archiveEntrySchema>;
+
+export const planningSnapshotSchema = z.object({
+  id: z.string(),
+  segmentId: z.string(),
+  observationSnapshotId: z.string(),
+  primaryDoctrine: editorialDoctrineSchema,
+  doctrineBranches: z.array(doctrineBranchSchema).default([]),
+  allowedTreatmentFamilies: z.array(treatmentFamilySchema).default([]),
+  blockedTreatmentFamilies: z.array(treatmentFamilySchema).default([]),
+  archiveDimensions: z.array(archiveDimensionSchema).default([
+    "intensity",
+    "visual-density",
+    "motion-energy",
+    "editorial-role"
+  ]),
+  lookaheadMoments: z.number().int().positive().default(3),
+  lookaheadSeconds: z.number().positive().default(8),
+  genomeBudgetPerBranch: z.number().int().positive().default(6),
+  archiveReuseBudgetPerBranch: z.number().int().positive().default(3),
+  beamWidth: z.number().int().positive().default(6)
+});
+
+export type PlanningSnapshot = z.infer<typeof planningSnapshotSchema>;
+
+export const plannerScoreBreakdownSchema = z.object({
+  sequenceConsequence: z.number().min(0).max(1),
+  repetitionAvoidance: z.number().min(0).max(1),
+  doctrineCoherence: z.number().min(0).max(1),
+  surprisePreservation: z.number().min(0).max(1),
+  climaxBudgetPreservation: z.number().min(0).max(1),
+  retrievalPracticality: z.number().min(0).max(1),
+  finalScore: z.number().min(0).max(1)
+});
+
+export type PlannerScoreBreakdown = z.infer<typeof plannerScoreBreakdownSchema>;
+
+export const plannerBeamCandidateSchema = z.object({
+  genomeId: z.string(),
+  doctrineBranchId: z.string(),
+  archiveCellKey: z.string(),
+  scoreBreakdown: plannerScoreBreakdownSchema,
+  pruned: z.boolean().default(false),
+  reasons: z.array(z.string()).default([])
+});
+
+export type PlannerBeamCandidate = z.infer<typeof plannerBeamCandidateSchema>;
+
+export const plannerSelectedPathSchema = z.object({
+  genomeIds: z.array(z.string()).default([]),
+  doctrineBranchIds: z.array(z.string()).default([]),
+  scoreBreakdown: plannerScoreBreakdownSchema,
+  lookaheadMomentsEvaluated: z.number().int().nonnegative().default(1)
+});
+
+export type PlannerSelectedPath = z.infer<typeof plannerSelectedPathSchema>;
+
+export const plannerAuditSchema = z.object({
+  observationSnapshot: observationSnapshotSchema,
+  planningSnapshot: planningSnapshotSchema,
+  archiveEntries: z.array(archiveEntrySchema).default([]),
+  shortlist: z.array(treatmentGenomeV1Schema).default([]),
+  beamCandidates: z.array(plannerBeamCandidateSchema).default([]),
+  selectedPath: plannerSelectedPathSchema,
+  fallbackUsed: z.boolean().default(false),
+  trace: z.array(z.lazy(() => traceEntrySchema)).default([])
+});
+
+export type PlannerAudit = z.infer<typeof plannerAuditSchema>;
+
 export const treatmentFingerprintSchema = z.object({
   segmentId: z.string(),
   treatmentFamily: treatmentFamilySchema,
@@ -887,6 +1055,7 @@ export const judgmentAuditRecordSchema = z.object({
   rejectedAssetCandidates: z.array(rankedAssetCandidateSchema).default([]),
   selectedAssetCandidateIds: z.array(z.string()).default([]),
   retrievalTrace: retrievalTraceSchema.optional(),
+  plannerAudit: plannerAuditSchema.optional(),
   trace: z.array(traceEntrySchema).default([]),
   createdAt: z.string().optional()
 });
@@ -939,6 +1108,7 @@ export const editDecisionPlanSchema = z.object({
   feedbackSignals: z.array(feedbackLogEntrySchema).default([]),
   confidence: z.number().min(0).max(1),
   governance: agentGovernanceSchema,
+  plannerAudit: plannerAuditSchema.optional(),
   trace: z.array(traceEntrySchema).default([]),
   audit: judgmentAuditRecordSchema
 });

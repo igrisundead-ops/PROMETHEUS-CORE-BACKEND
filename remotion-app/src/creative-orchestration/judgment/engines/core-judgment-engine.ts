@@ -14,6 +14,7 @@ import {SequenceMemoryEngine} from "./sequence-memory-engine";
 import {AntiRepetitionEngine} from "./anti-repetition-engine";
 import {PairwiseTasteCriticEngine} from "./pairwise-taste-critic-engine";
 import {VectorRetrievalEngine} from "./vector-retrieval-engine";
+import {SteppingStonePlanner} from "../planning/stepping-stone-planner";
 import {deriveConfidence} from "../utils/confidence";
 import {appendTrace, createTraceEntry} from "../utils/trace";
 import {hashString} from "../../utils";
@@ -50,6 +51,7 @@ export class CoreJudgmentEngine {
   private readonly antiRepetitionEngine = new AntiRepetitionEngine();
   private readonly pairwiseTasteCriticEngine = new PairwiseTasteCriticEngine();
   private readonly vectorRetrievalEngine: VectorRetrievalEngine;
+  private readonly steppingStonePlanner = new SteppingStonePlanner();
 
   constructor(deps: {
     vectorRetrievalEngine?: VectorRetrievalEngine;
@@ -189,9 +191,20 @@ export class CoreJudgmentEngine {
       recentEscalationHistory: snapshot.recentEscalationHistory
     };
     trace = snapshot.trace.slice();
-    const candidates = this.candidateTreatmentEngine.generate(sequenceAwareInput, snapshot);
+    const plannerDecision = this.steppingStonePlanner.plan({
+      judgmentInput: sequenceAwareInput,
+      snapshot
+    });
+    trace = [
+      ...trace,
+      ...plannerDecision.audit.trace
+    ];
+    const candidates = plannerDecision.shortlist.length > 0
+      ? plannerDecision.shortlist
+      : this.candidateTreatmentEngine.generate(sequenceAwareInput, snapshot);
     trace = appendTrace(trace, createTraceEntry("candidate-generation", `Generated ${candidates.length} legal candidate treatment families.`, {
-      families: candidates.map((candidate) => candidate.family)
+      families: candidates.map((candidate) => candidate.family),
+      plannerFallbackUsed: plannerDecision.audit.fallbackUsed
     }));
 
     const evaluations: CandidateEvaluation[] = candidates.map((candidate) => {
@@ -387,6 +400,7 @@ export class CoreJudgmentEngine {
       rankedAssetCandidates: retrievalResult.rankedAssetCandidates,
       rejectedAssetCandidates: retrievalResult.rejectedAssetCandidates,
       selectedAssetCandidateIds: retrievalResult.selectedAssetCandidateIds,
+      plannerAudit: plannerDecision.audit,
       retrievalTrace: retrievalResult.retrievalTrace,
       trace,
       createdAt: new Date().toISOString()
@@ -456,6 +470,7 @@ export class CoreJudgmentEngine {
       feedbackSignals,
       confidence,
       governance,
+      plannerAudit: plannerDecision.audit,
       trace,
       audit
     });

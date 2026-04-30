@@ -1710,7 +1710,12 @@ const NativeCaptionOverlay: React.FC<{
   captionBias: MotionCompositionModel["captionBias"];
   model: MotionCompositionModel;
   previewViewportScale: number;
-}> = ({currentTimeMs, videoMetadata, chunks, captionProfileId, captionBias, model, previewViewportScale}) => {
+  suppressCaptions?: boolean;
+}> = ({currentTimeMs, videoMetadata, chunks, captionProfileId, captionBias, model, previewViewportScale, suppressCaptions = false}) => {
+  if (suppressCaptions) {
+    return null;
+  }
+
   const preparedChunks = useMemo(() => buildPreparedChunks(chunks), [chunks]);
   const activeChunk = useMemo(() => selectLongformActiveChunk(chunks, currentTimeMs), [chunks, currentTimeMs]);
   const activeChunkPresentation = activeChunk ? preparedChunks.get(activeChunk.id) ?? null : null;
@@ -2005,7 +2010,8 @@ export const NativePreviewOverlayStage: React.FC<{
   model: MotionCompositionModel;
   captionProfileId: CaptionStyleProfileId;
   previewPerformanceMode: PreviewPerformanceMode;
-}> = ({currentTimeMs, videoMetadata, model, captionProfileId, previewPerformanceMode}) => {
+  suppressCaptions?: boolean;
+}> = ({currentTimeMs, videoMetadata, model, captionProfileId, previewPerformanceMode, suppressCaptions = false}) => {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const [previewViewportScale, setPreviewViewportScale] = useState(1);
   const isLeanNativePreview = previewPerformanceMode === "turbo" || model.tier === "minimal";
@@ -2803,6 +2809,7 @@ export const NativePreviewStage: React.FC<NativePreviewStageProps> = ({
           captionBias={model.captionBias}
           model={model}
           previewViewportScale={previewViewportScale}
+          suppressCaptions={false}
         />
 
         {showMotionGraphicsDebugOverlay && activeMotionGraphicsDecision ? (

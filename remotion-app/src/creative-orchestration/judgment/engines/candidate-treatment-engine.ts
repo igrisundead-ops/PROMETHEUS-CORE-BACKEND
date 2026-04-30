@@ -1,5 +1,5 @@
 import {buildCandidateFromFamily} from "../rules/treatment-selection";
-import type {CandidateTreatmentProfile, JudgmentEngineInput, PreJudgmentSnapshot} from "../types";
+import type {CandidateTreatmentProfile, JudgmentEngineInput, PreJudgmentSnapshot, TreatmentFamily} from "../types";
 
 const proposalMatchesCandidate = (candidate: CandidateTreatmentProfile, proposalId: string, payload: Record<string, unknown>): boolean => {
   if (candidate.allowedProposalTypes.length === 0) {
@@ -13,7 +13,8 @@ const proposalMatchesCandidate = (candidate: CandidateTreatmentProfile, proposal
 
 export class CandidateTreatmentEngine {
   generate(input: JudgmentEngineInput, snapshot: PreJudgmentSnapshot): CandidateTreatmentProfile[] {
-    return snapshot.allowedTreatmentFamilies.map((family) => {
+    const families: TreatmentFamily[] = snapshot.allowedTreatmentFamilies.length > 0 ? snapshot.allowedTreatmentFamilies : ["safe-premium"];
+    return families.map((family) => {
       const candidate = buildCandidateFromFamily(family, snapshot, input);
       const preferredProposalIds = input.agentProposals
         .filter((proposal) => candidate.allowedProposalTypes.includes(proposal.type) && proposalMatchesCandidate(candidate, proposal.id, proposal.payload))
