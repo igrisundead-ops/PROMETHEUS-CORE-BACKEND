@@ -163,6 +163,62 @@ The frontend panel uses:
 
 The backend also accepts the same request payload on `POST /api/jobs` for the broader orchestration flow.
 
+## Canonical Asset Embedding
+
+The canonical asset retrieval path uses:
+
+- one unified asset document per asset
+- local `BAAI/bge-small-en-v1.5` embeddings by default for development and working indexing runs
+- Zilliz / Milvus for vector storage and retrieval
+
+Required environment for a real vector indexing run:
+
+- `ASSET_MILVUS_ENABLED=true`
+- `MILVUS_ADDRESS=<your-zilliz-host:19530>`
+- `MILVUS_TOKEN=<your-zilliz-token>`
+- `MILVUS_DATABASE=default` or your chosen database
+- `MILVUS_COLLECTION_ASSETS=unified_motion_graphics_assets`
+- `ASSET_EMBEDDING_PROVIDER=local-hf`
+- `ASSET_EMBEDDING_TEXT_MODE=compact`
+- `ASSET_EMBEDDING_BATCH_SIZE=8`
+- `LOCAL_EMBEDDING_PYTHON_BIN=python`
+- `LOCAL_EMBEDDING_MODEL_NAME=BAAI/bge-small-en-v1.5`
+- `LOCAL_EMBEDDING_DIMENSIONS=384`
+- `LOCAL_EMBEDDING_USE_FP16=false`
+
+Experimental opt-in only, not connected to the default working path:
+
+- `ASSET_EMBEDDING_PROVIDER=bge-m3-local`
+- `BGE_M3_LOCAL_PYTHON_BIN=python`
+- `BGE_M3_LOCAL_MODEL_NAME=BAAI/bge-m3`
+- `BGE_M3_LOCAL_USE_FP16=false`
+
+Warm the local Hugging Face cache before your first indexing run:
+
+```bash
+python scripts/prefetch-bge-m3.py
+```
+
+Useful commands:
+
+```bash
+npm run assets:scan
+npm run assets:index
+npm run assets:index:full
+```
+
+What each command does:
+
+- `assets:scan` regenerates the unified asset documents and runtime catalog without embeddings.
+- `assets:index` incrementally embeds changed assets and upserts them into Milvus when enabled.
+- `assets:index:full` forces a full re-embedding and Milvus reindex pass.
+
+Generated artifacts:
+
+- `src/data/unified-asset-documents.generated.json`
+- `src/data/unified-motion-assets.generated.json`
+- `src/data/unified-asset-index-state.generated.json`
+
 ## Render Final MP4
 
 ```bash

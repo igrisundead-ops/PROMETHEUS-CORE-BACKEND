@@ -191,7 +191,7 @@ export const createBackendApp = async ({
   });
   await god.initialize();
   const assetRetrieval = new AssetRetrievalService(env);
-  const vectorRetrieval = new VectorRetrievalService(env);
+  const vectorRetrieval = env.ASSET_MILVUS_ENABLED ? new VectorRetrievalService(env) : undefined;
   const r2Service = deps?.r2Service ?? createR2TransferService(env);
 
   app.get("/health", async () => ({

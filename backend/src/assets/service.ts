@@ -1,8 +1,9 @@
-import {MilvusClient} from "@zilliz/milvus2-sdk-node";
+import {HttpClient, MilvusClient} from "@zilliz/milvus2-sdk-node";
 import {z} from "zod";
 
 import type {BackendEnv} from "../config";
 import {createHash} from "node:crypto";
+import {createEmbeddingProvider, type EmbeddingProvider} from "../../../remotion-app/src/lib/embeddings/provider";
 
 const requestSchema = z.object({
   queryText: z.string().min(1),
@@ -235,17 +236,56 @@ type RawMilvusHit = Record<string, unknown> & {
   score: number;
 };
 
+const isHttpMilvusAddress = (address: string): boolean => /^https?:\/\//i.test(address.trim());
+
+const resolveHttpMilvusEndpoint = (address: string): string => {
+  const parsed = new URL(address);
+  return parsed.origin;
+};
+
 export class AssetRetrievalService {
-  private readonly client: MilvusClient | null;
+  private readonly client: MilvusClient | HttpClient | null;
+  private readonly useHttpMilvus: boolean;
+  private readonly embeddingProvider: EmbeddingProvider | null;
 
   constructor(private readonly env: BackendEnv) {
+    this.useHttpMilvus = env.ASSET_MILVUS_ENABLED && isHttpMilvusAddress(env.MILVUS_ADDRESS);
     this.client = env.ASSET_MILVUS_ENABLED
-      ? new MilvusClient({
-          address: env.MILVUS_ADDRESS,
-          token: env.MILVUS_TOKEN || undefined,
-          database: env.MILVUS_DATABASE || undefined
-        })
+      ? this.useHttpMilvus
+        ? new HttpClient({
+            endpoint: resolveHttpMilvusEndpoint(env.MILVUS_ADDRESS),
+            token: env.MILVUS_TOKEN || undefined,
+            database: env.MILVUS_DATABASE || undefined,
+            timeout: 60000
+          })
+        : new MilvusClient({
+            address: env.MILVUS_ADDRESS,
+            token: env.MILVUS_TOKEN || undefined,
+            database: env.MILVUS_DATABASE || undefined,
+            ssl: isHttpMilvusAddress(env.MILVUS_ADDRESS)
+          })
       : null;
+    this.embeddingProvider = env.ASSET_EMBEDDING_PROVIDER === "local-test"
+      ? null
+      : createEmbeddingProvider({
+          provider: env.ASSET_EMBEDDING_PROVIDER,
+          model: env.ASSET_EMBEDDING_MODEL,
+          dimensions: env.ASSET_EMBEDDING_DIMENSIONS,
+          apiKey: env.ASSET_EMBEDDING_API_KEY || env.OPENAI_API_KEY,
+          baseUrl: env.OPENAI_BASE_URL,
+          pythonBin: env.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
+            ? env.BGE_M3_LOCAL_PYTHON_BIN
+            : env.LOCAL_EMBEDDING_PYTHON_BIN,
+          useFp16: env.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
+            ? env.BGE_M3_LOCAL_USE_FP16
+            : env.LOCAL_EMBEDDING_USE_FP16,
+          localBatchSize: 16
+        });
+
+    console.log(
+      `[assets:retrieve] Initialized provider=${env.ASSET_EMBEDDING_PROVIDER} model=${env.ASSET_EMBEDDING_MODEL} ` +
+      `dims=${env.ASSET_EMBEDDING_DIMENSIONS} milvus=${env.ASSET_MILVUS_ENABLED} collection=${env.MILVUS_COLLECTION_ASSETS}.`
+    );
   }
 
   private async embedQueryText(queryText: string): Promise<number[]> {
@@ -253,31 +293,8 @@ export class AssetRetrievalService {
       return buildDeterministicVector(queryText, this.env.ASSET_EMBEDDING_DIMENSIONS);
     }
 
-    const apiKey = this.env.ASSET_EMBEDDING_API_KEY || this.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("ASSET_EMBEDDING_API_KEY or OPENAI_API_KEY is required for Milvus retrieval.");
-    }
-
-    const response = await fetch(`${this.env.OPENAI_BASE_URL.replace(/\/+$/, "")}/embeddings`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: this.env.ASSET_EMBEDDING_MODEL,
-        input: [queryText],
-        dimensions: this.env.ASSET_EMBEDDING_DIMENSIONS
-      })
-    });
-
-    if (!response.ok) {
-      const body = await response.text().catch(() => "");
-      throw new Error(`OpenAI embeddings request failed (${response.status} ${response.statusText}): ${body}`);
-    }
-
-    const payload = await response.json() as {data?: Array<{embedding?: number[]}>};
-    return payload.data?.[0]?.embedding ?? [];
+    const [embedding] = await this.embeddingProvider!.embedTexts([queryText]);
+    return embedding ?? [];
   }
 
   private buildFilter(request: AssetRetrievalRequest): string | undefined {
@@ -453,16 +470,30 @@ export class AssetRetrievalService {
     }
 
     const request = requestSchema.parse(rawRequest);
-    const hasCollection = await this.client.hasCollection({
-      collection_name: this.env.MILVUS_COLLECTION_ASSETS
-    });
-    if (!hasCollection.value) {
+    const hasCollection = this.useHttpMilvus
+      ? await (this.client as HttpClient).hasCollection({
+          collectionName: this.env.MILVUS_COLLECTION_ASSETS,
+          dbName: this.env.MILVUS_DATABASE
+        })
+      : await (this.client as MilvusClient).hasCollection({
+          collection_name: this.env.MILVUS_COLLECTION_ASSETS
+        });
+    const collectionExists = this.useHttpMilvus
+      ? Boolean((hasCollection as any).data?.has)
+      : Boolean((hasCollection as Awaited<ReturnType<MilvusClient["hasCollection"]>>).value);
+    if (!collectionExists) {
       throw new Error(`Milvus collection ${this.env.MILVUS_COLLECTION_ASSETS} does not exist.`);
     }
 
-    await this.client.loadCollection({
-      collection_name: this.env.MILVUS_COLLECTION_ASSETS
-    });
+    if (this.useHttpMilvus) {
+      await (this.client as HttpClient).loadCollection({
+        collectionName: this.env.MILVUS_COLLECTION_ASSETS
+      });
+    } else {
+      await (this.client as MilvusClient).loadCollection({
+        collection_name: this.env.MILVUS_COLLECTION_ASSETS
+      });
+    }
 
     const queryVector = await this.embedQueryText([
       request.queryText,
@@ -470,51 +501,78 @@ export class AssetRetrievalService {
       ...(request.contexts ?? []),
       ...(request.compositionHints ?? [])
     ].join(" ").trim());
-    const rawResult = await this.client.search({
-      collection_name: this.env.MILVUS_COLLECTION_ASSETS,
-      anns_field: "embedding",
-      data: [queryVector],
-      limit: Math.max((request.limit ?? 8) * 3, 18),
-      metric_type: "COSINE",
-      params: {
-        ef: 96
-      },
-      filter: this.buildFilter(request),
-      output_fields: [
-        "asset_type",
-        "absolute_path",
-        "public_path",
-        "filename",
-        "tags_text",
-        "labels_text",
-        "retrieval_caption",
-        "semantic_description",
-        "animation_family",
-        "motion_intensity",
-        "mood_text",
-        "contexts_text",
-        "anti_contexts_text",
-        "constraints_text",
-        "dominant_visual_role",
-        "confidence",
-        "embedding_text",
-        "extension_is_animated"
-      ]
-    });
+    const outputFields = [
+      "asset_type",
+      "absolute_path",
+      "public_path",
+      "filename",
+      "tags_text",
+      "labels_text",
+      "retrieval_caption",
+      "semantic_description",
+      "animation_family",
+      "motion_intensity",
+      "mood_text",
+      "contexts_text",
+      "anti_contexts_text",
+      "constraints_text",
+      "dominant_visual_role",
+      "confidence",
+      "embedding_text",
+      "extension_is_animated"
+    ];
+    const rawHits: RawMilvusHit[] = [];
+    if (this.useHttpMilvus) {
+      const response = await (this.client as HttpClient).search({
+        collectionName: this.env.MILVUS_COLLECTION_ASSETS,
+        annsField: "embedding",
+        data: [queryVector],
+        limit: Math.max((request.limit ?? 8) * 3, 18),
+        filter: this.buildFilter(request),
+        outputFields,
+        searchParams: {
+          ef: 96
+        }
+      });
+      const rows = Array.isArray(response.data) ? response.data : [response.data];
+      rawHits.push(
+        ...rows.map((entry) => ({
+          ...(entry as Record<string, unknown>),
+          id: String((entry as Record<string, unknown>).id ?? (entry as Record<string, unknown>).asset_id ?? ""),
+          score: Number((entry as Record<string, unknown>).distance ?? (entry as Record<string, unknown>).score ?? 0)
+        }))
+      );
+    } else {
+      const rawResult = await (this.client as MilvusClient).search({
+        collection_name: this.env.MILVUS_COLLECTION_ASSETS,
+        anns_field: "embedding",
+        data: [queryVector],
+        limit: Math.max((request.limit ?? 8) * 3, 18),
+        metric_type: "COSINE",
+        params: {
+          ef: 96
+        },
+        filter: this.buildFilter(request),
+        output_fields: outputFields
+      });
+      rawHits.push(
+        ...rawResult.results.map((entry) => ({
+          ...(entry as Record<string, unknown>),
+          id: String(entry.id),
+          score: Number(entry.score ?? 0)
+        }))
+      );
+    }
 
-    const reranked = rawResult.results
-      .map((entry) => this.rerankHit(request, {
-        ...(entry as Record<string, unknown>),
-        id: String(entry.id),
-        score: Number(entry.score ?? 0)
-      }))
+    const reranked = rawHits
+      .map((entry) => this.rerankHit(request, entry))
       .sort((left, right) => right.score - left.score || left.asset_id.localeCompare(right.asset_id))
       .slice(0, request.limit ?? 8);
 
     return {
       backend: "milvus",
       query: request.queryText,
-      totalCandidates: rawResult.results.length,
+      totalCandidates: rawHits.length,
       results: reranked,
       warnings: []
     };

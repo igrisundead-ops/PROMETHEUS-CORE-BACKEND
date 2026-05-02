@@ -2,11 +2,12 @@ import path from "node:path";
 
 import {sha256Text} from "../hash";
 
+import {buildCompactAssetEmbeddingText} from "./embedding-text";
 import {resolveMetadataMatches} from "./metadata-sources";
-import type {AssetDiscoveryRecord, NormalizedAssetDocument} from "./types";
+import type {AssetDiscoveryRecord, AssetEmbeddingTextMode, NormalizedAssetDocument} from "./types";
 import {buildSearchTerms, inferMoodTags, motionLevelToTier, normalizeAssetText, slugifyAssetValue, uniqueStrings} from "./text-utils";
 
-const ASSET_METADATA_VERSION = "unified-assets-v1";
+const ASSET_METADATA_VERSION = "unified-assets-v2";
 
 const resolvePublicPath = (record: AssetDiscoveryRecord, assetId: string): string => {
   const normalizedAbsolutePath = record.absolutePath.replace(/\\/g, "/");
@@ -101,7 +102,10 @@ const buildEmbeddingText = ({
   ].filter(Boolean).join(" ");
 };
 
-export const normalizeDiscoveredAsset = (record: AssetDiscoveryRecord): NormalizedAssetDocument => {
+export const normalizeDiscoveredAsset = (
+  record: AssetDiscoveryRecord,
+  embeddingTextMode: AssetEmbeddingTextMode = "compact"
+): NormalizedAssetDocument => {
   const metadata = resolveMetadataMatches(record);
   const rawLabels = uniqueStrings([
     ...metadata.labels,
@@ -142,7 +146,7 @@ export const normalizeDiscoveredAsset = (record: AssetDiscoveryRecord): Normaliz
   const publicPath = resolvePublicPath(record, assetId);
   const durationClass = resolveDurationClass(record);
   const aspectRatio = record.aspectRatio ? String(record.aspectRatio) : record.width && record.height ? `${record.width}:${record.height}` : "";
-  const embeddingText = buildEmbeddingText({
+  const fullEmbeddingText = buildEmbeddingText({
     record,
     labels,
     tags,
@@ -157,24 +161,8 @@ export const normalizeDiscoveredAsset = (record: AssetDiscoveryRecord): Normaliz
     dominantRole,
     motionIntensity
   });
-  const contentHash = sha256Text(JSON.stringify({
-    absolutePath: record.absolutePath,
-    modifiedTimeMs: record.modifiedTimeMs,
-    fileSizeBytes: record.fileSizeBytes,
-    retrievalCaption,
-    semanticDescription,
-    labels,
-    tags,
-    contexts,
-    antiContexts,
-    constraints,
-    publicPath,
-    motionIntensity,
-    dominantRole,
-    durationClass
-  }));
 
-  return {
+  const documentBase = {
     asset_id: assetId,
     asset_type: record.detectedAssetType,
     source_library: record.sourceLibrary,
@@ -201,8 +189,9 @@ export const normalizeDiscoveredAsset = (record: AssetDiscoveryRecord): Normaliz
     dominant_visual_role: dominantRole,
     confidence: Math.max(0.38, Math.min(0.99, metadata.confidence || 0.56)),
     source_mapping_reference: metadata.sourceReferences,
-    embedding_text: embeddingText,
-    content_hash: contentHash,
+    embedding_text: fullEmbeddingText,
+    embedding_text_mode: "full" as const,
+    content_hash: "",
     metadata_version: ASSET_METADATA_VERSION,
     file_size_bytes: record.fileSizeBytes,
     modified_time_ms: record.modifiedTimeMs,
@@ -210,5 +199,35 @@ export const normalizeDiscoveredAsset = (record: AssetDiscoveryRecord): Normaliz
     height: record.height ?? null,
     duration_seconds: record.durationSeconds ?? null,
     extension_is_animated: [".html", ".json", ".lottie", ".mp4", ".webm", ".mov"].includes(record.fileExtension)
+  } satisfies NormalizedAssetDocument;
+
+  const embeddingText = embeddingTextMode === "compact"
+    ? buildCompactAssetEmbeddingText(documentBase)
+    : fullEmbeddingText;
+  const contentHash = sha256Text(JSON.stringify({
+    absolutePath: record.absolutePath,
+    modifiedTimeMs: record.modifiedTimeMs,
+    fileSizeBytes: record.fileSizeBytes,
+    retrievalCaption,
+    semanticDescription,
+    labels,
+    tags,
+    contexts,
+    antiContexts,
+    constraints,
+    publicPath,
+    motionIntensity,
+    dominantRole,
+    durationClass,
+    embeddingTextMode,
+    embeddingText,
+    metadataVersion: ASSET_METADATA_VERSION
+  }));
+
+  return {
+    ...documentBase,
+    embedding_text: embeddingText,
+    embedding_text_mode: embeddingTextMode,
+    content_hash: contentHash,
   };
 };

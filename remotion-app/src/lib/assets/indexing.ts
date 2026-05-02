@@ -5,12 +5,20 @@ import type {MotionAssetManifest} from "../types";
 import {sha256Text} from "../hash";
 
 import {createAssetEmbeddingProvider} from "./embedding";
+import {buildCompactAssetEmbeddingText} from "./embedding-text";
 import {discoverAssetFiles} from "./discovery";
 import {loadAssetPipelineConfig, type AssetPipelineConfig} from "./config";
 import {normalizeDiscoveredAsset} from "./normalization";
 import {createMilvusAssetClient, ensureMilvusAssetCollection, upsertMilvusAssetDocuments} from "./milvus";
 import {toMotionAssetManifest} from "./runtime-catalog";
 import type {AssetIndexState, NormalizedAssetDocument} from "./types";
+
+const formatDurationMs = (durationMs: number): string => {
+  const totalSeconds = Math.max(0, Math.round(durationMs / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+};
 
 const readJsonIfExists = async <T,>(filePath: string): Promise<T | null> => {
   try {
@@ -104,6 +112,13 @@ const withStableAssetId = (document: NormalizedAssetDocument, assetId: string): 
     ...document,
     asset_id: assetId,
     public_path: publicPath,
+    embedding_text: document.embedding_text_mode === "compact"
+      ? buildCompactAssetEmbeddingText({
+        ...document,
+        asset_id: assetId,
+        public_path: publicPath
+      })
+      : document.embedding_text,
     content_hash: sha256Text(JSON.stringify({
       assetId,
       absolutePath: document.absolute_path,
@@ -119,7 +134,16 @@ const withStableAssetId = (document: NormalizedAssetDocument, assetId: string): 
       publicPath,
       motionIntensity: document.motion_intensity,
       dominantRole: document.dominant_visual_role,
-      durationClass: document.duration_class
+      durationClass: document.duration_class,
+      embeddingTextMode: document.embedding_text_mode,
+      embeddingText: document.embedding_text_mode === "compact"
+        ? buildCompactAssetEmbeddingText({
+          ...document,
+          asset_id: assetId,
+          public_path: publicPath
+        })
+        : document.embedding_text,
+      metadataVersion: document.metadata_version
     }))
   };
 };
@@ -161,7 +185,7 @@ export const scanUnifiedAssets = async (config: AssetPipelineConfig = loadAssetP
   warnings: string[];
 }> => {
   const discovered = await discoverAssetFiles(config);
-  const normalizedDocuments = discovered.map(normalizeDiscoveredAsset);
+  const normalizedDocuments = discovered.map((record) => normalizeDiscoveredAsset(record, config.ASSET_EMBEDDING_TEXT_MODE));
   const deduped = ensureUniqueAssetIds(normalizedDocuments);
   const documents = deduped.documents;
 
@@ -215,8 +239,16 @@ export const indexUnifiedAssets = async ({
   skippedCount: number;
   warnings: string[];
 }> => {
+  const indexStartedAt = Date.now();
+  console.log(`[assets:index] Scanning unified asset catalog...`);
   const {documents, runtimeCatalog, warnings} = await scanUnifiedAssets(config);
+  console.log(
+    `[assets:index] Scan complete: ${documents.length} documents, ${runtimeCatalog.length} runtime assets in ${formatDurationMs(Date.now() - indexStartedAt)}.`
+  );
   const provider = createAssetEmbeddingProvider(config);
+  console.log(
+    `[assets:index] Embedding provider: ${provider.provider} (${provider.model}, ${provider.dimensions} dims). textMode=${config.ASSET_EMBEDDING_TEXT_MODE}.`
+  );
   const previousState = (await readJsonIfExists<AssetIndexState>(config.ASSET_INDEX_STATE_PATH)) ?? {
     version: "unified-assets-v1",
     provider: provider.provider,
@@ -224,34 +256,67 @@ export const indexUnifiedAssets = async ({
     dimensions: provider.dimensions,
     records: []
   };
+  const providerChanged = previousState.provider !== provider.provider ||
+    previousState.model !== provider.model ||
+    previousState.dimensions !== provider.dimensions;
+  if (providerChanged) {
+    console.log(
+      `[assets:index] Provider mismatch detected. Previous=${previousState.provider}/${previousState.model}/${previousState.dimensions} ` +
+      `Current=${provider.provider}/${provider.model}/${provider.dimensions}. Forcing full re-embed.`
+    );
+  }
   const previousMap = new Map(previousState.records.map((record) => [record.asset_id, record]));
-  const documentsToEmbed = forceFull || config.ASSET_REINDEX_MODE === "full"
+  const documentsToEmbed = forceFull || config.ASSET_REINDEX_MODE === "full" || providerChanged
     ? documents
     : documents.filter((document) => previousMap.get(document.asset_id)?.content_hash !== document.content_hash);
   const batchSize = config.ASSET_EMBEDDING_BATCH_SIZE;
   const embeddings = new Map<string, number[]>();
 
-  for (let index = 0; index < documentsToEmbed.length; index += batchSize) {
-    const batch = documentsToEmbed.slice(index, index + batchSize);
-    const batchVectors = await provider.embedTexts(batch.map((document) => document.embedding_text));
-    batch.forEach((document, offset) => {
-      embeddings.set(document.asset_id, batchVectors[offset]);
-    });
-  }
+  console.log(
+    `[assets:index] ${documentsToEmbed.length} documents queued for embedding (${Math.max(0, documents.length - documentsToEmbed.length)} unchanged skipped candidates). ` +
+    `batchSize=${batchSize} milvus=${config.ASSET_MILVUS_ENABLED} provider=${provider.provider} model=${provider.model}.`
+  );
 
-  if (config.ASSET_MILVUS_ENABLED) {
-    const client = createMilvusAssetClient(config);
-    await ensureMilvusAssetCollection({
-      client,
-      config,
-      reset: forceFull || config.ASSET_REINDEX_MODE === "full"
-    });
-    await upsertMilvusAssetDocuments({
-      client,
-      config,
-      documents: documentsToEmbed,
-      embeddings: documentsToEmbed.map((document) => embeddings.get(document.asset_id) ?? [])
-    });
+  try {
+    for (let index = 0; index < documentsToEmbed.length; index += batchSize) {
+      const batch = documentsToEmbed.slice(index, index + batchSize);
+      const batchNumber = Math.floor(index / batchSize) + 1;
+      const batchCount = Math.max(1, Math.ceil(documentsToEmbed.length / batchSize));
+      const batchStartedAt = Date.now();
+      console.log(
+        `[assets:index] Embedding batch ${batchNumber}/${batchCount} (${batch.length} assets, ${Math.min(index + batch.length, documentsToEmbed.length)}/${documentsToEmbed.length} total)...`
+      );
+      const batchVectors = await provider.embedTexts(batch.map((document) => document.embedding_text));
+      batch.forEach((document, offset) => {
+        embeddings.set(document.asset_id, batchVectors[offset]);
+      });
+      console.log(
+        `[assets:index] Batch ${batchNumber}/${batchCount} complete in ${formatDurationMs(Date.now() - batchStartedAt)}.`
+      );
+    }
+
+    if (config.ASSET_MILVUS_ENABLED) {
+      const client = createMilvusAssetClient(config);
+      console.log(`[assets:index] Preparing Milvus collection ${config.MILVUS_COLLECTION_ASSETS}...`);
+      await ensureMilvusAssetCollection({
+        client,
+        config,
+        reset: forceFull || config.ASSET_REINDEX_MODE === "full"
+      });
+      console.log(
+        `[assets:index] Milvus collection ready. Upserting ${documentsToEmbed.length} embedded documents...`
+      );
+      const milvusStartedAt = Date.now();
+      await upsertMilvusAssetDocuments({
+        client,
+        config,
+        documents: documentsToEmbed,
+        embeddings: documentsToEmbed.map((document) => embeddings.get(document.asset_id) ?? [])
+      });
+      console.log(`[assets:index] Milvus upsert complete in ${formatDurationMs(Date.now() - milvusStartedAt)}.`);
+    }
+  } finally {
+    await provider.dispose?.();
   }
 
   const records = documents.map((document) => ({
@@ -267,6 +332,10 @@ export const indexUnifiedAssets = async ({
     dimensions: provider.dimensions,
     records
   } satisfies AssetIndexState);
+
+  console.log(
+    `[assets:index] Finished in ${formatDurationMs(Date.now() - indexStartedAt)}.`
+  );
 
   return {
     embeddedCount: documentsToEmbed.length,

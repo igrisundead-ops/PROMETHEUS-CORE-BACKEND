@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src", "vitest.config.ts", "../remotion-app/src/lib/vector/**/*.ts"]
+  "include": ["src", "vitest.config.ts", "../remotion-app/src/lib/vector/**/*.ts", "../remotion-app/src/lib/embeddings/**/*.ts"]
 }

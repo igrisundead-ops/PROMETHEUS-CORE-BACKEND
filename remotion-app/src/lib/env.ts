@@ -1,4 +1,5 @@
 import {config as loadDotenv} from "dotenv";
+import path from "node:path";
 import {z} from "zod";
 
 import type {AppEnv} from "./types";
@@ -45,6 +46,17 @@ export const loadEnv = (): AppEnv => {
   }
 
   loadDotenv();
+  loadDotenv({
+    path: path.resolve(process.cwd(), "..", ".env")
+  });
+  loadDotenv({
+    path: path.resolve(process.cwd(), ".env.local"),
+    override: true
+  });
+  loadDotenv({
+    path: path.resolve(process.cwd(), "..", ".env.local"),
+    override: true
+  });
   cachedEnv = parseEnv(process.env);
   return cachedEnv;
 };

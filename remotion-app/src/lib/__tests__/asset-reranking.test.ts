@@ -31,6 +31,7 @@ const makeDocument = (overrides: Partial<NormalizedAssetDocument>): NormalizedAs
   confidence: 0.91,
   source_mapping_reference: ["schema:ring-focus"],
   embedding_text: "Circular halo ring accent with cinematic blur for thoughtful emphasis and centered headline support.",
+  embedding_text_mode: "compact",
   content_hash: "abc",
   metadata_version: "v1",
   file_size_bytes: 100,

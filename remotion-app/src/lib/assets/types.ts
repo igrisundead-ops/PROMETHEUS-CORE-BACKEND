@@ -22,6 +22,8 @@ export type UnifiedAssetSourceLibrary =
   | "public-showcase-source"
   | "workspace-assets-root";
 
+export type AssetEmbeddingTextMode = "compact" | "full";
+
 export type AssetDiscoveryRecord = {
   absolutePath: string;
   relativePath: string;
@@ -69,6 +71,7 @@ export type NormalizedAssetDocument = {
   confidence: number;
   source_mapping_reference: string[];
   embedding_text: string;
+  embedding_text_mode: AssetEmbeddingTextMode;
   content_hash: string;
   metadata_version: string;
   file_size_bytes: number;

@@ -126,10 +126,14 @@ export const ingestAssetsToMilvus = async ({
   if (!dryRun) {
     const embeddingClient = createEmbeddingClient(config);
     const vectors: number[][] = [];
-    for (let index = 0; index < records.length; index += config.EMBEDDING_BATCH_SIZE) {
-      const batch = records.slice(index, index + config.EMBEDDING_BATCH_SIZE);
-      const batchVectors = await embeddingClient.embedTexts(batch.map((record) => record.vectorSearchText));
-      vectors.push(...batchVectors);
+    try {
+      for (let index = 0; index < records.length; index += config.EMBEDDING_BATCH_SIZE) {
+        const batch = records.slice(index, index + config.EMBEDDING_BATCH_SIZE);
+        const batchVectors = await embeddingClient.embedTexts(batch.map((record) => record.vectorSearchText));
+        vectors.push(...batchVectors);
+      }
+    } finally {
+      await embeddingClient.dispose?.();
     }
     const client = createMilvusCreativeClient(config);
     await ensureCreativeAssetCollection({client, config});

@@ -1,6 +1,7 @@
+import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
 
-import {config as loadDotenv} from "dotenv";
+import {config as loadDotenv, parse as parseDotenv} from "dotenv";
 import {z} from "zod";
 
 const envSchema = z.object({
@@ -53,29 +54,107 @@ const envSchema = z.object({
   MILVUS_DATABASE: z.string().default("default"),
   MILVUS_COLLECTION: z.string().default("prometheus_creative_assets"),
   MILVUS_COLLECTION_ASSETS: z.string().default("unified_motion_graphics_assets"),
-  EMBEDDING_PROVIDER: z.enum(["openai", "local-test"]).default("local-test"),
-  EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
-  EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(1536),
+  EMBEDDING_PROVIDER: z.enum(["openai", "local-test", "local-hf", "bge-m3-local"]).default("local-hf"),
+  EMBEDDING_MODEL: z.string().default("BAAI/bge-small-en-v1.5"),
+  EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(384),
   EMBEDDING_API_KEY: z.string().default(""),
-  ASSET_EMBEDDING_PROVIDER: z.enum(["openai", "local-test"]).default("openai"),
-  ASSET_EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
-  ASSET_EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(1536),
+  ASSET_EMBEDDING_PROVIDER: z.enum(["openai", "local-test", "local-hf", "bge-m3-local"]).default("local-hf"),
+  ASSET_EMBEDDING_MODEL: z.string().default("BAAI/bge-small-en-v1.5"),
+  ASSET_EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(384),
   ASSET_EMBEDDING_API_KEY: z.string().default(""),
   OPENAI_API_KEY: z.string().default(""),
-  OPENAI_BASE_URL: z.string().default("https://api.openai.com/v1")
+  OPENAI_BASE_URL: z.string().default("https://api.openai.com/v1"),
+  LOCAL_EMBEDDING_PYTHON_BIN: z.string().default("python"),
+  LOCAL_EMBEDDING_MODEL_NAME: z.string().default("BAAI/bge-small-en-v1.5"),
+  LOCAL_EMBEDDING_DIMENSIONS: z.coerce.number().int().positive().default(384),
+  LOCAL_EMBEDDING_USE_FP16: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  BGE_M3_LOCAL_PYTHON_BIN: z.string().default("python"),
+  BGE_M3_LOCAL_MODEL_NAME: z.string().default("BAAI/bge-m3"),
+  BGE_M3_LOCAL_USE_FP16: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false)
 });
 
 export type BackendEnv = z.infer<typeof envSchema>;
 
 let cachedEnv: BackendEnv | null = null;
+let overrideWarningLogged = false;
+
+const normalizeMilvusAddress = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed.replace(/\/+$/, "");
+  }
+
+  if (!trimmed.includes(":")) {
+    return `${trimmed}:19530`;
+  }
+
+  return trimmed;
+};
 
 const loadDotenvFallbacks = (): void => {
+  const sharedRoot = path.resolve(process.cwd(), "..");
+  const remotionRoot = path.resolve(sharedRoot, "remotion-app");
+
+  if (!overrideWarningLogged) {
+    const backendLocalPath = path.resolve(process.cwd(), ".env.local");
+    const remotionLocalPath = path.resolve(remotionRoot, ".env.local");
+    if (existsSync(backendLocalPath) && existsSync(remotionLocalPath)) {
+      const backendLocal = parseDotenv(readFileSync(backendLocalPath, "utf8"));
+      const remotionLocal = parseDotenv(readFileSync(remotionLocalPath, "utf8"));
+      const comparedKeys = [
+        "ASSET_EMBEDDING_PROVIDER",
+        "ASSET_EMBEDDING_MODEL",
+        "ASSET_EMBEDDING_DIMENSIONS",
+        "EMBEDDING_PROVIDER",
+        "EMBEDDING_MODEL",
+        "EMBEDDING_DIMENSIONS",
+        "LOCAL_EMBEDDING_MODEL_NAME",
+        "LOCAL_EMBEDDING_DIMENSIONS",
+        "BGE_M3_LOCAL_MODEL_NAME",
+        "MILVUS_DATABASE",
+        "MILVUS_COLLECTION_ASSETS"
+      ] as const;
+      const mismatches = comparedKeys
+        .filter((key) => backendLocal[key] && remotionLocal[key] && backendLocal[key] !== remotionLocal[key])
+        .map((key) => `${key}: backend=${backendLocal[key]} remotion=${remotionLocal[key]}`);
+      if (mismatches.length > 0) {
+        console.warn(
+          `[backend:config] remotion-app/.env.local overrides backend/.env.local for overlapping keys. ` +
+          `Effective backend embedding settings may follow remotion values. Mismatches: ${mismatches.join(" | ")}`
+        );
+      }
+    }
+    overrideWarningLogged = true;
+  }
+
   loadDotenv();
   loadDotenv({
-    path: path.resolve(process.cwd(), "..", ".env")
+    path: path.resolve(sharedRoot, ".env")
   });
   loadDotenv({
-    path: path.resolve(process.cwd(), "..", "remotion-app", ".env")
+    path: path.resolve(remotionRoot, ".env")
+  });
+  loadDotenv({
+    path: path.resolve(process.cwd(), ".env.local"),
+    override: true
+  });
+  loadDotenv({
+    path: path.resolve(sharedRoot, ".env.local"),
+    override: true
+  });
+  loadDotenv({
+    path: path.resolve(remotionRoot, ".env.local"),
+    override: true
   });
 };
 
@@ -86,7 +165,10 @@ export const loadEnv = (overrides?: Partial<NodeJS.ProcessEnv>): BackendEnv => {
       ...process.env,
       ...overrides
     };
-    cachedEnv = envSchema.parse(mergedEnv);
+    cachedEnv = {
+      ...envSchema.parse(mergedEnv),
+      MILVUS_ADDRESS: normalizeMilvusAddress(String(mergedEnv.MILVUS_ADDRESS ?? "127.0.0.1:19530"))
+    };
   }
   return cachedEnv;
 };

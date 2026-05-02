@@ -1,76 +1,22 @@
-import {sha256Text} from "../hash";
+import {createEmbeddingProvider, type EmbeddingProvider} from "../embeddings/provider";
 
 import type {AssetPipelineConfig} from "./config";
 
-export type AssetEmbeddingProvider = {
-  provider: string;
-  model: string;
-  dimensions: number;
-  embedTexts(texts: string[]): Promise<number[][]>;
-};
-
-const buildDeterministicVector = (text: string, dimensions: number): number[] => {
-  const vector = new Array<number>(dimensions);
-  for (let index = 0; index < dimensions; index += 1) {
-    const digest = sha256Text(`${text}|${index}`);
-    const sample = Number.parseInt(digest.slice(0, 8), 16);
-    vector[index] = ((sample % 2000) / 1000) - 1;
-  }
-  return vector;
-};
-
-const createLocalTestProvider = (config: AssetPipelineConfig): AssetEmbeddingProvider => ({
-  provider: "local-test",
-  model: config.ASSET_EMBEDDING_MODEL,
-  dimensions: config.ASSET_EMBEDDING_DIMENSIONS,
-  async embedTexts(texts: string[]): Promise<number[][]> {
-    return texts.map((text) => buildDeterministicVector(text, config.ASSET_EMBEDDING_DIMENSIONS));
-  }
-});
-
-const createOpenAiProvider = (config: AssetPipelineConfig): AssetEmbeddingProvider => ({
-  provider: "openai",
-  model: config.ASSET_EMBEDDING_MODEL,
-  dimensions: config.ASSET_EMBEDDING_DIMENSIONS,
-  async embedTexts(texts: string[]): Promise<number[][]> {
-    if (!config.embeddingApiKey) {
-      throw new Error("ASSET_EMBEDDING_API_KEY or OPENAI_API_KEY is required when ASSET_EMBEDDING_PROVIDER=openai.");
-    }
-
-    const response = await fetch(`${config.OPENAI_BASE_URL.replace(/\/+$/, "")}/embeddings`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${config.embeddingApiKey}`
-      },
-      body: JSON.stringify({
-        model: config.ASSET_EMBEDDING_MODEL,
-        input: texts,
-        dimensions: config.ASSET_EMBEDDING_DIMENSIONS
-      })
-    });
-
-    if (!response.ok) {
-      const body = await response.text().catch(() => "");
-      throw new Error(`OpenAI embeddings request failed (${response.status} ${response.statusText}): ${body}`);
-    }
-
-    const payload = await response.json() as {
-      data?: Array<{embedding?: number[]}>;
-    };
-    const embeddings = payload.data?.map((entry) => entry.embedding ?? []) ?? [];
-    if (embeddings.length !== texts.length) {
-      throw new Error(`Expected ${texts.length} embeddings, received ${embeddings.length}.`);
-    }
-
-    return embeddings;
-  }
-});
+export type AssetEmbeddingProvider = EmbeddingProvider;
 
 export const createAssetEmbeddingProvider = (config: AssetPipelineConfig): AssetEmbeddingProvider => {
-  if (config.ASSET_EMBEDDING_PROVIDER === "local-test") {
-    return createLocalTestProvider(config);
-  }
-
-  return createOpenAiProvider(config);
+  return createEmbeddingProvider({
+    provider: config.ASSET_EMBEDDING_PROVIDER,
+    model: config.ASSET_EMBEDDING_MODEL,
+    dimensions: config.ASSET_EMBEDDING_DIMENSIONS,
+    apiKey: config.embeddingApiKey,
+    baseUrl: config.OPENAI_BASE_URL,
+    pythonBin: config.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
+      ? config.BGE_M3_LOCAL_PYTHON_BIN
+      : config.LOCAL_EMBEDDING_PYTHON_BIN,
+    useFp16: config.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
+      ? config.BGE_M3_LOCAL_USE_FP16
+      : config.LOCAL_EMBEDDING_USE_FP16,
+    localBatchSize: Math.max(1, Math.min(config.ASSET_EMBEDDING_BATCH_SIZE, 32))
+  });
 };

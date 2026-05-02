@@ -4,7 +4,8 @@ import {indexUnifiedAssets} from "../src/lib/assets/indexing";
 const run = async (): Promise<void> => {
   const config = loadAssetPipelineConfig();
   const result = await indexUnifiedAssets({
-    config
+    config,
+    forceFull: process.argv.includes("--full")
   });
 
   console.log(`Documents indexed: ${result.documentCount}`);
