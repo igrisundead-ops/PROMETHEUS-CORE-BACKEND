@@ -118,7 +118,7 @@ export const LongformNumericCounterOverlay: React.FC<LongformNumericCounterOverl
             style={{
               paddingTop: "0.24em",
               color: accent.secondary,
-              fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+              fontFamily: "\"DM Sans\", sans-serif",
               fontSize: `${unitSizePx}px`,
               fontWeight: 800,
               letterSpacing: "-0.02em",
@@ -148,7 +148,7 @@ export const LongformNumericCounterOverlay: React.FC<LongformNumericCounterOverl
             style={{
               paddingTop: "0.14em",
               color: accent.secondary,
-              fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+              fontFamily: "\"DM Sans\", sans-serif",
               fontSize: `${unitSizePx}px`,
               fontWeight: 800,
               letterSpacing: "-0.02em",
@@ -178,7 +178,7 @@ export const LongformNumericCounterOverlay: React.FC<LongformNumericCounterOverl
           style={{
             maxWidth: "88%",
             color: accent.support,
-            fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+            fontFamily: "\"DM Sans\", sans-serif",
             fontSize: `${supportSizePx}px`,
             fontWeight: 700,
             letterSpacing: "0.18em",

@@ -304,7 +304,7 @@ const PiPAssetCard: React.FC<{
           justifyContent: "space-between",
           gap: 12,
           marginBottom: 10,
-          fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+          fontFamily: "\"DM Sans\", sans-serif",
           fontSize: 10,
           fontWeight: 800,
           letterSpacing: "0.16em",
@@ -383,7 +383,7 @@ const PiPAssetCard: React.FC<{
         </div>
         <div
           style={{
-            fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+            fontFamily: "\"DM Sans\", sans-serif",
             fontSize: 11,
             lineHeight: 1.36,
             letterSpacing: "0.08em",
@@ -676,7 +676,7 @@ export const CinematicPiPOverlay: React.FC<{
             background: "rgba(6, 9, 16, 0.54)",
             backdropFilter: "blur(14px)",
             color: "rgba(244, 248, 255, 0.9)",
-            fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+            fontFamily: "\"DM Sans\", sans-serif",
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: "0.18em",
@@ -743,7 +743,7 @@ export const CinematicPiPOverlay: React.FC<{
                     background: "rgba(255,255,255,0.05)",
                     boxShadow: `0 0 0 1px rgba(255,255,255,0.02), 0 10px 24px rgba(0,0,0,0.14)`,
                     color: chip.accent.primary,
-                    fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+                    fontFamily: "\"DM Sans\", sans-serif",
                     fontSize: 10,
                     fontWeight: 800,
                     letterSpacing: "0.14em",
@@ -759,7 +759,7 @@ export const CinematicPiPOverlay: React.FC<{
           <div
             style={{
               maxWidth: "34ch",
-              fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+              fontFamily: "\"DM Sans\", sans-serif",
               fontSize: "clamp(0.88rem, 1.3vw, 1rem)",
               lineHeight: 1.42,
               letterSpacing: "0.1em",
@@ -816,7 +816,7 @@ export const CinematicPiPOverlay: React.FC<{
           background: "rgba(5,8,14,0.5)",
           backdropFilter: "blur(16px)",
           color: "rgba(229,236,250,0.84)",
-          fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+          fontFamily: "\"DM Sans\", sans-serif",
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: "0.12em",

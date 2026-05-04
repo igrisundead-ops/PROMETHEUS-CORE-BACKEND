@@ -154,7 +154,7 @@ const getHeaderStyle = (palette: VariantPalette): React.CSSProperties => {
     gap: 12,
     marginBottom: 12,
     color: palette.primary,
-    fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+    fontFamily: "\"DM Sans\", sans-serif",
     fontSize: "0.66rem",
     fontWeight: 800,
     letterSpacing: "0.16em",
@@ -183,7 +183,7 @@ const getTagStyle = (palette: VariantPalette): React.CSSProperties => {
       : "rgba(255,255,255,0.06)",
     border: `1px solid ${palette.border}`,
     color: palette.text === "#10131a" ? "rgba(16, 21, 31, 0.82)" : "rgba(241, 246, 255, 0.88)",
-    fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+    fontFamily: "\"DM Sans\", sans-serif",
     fontSize: "0.64rem",
     fontWeight: 700,
     letterSpacing: "0.08em",
@@ -275,7 +275,7 @@ const renderGraphicAssetPanel = ({
           <span
             style={{
               color: palette.muted,
-              fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+              fontFamily: "\"DM Sans\", sans-serif",
               fontSize: "0.62rem",
               fontWeight: 700,
               letterSpacing: "0.12em",
@@ -390,7 +390,7 @@ const renderKeywordCard = ({
           style={{
             marginTop: 2,
             color: palette.muted,
-            fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+            fontFamily: "\"DM Sans\", sans-serif",
             fontSize: "0.76rem",
             letterSpacing: "0.06em",
             textTransform: "uppercase"
@@ -537,7 +537,7 @@ const renderStepSequence = ({
                 style={{
                   marginBottom: 8,
                   color: palette.primary,
-                  fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+                  fontFamily: "\"DM Sans\", sans-serif",
                   fontSize: "0.64rem",
                   fontWeight: 800,
                   letterSpacing: "0.14em",

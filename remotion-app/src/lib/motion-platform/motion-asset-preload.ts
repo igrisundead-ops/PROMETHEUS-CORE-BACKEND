@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useState} from "react";
 
 import type {MotionAssetManifest} from "../types";
+import {getHouseTypographyPreviewFontFamilies} from "../cinematic-typography/house-font-loader";
 import {getUnifiedMotionAssetCatalog, selectMotionAssetsForPreview} from "./motion-asset-registry";
 
 export type MotionPreviewWarmupState = "idle" | "warming" | "ready" | "error";
@@ -109,7 +110,7 @@ export const primeMotionPreviewWarmup = async ({
   selectedAssets = [],
   draftPreviewUrl,
   videoUrls = [],
-  fontFamilies = ["Sora", "Manrope", "DM Serif Display", "Playfair Display"],
+  fontFamilies = ["Sora", "DM Sans", "DM Serif Display", "Playfair Display", ...getHouseTypographyPreviewFontFamilies()],
   priorityLimit = 12
 }: MotionPreviewWarmupRequest = {}): Promise<void> => {
   if (typeof window === "undefined") {
@@ -138,7 +139,7 @@ export const useMotionPreviewWarmup = ({
   selectedAssets = [],
   draftPreviewUrl,
   videoUrls = [],
-  fontFamilies = ["Sora", "Manrope", "DM Serif Display", "Playfair Display"],
+  fontFamilies = ["Sora", "DM Sans", "DM Serif Display", "Playfair Display", ...getHouseTypographyPreviewFontFamilies()],
   priorityLimit = 12
 }: MotionPreviewWarmupRequest = {}): MotionPreviewWarmupState => {
   const [state, setState] = useState<MotionPreviewWarmupState>("idle");

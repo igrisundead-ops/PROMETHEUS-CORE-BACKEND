@@ -1,0 +1,61 @@
+graph TD
+  subgraph Neutral___Support["Neutral / Support"]
+  role_neutral_sans_core["neutral_sans_core"]
+  dm_sans["DM Sans\nactive-runtime"]
+  end
+  subgraph Hero_Serif___Alternate["Hero Serif / Alternate"]
+  role_hero_serif_primary["hero_serif_primary"]
+  jugendreisen["Jugendreisen\ndoctrine-only"]
+  role_hero_serif_alternate["hero_serif_alternate"]
+  louize["Louize\ndoctrine-only"]
+  noto_serif_display["Noto Serif Display\nactive-runtime"]
+  end
+  subgraph Editorial_Serif["Editorial Serif"]
+  role_editorial_serif_support["editorial_serif_support"]
+  playfair_display["Playfair Display\nactive-runtime"]
+  cormorant_garamond["Cormorant Garamond\nlegacy-runtime"]
+  fraunces["Fraunces\nactive-runtime"]
+  crimson_pro["Crimson Pro\nactive-runtime"]
+  instrument_serif["Instrument Serif\nactive-runtime"]
+  end
+  subgraph Script___Accent["Script / Accent"]
+  role_script_accent_rare["script_accent_rare"]
+  ivar_script["Ivar Script\ndoctrine-only"]
+  bs_acapulko["BS Acapulko\ndoctrine-only"]
+  end
+  subgraph Pressure_Release["Pressure Release"]
+  role_display_sans_pressure_release["display_sans_pressure_release"]
+  sokoli["Sokoli\ndoctrine-only"]
+  anton["Anton\ndoctrine-only"]
+  bebas_neue["Bebas Neue\ndoctrine-only"]
+  end
+  subgraph Experimental___Display["Experimental / Display"]
+  end
+  role_hero_serif_primary --> jugendreisen
+  role_hero_serif_alternate --> louize
+  role_hero_serif_alternate --> noto_serif_display
+  role_editorial_serif_support --> playfair_display
+  role_editorial_serif_support --> cormorant_garamond
+  role_editorial_serif_support --> fraunces
+  role_editorial_serif_support --> crimson_pro
+  role_editorial_serif_support --> instrument_serif
+  role_neutral_sans_core --> dm_sans
+  role_script_accent_rare --> ivar_script
+  role_script_accent_rare --> bs_acapulko
+  role_display_sans_pressure_release --> sokoli
+  role_display_sans_pressure_release --> anton
+  role_display_sans_pressure_release --> bebas_neue
+  jugendreisen -->|supports| dm_sans
+  jugendreisen -->|contrast| ivar_script
+  jugendreisen -. avoid .-> bs_acapulko
+  jugendreisen -->|fallback| louize
+  jugendreisen -->|fallback| noto_serif_display
+  jugendreisen -. redundant .-> playfair_display
+  fraunces -->|supports| dm_sans
+  fraunces -->|fallback| crimson_pro
+  fraunces -->|fallback| instrument_serif
+  fraunces -. redundant .-> cormorant_garamond
+  crimson_pro -->|supports| dm_sans
+  sokoli -->|contrast| dm_sans
+  anton -. avoid .-> jugendreisen
+  bebas_neue -. avoid .-> jugendreisen

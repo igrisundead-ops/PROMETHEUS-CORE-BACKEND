@@ -327,7 +327,7 @@ export const CINEMATIC_TREATMENTS: CinematicTreatment[] = [
     moodTags: ["luxury", "editorial", "restrained"],
     pacingProfile: ["slow", "medium"],
     fontProfile: "instrument-nocturne",
-    fallbackFontProfile: "cormorant-salon",
+    fallbackFontProfile: "fraunces-editorial",
     casePolicy: "title",
     trackingRules: {
       base: "-0.02em",

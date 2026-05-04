@@ -1,6 +1,7 @@
 import {describe, expect, it} from "vitest";
 
 import {buildCinematicCaptionPlans} from "../cinematic-typography/selector";
+import {getEditorialFontPalette} from "../cinematic-typography/font-runtime-registry";
 import type {CaptionEditorialDecision} from "../motion-platform/caption-editorial-engine";
 import type {CaptionChunk} from "../types";
 
@@ -115,6 +116,16 @@ const makeEditorialDecision = ({
       },
       reasoning: [],
       readabilitySafeguards: []
+    },
+    fontSelection: {
+      requestedRoleId: "editorial_serif_support",
+      selectedRoleId: "editorial_serif_support",
+      fontCandidateId: "fraunces",
+      fontPaletteId: "fraunces-editorial",
+      palette: getEditorialFontPalette("fraunces-editorial"),
+      intensityBand: "medium",
+      motionDemand: "medium",
+      rationale: []
     }
   } as CaptionEditorialDecision;
 };

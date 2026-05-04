@@ -137,8 +137,10 @@ describe("caption editorial engine", () => {
     expect(decision.assetBias).toBe("structured");
     expect(decision.keywordPhrases.length).toBeGreaterThan(0);
     expect(decision.typography.role).toBe("hook");
-    expect(decision.fontFamily).toContain("Playfair Display");
+    expect(decision.fontFamily).toContain("Noto Serif Display");
+    expect(decision.fontSelection.selectedRoleId).toBe("hero_serif_alternate");
     expect(decision.rationale.join(" ")).toContain("typography-pattern=");
+    expect(decision.rationale.join(" ")).toContain("font-candidate=");
   });
 
   it("uses the combat plan to bias keyword filtration and editorial rationale", () => {
@@ -166,5 +168,24 @@ describe("caption editorial engine", () => {
     expect(decision.rationale.join(" ")).toContain("combat-primary=");
     expect(decision.typography.pattern.id.length).toBeGreaterThan(0);
     expect(decision.typography.readabilitySafeguards.length).toBeGreaterThan(0);
+  });
+
+  it("routes documentary quote moments into the support-serif lane", () => {
+    const decision = resolveCaptionEditorialDecision({
+      chunk: makeChunk({
+        text: "This is the part people actually remember",
+        startMs: 0,
+        endMs: 2600,
+        emphasisWordIndices: [5],
+        words: buildWords("This is the part people actually remember", 0, 2600)
+      }),
+      surfaceToneHint: "dark",
+      forceMode: "escalated"
+    });
+
+    expect(decision.typography.role).toBe("quote");
+    expect(decision.fontSelection.selectedRoleId).toBe("editorial_serif_support");
+    expect(["fraunces", "crimson-pro", "instrument-serif"]).toContain(decision.fontSelection.fontCandidateId);
+    expect(decision.rationale.join(" ")).toContain("selected-role=editorial_serif_support");
   });
 });

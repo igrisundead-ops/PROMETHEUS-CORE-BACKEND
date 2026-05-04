@@ -14,6 +14,10 @@ import {
   type TypographyTextRole
 } from "../typography-intelligence";
 import {getEditorialFontPalette, type EditorialFontPaletteId} from "../cinematic-typography/editorial-fonts";
+import {
+  selectRuntimeFontSelection,
+  type RuntimeFontSelection
+} from "../cinematic-typography/runtime-font-selector";
 import {selectActiveMotionBackgroundOverlayCueAtTime} from "./background-overlay-planner";
 import type {
   CaptionChunk,
@@ -66,6 +70,7 @@ export type CaptionEditorialDecision = {
   rationale: string[];
   cssVariables: Record<string, string>;
   typography: TypographySelection;
+  fontSelection: RuntimeFontSelection;
 };
 
 const DEFAULT_KEYWORD_STOP_WORDS = new Set([
@@ -302,7 +307,14 @@ const resolveTypographyRole = ({
   }
 
   if (mode === "escalated") {
-    if (!hasGraphicAsset && combinedKeywordPhrases.length <= 2 && chunk.words.length <= 6) {
+    if (
+      !hasGraphicAsset &&
+      (
+        combinedKeywordPhrases.length <= 2 ||
+        chunk.words.length >= 6 ||
+        chunk.endMs - chunk.startMs >= 2200
+      )
+    ) {
       return "quote";
     }
     return "headline";
@@ -344,73 +356,62 @@ const resolveTypographyEnergyScore = ({
 const resolveCaptionEditorialTypeface = ({
   mode,
   typography,
-  uppercaseBias
+  uppercaseBias,
+  fontSelection
 }: {
   mode: CaptionEditorialMode;
   typography: TypographySelection;
   uppercaseBias: boolean;
+  fontSelection: RuntimeFontSelection;
 }): {
   fontFamily: string;
   fontWeight: number | string;
   letterSpacing: string;
 } => {
-  const mood = typography.pattern.mood;
-  const role = typography.role;
-  let paletteId: EditorialFontPaletteId = "fraunces-editorial";
+  const paletteId: EditorialFontPaletteId = fontSelection.fontPaletteId;
+  const palette = getEditorialFontPalette(paletteId);
   let fontWeight: number | string = 600;
-  let letterSpacing = uppercaseBias ? "0.026em" : "-0.016em";
+  let letterSpacing = uppercaseBias ? "0.024em" : "-0.016em";
 
-  if (mode === "keyword-only") {
-    if (mood === "tech") {
-      paletteId = "dm-sans-core";
-      fontWeight = 700;
-      letterSpacing = uppercaseBias ? "0.03em" : "-0.014em";
-    } else if (mood === "luxury" || mood === "editorial") {
-      paletteId = "noto-display";
+  switch (paletteId) {
+    case "dm-sans-core":
+      fontWeight = mode === "keyword-only" ? 700 : 600;
+      letterSpacing = uppercaseBias ? "0.028em" : "-0.012em";
+      break;
+    case "noto-display":
       fontWeight = 700;
       letterSpacing = uppercaseBias ? "0.038em" : "-0.022em";
-    } else {
-      paletteId = "playfair-contrast";
-      fontWeight = 700;
-      letterSpacing = uppercaseBias ? "0.03em" : "-0.02em";
-    }
-  } else if (role === "headline" || role === "hook" || role === "transition-card" || role === "cta" || mode === "escalated") {
-    if (mood === "luxury" || mood === "editorial") {
-      paletteId = uppercaseBias ? "noto-display" : "playfair-contrast";
+      break;
+    case "playfair-contrast":
       fontWeight = 700;
       letterSpacing = uppercaseBias ? "0.03em" : "-0.018em";
-    } else if (mood === "trailer" || mood === "aggressive" || mood === "cinematic") {
-      paletteId = "fraunces-editorial";
-      fontWeight = 650;
-      letterSpacing = uppercaseBias ? "0.022em" : "-0.02em";
-    } else {
-      paletteId = "fraunces-editorial";
+      break;
+    case "instrument-nocturne":
+      fontWeight = 400;
+      letterSpacing = uppercaseBias ? "0.02em" : "-0.014em";
+      break;
+    case "crimson-voice":
+    case "lora-documentary":
       fontWeight = 600;
-      letterSpacing = uppercaseBias ? "0.024em" : "-0.016em";
-    }
-  } else if (role === "tech-overlay" || mood === "tech") {
-    paletteId = "dm-sans-core";
-    fontWeight = 600;
-    letterSpacing = uppercaseBias ? "0.02em" : "-0.01em";
-  } else if (mood === "emotional") {
-    paletteId = "instrument-nocturne";
-    fontWeight = 400;
-    letterSpacing = uppercaseBias ? "0.02em" : "-0.014em";
-  } else if (mood === "documentary") {
-    paletteId = "crimson-voice";
-    fontWeight = 600;
-    letterSpacing = uppercaseBias ? "0.018em" : "-0.012em";
-  } else if (mood === "luxury") {
-    paletteId = "cormorant-salon";
-    fontWeight = 600;
-    letterSpacing = uppercaseBias ? "0.022em" : "-0.016em";
-  } else {
-    paletteId = "lora-documentary";
-    fontWeight = 600;
-    letterSpacing = uppercaseBias ? "0.018em" : "-0.012em";
+      letterSpacing = uppercaseBias ? "0.018em" : "-0.012em";
+      break;
+    case "cormorant-salon":
+      fontWeight = 600;
+      letterSpacing = uppercaseBias ? "0.022em" : "-0.016em";
+      break;
+    case "fraunces-editorial":
+    default:
+      fontWeight =
+        typography.role === "headline" ||
+        typography.role === "hook" ||
+        typography.role === "transition-card" ||
+        typography.role === "cta" ||
+        mode === "keyword-only"
+          ? 650
+          : 600;
+      letterSpacing = uppercaseBias ? "0.022em" : "-0.016em";
+      break;
   }
-
-  const palette = getEditorialFontPalette(paletteId);
 
   return {
     fontFamily: palette.displayFamily,
@@ -536,11 +537,26 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     surfaceTone,
     presentationMode: context.presentationMode ?? null
   });
+  const fontSelection = selectRuntimeFontSelection({
+    typographyRole,
+    contentEnergy: typographyEnergy,
+    patternMood: typography.pattern.mood,
+    targetMoods: typography.targetMoods,
+    patternUnit: typography.pattern.unit,
+    wordCount: context.chunk.words.length,
+    emphasisCount,
+    mode,
+    surfaceTone,
+    motionTier: context.motionTier ?? null,
+    semanticIntent: context.chunk.semantic?.intent ?? null,
+    presentationMode: context.presentationMode ?? null
+  });
   const uppercaseBias = mode !== "normal" || isLightSurface || typography.styling.preferredCase === "uppercase";
   const typeface = resolveCaptionEditorialTypeface({
     mode,
     typography,
-    uppercaseBias
+    uppercaseBias,
+    fontSelection
   });
   const letterSpacing = typeface.letterSpacing;
   const fontFamily = typeface.fontFamily;
@@ -573,6 +589,7 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     `typography-pattern=${typography.pattern.id}`,
     `typography-unit=${typography.pattern.unit}`,
     `typography-mood=${typography.pattern.mood}`,
+    ...fontSelection.rationale,
     typography.combo ? `typography-combo=${typography.combo.id}` : null
   ]);
 
@@ -605,7 +622,8 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
       "--caption-typography-mood": typography.pattern.mood,
       "--caption-typography-case": typography.styling.preferredCase
     },
-    typography
+    typography,
+    fontSelection
   };
 };
 

@@ -52,9 +52,9 @@
       source: "google",
       styles: ["bold"]
     },
-    manrope: {
-      name: "Manrope",
-      css: "\"Manrope\", \"Segoe UI\", sans-serif",
+    dmSans: {
+      name: "DM Sans",
+      css: "\"DM Sans\", \"Segoe UI\", sans-serif",
       source: "google",
       styles: ["sans"]
     },
@@ -128,7 +128,7 @@
 
   var FONT_CATEGORIES = {
     fallback: [
-      "Manrope",
+      "DM Sans",
       "Bebas Neue",
       "Oswald",
       "Cinzel",

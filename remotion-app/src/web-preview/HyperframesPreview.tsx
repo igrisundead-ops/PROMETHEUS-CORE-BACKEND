@@ -57,7 +57,7 @@ const resolveTrackCardStyle = (layer: DisplayTimelineLayer): React.CSSProperties
   const styleMetadata = layer.styleMetadata ?? {};
   const trackType = typeof styleMetadata["trackType"] === "string" ? styleMetadata["trackType"] : "text";
   const backgroundStyle = typeof styleMetadata["backgroundStyle"] === "string" ? styleMetadata["backgroundStyle"] : "glass-gradient";
-  const fontFamily = trackType === "text" ? "\"DM Serif Display\", \"Playfair Display\", serif" : "\"Manrope\", sans-serif";
+  const fontFamily = trackType === "text" ? "\"DM Serif Display\", \"Playfair Display\", serif" : "\"DM Sans\", sans-serif";
 
   const background =
     backgroundStyle === "subtle-animated-background-grid"

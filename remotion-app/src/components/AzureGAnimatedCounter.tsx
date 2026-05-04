@@ -78,7 +78,7 @@ export const AzureGAnimatedCounter: React.FC<AzureGAnimatedCounterProps> = ({
             justifyContent: "space-between",
             gap: 10,
             color: accent.primary,
-            fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+            fontFamily: "\"DM Sans\", sans-serif",
             fontSize: "0.64rem",
             fontWeight: 800,
             letterSpacing: "0.18em",
@@ -102,7 +102,7 @@ export const AzureGAnimatedCounter: React.FC<AzureGAnimatedCounterProps> = ({
           <div
             style={{
               color: "rgba(246, 250, 255, 0.82)",
-              fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+              fontFamily: "\"DM Sans\", sans-serif",
               fontSize: "0.68rem",
               fontWeight: 700,
               letterSpacing: "0.14em",
@@ -136,7 +136,7 @@ export const AzureGAnimatedCounter: React.FC<AzureGAnimatedCounterProps> = ({
               alignItems: "center",
               gap: 10,
               color: "rgba(234, 240, 252, 0.78)",
-              fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+              fontFamily: "\"DM Sans\", sans-serif",
               fontSize: "0.72rem",
               letterSpacing: "0.08em",
               textTransform: "uppercase"

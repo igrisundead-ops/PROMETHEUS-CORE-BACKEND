@@ -13,6 +13,6 @@
   <rect width="1200" height="1200" fill="url(#bg)"/>
   <circle cx="600" cy="420" r="420" fill="url(#glow)"/>
   <rect x="120" y="790" width="960" height="220" rx="48" fill="rgba(9, 16, 31, 0.52)" stroke="rgba(180, 206, 255, 0.24)" stroke-width="4"/>
-  <text x="600" y="555" fill="#f7fbff" font-family="Manrope, Arial, sans-serif" font-size="94" font-weight="800" letter-spacing="12" text-anchor="middle">BILL</text>
-  <text x="600" y="670" fill="#8fb1ff" font-family="Manrope, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="8" text-anchor="middle">bill-stack</text>
+  <text x="600" y="555" fill="#f7fbff" font-family="DM Sans, Arial, sans-serif" font-size="94" font-weight="800" letter-spacing="12" text-anchor="middle">BILL</text>
+  <text x="600" y="670" fill="#8fb1ff" font-family="DM Sans, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="8" text-anchor="middle">bill-stack</text>
 </svg>

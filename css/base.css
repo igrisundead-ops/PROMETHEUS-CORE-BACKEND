@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Allura&family=Anton&family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600;6..96,700&family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Great+Vibes&family=League+Gothic&family=Manrope:wght@400;500;700&family=Oswald:wght@500;600;700&family=Teko:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Allura&family=Anton&family=Bebas+Neue&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600;6..96,700&family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=DMSans:wght@400;500;700&family=Great+Vibes&family=League+Gothic&family=Oswald:wght@500;600;700&family=Teko:wght@500;600;700&display=swap");
 
 @font-face {
   font-family: "Fabringo";
@@ -84,7 +84,7 @@ body {
   min-height: 100vh;
   padding: 22px;
   color: var(--panel-text);
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
   background:
     radial-gradient(1000px 560px at 8% 0%, rgba(255, 126, 53, 0.24) 0%, rgba(255, 126, 53, 0) 58%),
     radial-gradient(980px 560px at 92% 100%, rgba(77, 125, 255, 0.26) 0%, rgba(77, 125, 255, 0) 58%),

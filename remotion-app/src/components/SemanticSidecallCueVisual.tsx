@@ -213,7 +213,7 @@ const headerStyle = (cue: MotionShowcaseCue): CSSProperties => {
     gap: 12,
     marginBottom: 12,
     color: accent.primary,
-    fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+    fontFamily: "\"DM Sans\", sans-serif",
     fontSize: "0.66rem",
     fontWeight: 800,
     letterSpacing: "0.16em",
@@ -242,7 +242,7 @@ const buildTagStyle = (cue: MotionShowcaseCue): CSSProperties => {
     background: "rgba(255,255,255,0.06)",
     border: `1px solid ${accent.glow.replace(/0\.\d+\)$/, "0.2)")}`,
     color: "rgba(241, 246, 255, 0.82)",
-    fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+    fontFamily: "\"DM Sans\", sans-serif",
     fontSize: "0.64rem",
     fontWeight: 700,
     letterSpacing: "0.08em",
@@ -533,7 +533,7 @@ const TimelineGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
             <div
               style={{
                 color: "rgba(205,214,234,0.72)",
-                fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+                fontFamily: "\"DM Sans\", sans-serif",
                 fontSize: "0.7rem",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase"
@@ -610,7 +610,7 @@ const BlueprintGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
             <div
               style={{
                 color: accent.primary,
-                fontFamily: "\"Manrope\", \"DM Sans\", sans-serif",
+                fontFamily: "\"DM Sans\", sans-serif",
                 fontSize: "0.66rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",

@@ -2,6 +2,7 @@ import type {CaptionChunk, CaptionVerticalBias, MotionTier, TranscribedWord} fro
 import type {CaptionEditorialDecision} from "../motion-platform/caption-editorial-engine";
 
 import {getEditorialFontPalette, type EditorialFontPalette} from "./editorial-fonts";
+import {selectRuntimeFontSelection, type RuntimeFontSelection} from "./runtime-font-selector";
 import {CINEMATIC_TREATMENTS, type CinematicCasePolicy, type CinematicSceneEnergy, type CinematicTreatment} from "./treatments";
 
 export type CinematicWordPlan = {
@@ -47,6 +48,7 @@ export type CinematicCaptionPlan = {
   chunkIndex: number;
   editorialDecision: CaptionEditorialDecision;
   treatment: CinematicTreatment;
+  fontSelection: RuntimeFontSelection;
   fontPalette: EditorialFontPalette;
   lines: CinematicLinePlan[];
   continuity: CinematicContinuityPlan;
@@ -419,12 +421,17 @@ const scoreTreatment = ({
   score += metrics.targetMoods.filter((mood) => treatment.moodTags.includes(mood)).length * 0.55;
   score += treatment.sceneCompatibilityHints.semanticIntents.includes(metrics.semanticIntent) ? 0.7 : 0;
   score += treatment.fontProfile === "dm-sans-core" && metrics.speechPacing === "fast" ? 0.45 : 0;
+  score += editorialDecision.fontSelection?.fontPaletteId === treatment.fontProfile ? 0.95 : 0;
+  score += editorialDecision.fontSelection?.fontPaletteId === treatment.fallbackFontProfile ? 0.35 : 0;
   score += treatment.emphasisRules.italicizeEmphasis && metrics.emphasisCount > 0 ? 0.5 : 0;
   score += !treatment.emphasisRules.italicizeEmphasis && metrics.emphasisCount === 0 ? 0.25 : 0;
   score += treatment.lineBreakBehavior === "single-anchor" && metrics.wordCount <= 3 ? 0.65 : 0;
   score += treatment.lineBreakBehavior === "balanced" && metrics.wordCount >= 4 ? 0.4 : 0;
   score += treatment.lineBreakBehavior === "staggered-pair" && metrics.speechPacing === "fast" ? 0.55 : 0;
   score += metrics.surfaceTone === "light" && treatment.fontProfile === "dm-sans-core" ? 0.3 : 0;
+  score += editorialDecision.fontSelection?.selectedRoleId === "hero_serif_alternate" && treatment.id === "noto-monument" ? 0.9 : 0;
+  score += editorialDecision.fontSelection?.selectedRoleId === "editorial_serif_support" && treatment.id === "fraunces-pullquote" ? 0.75 : 0;
+  score += editorialDecision.fontSelection?.selectedRoleId === "neutral_sans_core" && treatment.id === "precision-directive" ? 0.75 : 0;
   score += editorialDecision.mode === "keyword-only" && treatment.lineBreakBehavior !== "balanced" ? 0.45 : 0;
   score += editorialDecision.mode === "normal" && treatment.motionGrammar.unit !== "block" ? 0.25 : 0;
   score += metrics.punctuationWeight > 0 && treatment.id === "noto-monument" ? 0.45 : 0;
@@ -559,13 +566,29 @@ export const buildCinematicCaptionPlans = ({
         }))
         .sort((a, b) => b.score - a.score)[0]?.treatment ?? CINEMATIC_TREATMENTS[0];
 
+    const fontSelection = editorialDecision.fontSelection ?? selectRuntimeFontSelection({
+      typographyRole: editorialDecision.typography.role,
+      contentEnergy: editorialDecision.typography.contentEnergy,
+      patternMood: editorialDecision.typography.pattern.mood,
+      targetMoods: editorialDecision.typography.targetMoods,
+      patternUnit: editorialDecision.typography.pattern.unit,
+      wordCount: chunk.words.length,
+      emphasisCount: chunk.emphasisWordIndices.length,
+      mode: editorialDecision.mode,
+      surfaceTone: editorialDecision.surfaceTone,
+      motionTier: motionTier ?? null,
+      semanticIntent: chunk.semantic?.intent ?? null,
+      treatmentFontProfileHint: selectedTreatment.fontProfile,
+      treatmentFallbackFontProfileHint: selectedTreatment.fallbackFontProfile
+    });
     const continuity = resolveContinuity(selectedTreatment, previousPlan, chunk);
     const plan: CinematicCaptionPlan = {
       chunk,
       chunkIndex,
       editorialDecision,
       treatment: selectedTreatment,
-      fontPalette: getEditorialFontPalette(selectedTreatment.fontProfile),
+      fontSelection,
+      fontPalette: getEditorialFontPalette(fontSelection.fontPaletteId),
       lines: buildLinePlans(chunk, selectedTreatment),
       continuity,
       metrics,

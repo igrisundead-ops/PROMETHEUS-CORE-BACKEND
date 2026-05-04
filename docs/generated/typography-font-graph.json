@@ -1,0 +1,1372 @@
+{
+  "generatedAt": "2026-05-04T03:57:47.196Z",
+  "phases": {
+    "phase1": "done",
+    "phase2": "started",
+    "phase3": "not-started",
+    "phase4": "not-started"
+  },
+  "fonts": [
+    {
+      "id": "jugendreisen",
+      "name": "Jugendreisen",
+      "source": "reference-pool",
+      "stage": "benchmark",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_primary"
+      ],
+      "benchmarkForRole": "hero_serif_primary",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.98,
+      "restraintSignal": 0.9,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Primary benchmark for hero serif taste.",
+        "High-contrast prestige with strong identity.",
+        "Future hero candidates must beat or complement this benchmark, not merely resemble it.",
+        "Not a general alternate lane fallback."
+      ]
+    },
+    {
+      "id": "louize",
+      "name": "Louize",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_alternate"
+      ],
+      "benchmarkForRole": "hero_serif_alternate",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.9,
+      "restraintSignal": 0.84,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the alternate hero serif role.",
+        "The soft counterpoint to Jugendreisen.",
+        "No longer dual-purposed as a routine editorial support default."
+      ]
+    },
+    {
+      "id": "noto-serif-display",
+      "name": "Noto Serif Display",
+      "source": "current-system",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_alternate"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": true,
+      "runtimeStatus": "active-runtime",
+      "runtimePaletteId": "noto-display",
+      "doctrineOnly": false,
+      "premiumSignal": 0.82,
+      "restraintSignal": 0.8,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "high"
+      ],
+      "notes": [
+        "Current-system monument serif challenger.",
+        "Statement-only challenger for monumental title-card situations.",
+        "Not a general alternate hero serif."
+      ]
+    },
+    {
+      "id": "playfair-display",
+      "name": "Playfair Display",
+      "source": "current-system",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "editorial_serif_support"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": true,
+      "runtimeStatus": "active-runtime",
+      "runtimePaletteId": "playfair-contrast",
+      "doctrineOnly": false,
+      "premiumSignal": 0.8,
+      "restraintSignal": 0.76,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Fallback editorial serif challenger.",
+        "Removed from the hero-alternate lane to avoid prestige redundancy with Louize and Jugendreisen."
+      ]
+    },
+    {
+      "id": "cormorant-garamond",
+      "name": "Cormorant Garamond",
+      "source": "current-system",
+      "stage": "legacy",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "editorial_serif_support"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": true,
+      "runtimeStatus": "legacy-runtime",
+      "runtimePaletteId": "cormorant-salon",
+      "doctrineOnly": false,
+      "premiumSignal": 0.68,
+      "restraintSignal": 0.74,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Legacy fallback support serif.",
+        "Demoted out of premium core contention so editorial support can stay cleaner and more disciplined.",
+        "Emergency fallback only, not a preferred live support choice."
+      ]
+    },
+    {
+      "id": "fraunces",
+      "name": "Fraunces",
+      "source": "current-system",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "editorial_serif_support"
+      ],
+      "benchmarkForRole": "editorial_serif_support",
+      "runtimeSelectable": true,
+      "runtimeStatus": "active-runtime",
+      "runtimePaletteId": "fraunces-editorial",
+      "doctrineOnly": false,
+      "premiumSignal": 0.84,
+      "restraintSignal": 0.82,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for editorial serif support.",
+        "Very useful for editorial support and cinematic warmth.",
+        "Locked to support duty so Louize can own the alternate hero lane."
+      ]
+    },
+    {
+      "id": "crimson-pro",
+      "name": "Crimson Pro",
+      "source": "current-system",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "editorial_serif_support"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": true,
+      "runtimeStatus": "active-runtime",
+      "runtimePaletteId": "crimson-voice",
+      "doctrineOnly": false,
+      "premiumSignal": 0.73,
+      "restraintSignal": 0.9,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Primary documentary-support challenger under Fraunces.",
+        "Best used when the scene needs authority, humanity, and lower visual temperature than the benchmark support serif."
+      ]
+    },
+    {
+      "id": "instrument-serif",
+      "name": "Instrument Serif",
+      "source": "current-system",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "editorial_serif_support"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": true,
+      "runtimeStatus": "active-runtime",
+      "runtimePaletteId": "instrument-nocturne",
+      "doctrineOnly": false,
+      "premiumSignal": 0.78,
+      "restraintSignal": 0.83,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Soft luxury support challenger only.",
+        "Demoted out of the hero-alternate lane so it cannot compete with Louize for prestige identity.",
+        "Useful when editorial support needs hush, softness, and less documentary weight than Crimson Pro."
+      ]
+    },
+    {
+      "id": "dm-sans",
+      "name": "DM Sans",
+      "source": "current-system",
+      "stage": "approved",
+      "categories": [
+        "neutral-sans"
+      ],
+      "doctrineRoles": [
+        "neutral_sans_core"
+      ],
+      "benchmarkForRole": "neutral_sans_core",
+      "runtimeSelectable": true,
+      "runtimeStatus": "active-runtime",
+      "runtimePaletteId": "dm-sans-core",
+      "doctrineOnly": false,
+      "premiumSignal": 0.72,
+      "restraintSignal": 0.95,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Chosen singular neutral sans spine.",
+        "Carries UI, counters, overlays, captions, and utility text."
+      ]
+    },
+    {
+      "id": "ivar-script",
+      "name": "Ivar Script",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": "script_accent_rare",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.94,
+      "restraintSignal": 0.7,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the rare script accent role.",
+        "Should only survive if it behaves well in very short isolated moments."
+      ]
+    },
+    {
+      "id": "bs-acapulko",
+      "name": "BS Acapulko",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.88,
+      "restraintSignal": 0.66,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Challenger to Ivar Script for the rare accent slot.",
+        "Stylish accent candidate, but risks becoming noisy if overused."
+      ]
+    },
+    {
+      "id": "sokoli",
+      "name": "Sokoli",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "decorative"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.79,
+      "restraintSignal": 0.58,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Could become a pressure-release face if it earns a very narrow directive role."
+      ]
+    },
+    {
+      "id": "anton",
+      "name": "Anton",
+      "source": "current-system",
+      "stage": "legacy",
+      "categories": [
+        "display-sans"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.46,
+      "restraintSignal": 0.35,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Legacy pressure font.",
+        "Only survives if a harder commercial/directive lane truly needs it."
+      ]
+    },
+    {
+      "id": "bebas-neue",
+      "name": "Bebas Neue",
+      "source": "current-system",
+      "stage": "legacy",
+      "categories": [
+        "display-sans"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.38,
+      "restraintSignal": 0.28,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "The old default hero language.",
+        "Now explicitly demoted out of the main house voice."
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "id": "hero_serif_primary",
+      "label": "Hero Serif Primary",
+      "targetCount": 1,
+      "benchmarkCandidateId": "jugendreisen",
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "jugendreisen"
+      ],
+      "fallbackRoleIds": [
+        "hero_serif_alternate",
+        "editorial_serif_support",
+        "neutral_sans_core"
+      ],
+      "laneStatus": "doctrine-only",
+      "weakReasons": [
+        "no-active-runtime-font",
+        "benchmark-not-runtime-selectable"
+      ]
+    },
+    {
+      "id": "hero_serif_alternate",
+      "label": "Hero Serif Alternate",
+      "targetCount": 1,
+      "benchmarkCandidateId": "louize",
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [
+        "noto-serif-display"
+      ],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "louize"
+      ],
+      "fallbackRoleIds": [
+        "editorial_serif_support",
+        "neutral_sans_core"
+      ],
+      "laneStatus": "partial-runtime",
+      "weakReasons": [
+        "benchmark-not-runtime-selectable"
+      ]
+    },
+    {
+      "id": "editorial_serif_support",
+      "label": "Editorial Serif Support",
+      "targetCount": 1,
+      "benchmarkCandidateId": "fraunces",
+      "benchmarkRuntimeSelectable": true,
+      "activeRuntimeCandidateIds": [
+        "playfair-display",
+        "fraunces",
+        "crimson-pro",
+        "instrument-serif"
+      ],
+      "legacyRuntimeCandidateIds": [
+        "cormorant-garamond"
+      ],
+      "doctrineOnlyCandidateIds": [],
+      "fallbackRoleIds": [
+        "neutral_sans_core"
+      ],
+      "laneStatus": "runtime-ready",
+      "weakReasons": []
+    },
+    {
+      "id": "neutral_sans_core",
+      "label": "Neutral Sans Core",
+      "targetCount": 1,
+      "benchmarkCandidateId": "dm-sans",
+      "benchmarkRuntimeSelectable": true,
+      "activeRuntimeCandidateIds": [
+        "dm-sans"
+      ],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [],
+      "fallbackRoleIds": [],
+      "laneStatus": "runtime-ready",
+      "weakReasons": []
+    },
+    {
+      "id": "script_accent_rare",
+      "label": "Script Accent Rare",
+      "targetCount": 1,
+      "benchmarkCandidateId": "ivar-script",
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "ivar-script",
+        "bs-acapulko"
+      ],
+      "fallbackRoleIds": [
+        "editorial_serif_support",
+        "neutral_sans_core"
+      ],
+      "laneStatus": "doctrine-only",
+      "weakReasons": [
+        "no-active-runtime-font",
+        "benchmark-not-runtime-selectable"
+      ]
+    },
+    {
+      "id": "display_sans_pressure_release",
+      "label": "Display Sans Pressure Release",
+      "targetCount": 1,
+      "benchmarkCandidateId": null,
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "sokoli",
+        "anton",
+        "bebas-neue"
+      ],
+      "fallbackRoleIds": [
+        "neutral_sans_core",
+        "editorial_serif_support"
+      ],
+      "laneStatus": "doctrine-only",
+      "weakReasons": [
+        "no-active-runtime-font"
+      ]
+    }
+  ],
+  "compatibilityEdges": [
+    {
+      "id": "jugendreisen-dm-sans-supports",
+      "from": "jugendreisen",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.96,
+      "rationale": "This is the current north-star pairing: prestige hero serif anchored by clean neutral utility support."
+    },
+    {
+      "id": "jugendreisen-ivar-script-contrast",
+      "from": "jugendreisen",
+      "to": "ivar-script",
+      "relation": "contrast",
+      "score": 0.78,
+      "rationale": "Promising luxury contrast, but only for very rare accent insertions."
+    },
+    {
+      "id": "jugendreisen-bs-acapulko-avoid",
+      "from": "jugendreisen",
+      "to": "bs-acapulko",
+      "relation": "avoid",
+      "score": 0.34,
+      "rationale": "Too much ornamental glamour too quickly; likely to turn into premium costume instead of premium structure."
+    },
+    {
+      "id": "jugendreisen-louize-fallback",
+      "from": "jugendreisen",
+      "to": "louize",
+      "relation": "fallback",
+      "score": 0.81,
+      "rationale": "Louize can act as a softer alternate hero serif if it stays visibly distinct from the benchmark."
+    },
+    {
+      "id": "jugendreisen-noto-display-fallback",
+      "from": "jugendreisen",
+      "to": "noto-serif-display",
+      "relation": "fallback",
+      "score": 0.73,
+      "rationale": "Noto Serif Display can serve monumental statement duty, but it must not flatten into a generic substitute."
+    },
+    {
+      "id": "jugendreisen-playfair-redundant",
+      "from": "jugendreisen",
+      "to": "playfair-display",
+      "relation": "redundant",
+      "score": 0.48,
+      "rationale": "Playfair is capable, but risks occupying too similar a prestige niche without adding enough identity."
+    },
+    {
+      "id": "fraunces-dm-sans-supports",
+      "from": "fraunces",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.89,
+      "rationale": "Excellent editorial support pairing with warmth and readable utility balance."
+    },
+    {
+      "id": "fraunces-crimson-pro-fallback",
+      "from": "fraunces",
+      "to": "crimson-pro",
+      "relation": "fallback",
+      "score": 0.87,
+      "rationale": "Crimson Pro is the clearest documentary understudy when Fraunces would feel too warm, too luxe, or too voiced."
+    },
+    {
+      "id": "fraunces-instrument-serif-fallback",
+      "from": "fraunces",
+      "to": "instrument-serif",
+      "relation": "fallback",
+      "score": 0.74,
+      "rationale": "Instrument Serif can soften support moments, but it belongs in a hush-luxury support lane rather than competing for hero authority."
+    },
+    {
+      "id": "fraunces-cormorant-garamond-redundant",
+      "from": "fraunces",
+      "to": "cormorant-garamond",
+      "relation": "redundant",
+      "score": 0.41,
+      "rationale": "Cormorant no longer earns a primary support slot once Fraunces and Crimson cover premium warmth and documentary restraint."
+    },
+    {
+      "id": "crimson-pro-dm-sans-supports",
+      "from": "crimson-pro",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.85,
+      "rationale": "Strong documentary and explanatory support relationship."
+    },
+    {
+      "id": "sokoli-dm-sans-contrast",
+      "from": "sokoli",
+      "to": "dm-sans",
+      "relation": "contrast",
+      "score": 0.67,
+      "rationale": "Could work as a pressure-release directive contrast, but should stay in a tightly bounded lane."
+    },
+    {
+      "id": "anton-jugendreisen-avoid",
+      "from": "anton",
+      "to": "jugendreisen",
+      "relation": "avoid",
+      "score": 0.29,
+      "rationale": "This pairing exposes the old habit of swapping authority for blunt force."
+    },
+    {
+      "id": "bebas-neue-jugendreisen-avoid",
+      "from": "bebas-neue",
+      "to": "jugendreisen",
+      "relation": "avoid",
+      "score": 0.18,
+      "rationale": "Directly conflicts with the new serif-led doctrine if treated as an equal hero language."
+    }
+  ],
+  "fallbackEdges": [
+    {
+      "id": "hero_serif_primary-fallback-hero_serif_alternate",
+      "fromRoleId": "hero_serif_primary",
+      "toRoleId": "hero_serif_alternate"
+    },
+    {
+      "id": "hero_serif_primary-fallback-editorial_serif_support",
+      "fromRoleId": "hero_serif_primary",
+      "toRoleId": "editorial_serif_support"
+    },
+    {
+      "id": "hero_serif_primary-fallback-neutral_sans_core",
+      "fromRoleId": "hero_serif_primary",
+      "toRoleId": "neutral_sans_core"
+    },
+    {
+      "id": "hero_serif_alternate-fallback-editorial_serif_support",
+      "fromRoleId": "hero_serif_alternate",
+      "toRoleId": "editorial_serif_support"
+    },
+    {
+      "id": "hero_serif_alternate-fallback-neutral_sans_core",
+      "fromRoleId": "hero_serif_alternate",
+      "toRoleId": "neutral_sans_core"
+    },
+    {
+      "id": "editorial_serif_support-fallback-neutral_sans_core",
+      "fromRoleId": "editorial_serif_support",
+      "toRoleId": "neutral_sans_core"
+    },
+    {
+      "id": "script_accent_rare-fallback-editorial_serif_support",
+      "fromRoleId": "script_accent_rare",
+      "toRoleId": "editorial_serif_support"
+    },
+    {
+      "id": "script_accent_rare-fallback-neutral_sans_core",
+      "fromRoleId": "script_accent_rare",
+      "toRoleId": "neutral_sans_core"
+    },
+    {
+      "id": "display_sans_pressure_release-fallback-neutral_sans_core",
+      "fromRoleId": "display_sans_pressure_release",
+      "toRoleId": "neutral_sans_core"
+    },
+    {
+      "id": "display_sans_pressure_release-fallback-editorial_serif_support",
+      "fromRoleId": "display_sans_pressure_release",
+      "toRoleId": "editorial_serif_support"
+    }
+  ],
+  "strongestPairings": [
+    {
+      "id": "jugendreisen-dm-sans-supports",
+      "from": "jugendreisen",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.96,
+      "rationale": "This is the current north-star pairing: prestige hero serif anchored by clean neutral utility support."
+    },
+    {
+      "id": "fraunces-dm-sans-supports",
+      "from": "fraunces",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.89,
+      "rationale": "Excellent editorial support pairing with warmth and readable utility balance."
+    },
+    {
+      "id": "fraunces-crimson-pro-fallback",
+      "from": "fraunces",
+      "to": "crimson-pro",
+      "relation": "fallback",
+      "score": 0.87,
+      "rationale": "Crimson Pro is the clearest documentary understudy when Fraunces would feel too warm, too luxe, or too voiced."
+    },
+    {
+      "id": "crimson-pro-dm-sans-supports",
+      "from": "crimson-pro",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.85,
+      "rationale": "Strong documentary and explanatory support relationship."
+    },
+    {
+      "id": "jugendreisen-louize-fallback",
+      "from": "jugendreisen",
+      "to": "louize",
+      "relation": "fallback",
+      "score": 0.81,
+      "rationale": "Louize can act as a softer alternate hero serif if it stays visibly distinct from the benchmark."
+    },
+    {
+      "id": "jugendreisen-ivar-script-contrast",
+      "from": "jugendreisen",
+      "to": "ivar-script",
+      "relation": "contrast",
+      "score": 0.78,
+      "rationale": "Promising luxury contrast, but only for very rare accent insertions."
+    },
+    {
+      "id": "fraunces-instrument-serif-fallback",
+      "from": "fraunces",
+      "to": "instrument-serif",
+      "relation": "fallback",
+      "score": 0.74,
+      "rationale": "Instrument Serif can soften support moments, but it belongs in a hush-luxury support lane rather than competing for hero authority."
+    },
+    {
+      "id": "jugendreisen-noto-display-fallback",
+      "from": "jugendreisen",
+      "to": "noto-serif-display",
+      "relation": "fallback",
+      "score": 0.73,
+      "rationale": "Noto Serif Display can serve monumental statement duty, but it must not flatten into a generic substitute."
+    }
+  ],
+  "weakOrMissingLanes": [
+    {
+      "id": "hero_serif_primary",
+      "label": "Hero Serif Primary",
+      "targetCount": 1,
+      "benchmarkCandidateId": "jugendreisen",
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "jugendreisen"
+      ],
+      "fallbackRoleIds": [
+        "hero_serif_alternate",
+        "editorial_serif_support",
+        "neutral_sans_core"
+      ],
+      "laneStatus": "doctrine-only",
+      "weakReasons": [
+        "no-active-runtime-font",
+        "benchmark-not-runtime-selectable"
+      ]
+    },
+    {
+      "id": "hero_serif_alternate",
+      "label": "Hero Serif Alternate",
+      "targetCount": 1,
+      "benchmarkCandidateId": "louize",
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [
+        "noto-serif-display"
+      ],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "louize"
+      ],
+      "fallbackRoleIds": [
+        "editorial_serif_support",
+        "neutral_sans_core"
+      ],
+      "laneStatus": "partial-runtime",
+      "weakReasons": [
+        "benchmark-not-runtime-selectable"
+      ]
+    },
+    {
+      "id": "script_accent_rare",
+      "label": "Script Accent Rare",
+      "targetCount": 1,
+      "benchmarkCandidateId": "ivar-script",
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "ivar-script",
+        "bs-acapulko"
+      ],
+      "fallbackRoleIds": [
+        "editorial_serif_support",
+        "neutral_sans_core"
+      ],
+      "laneStatus": "doctrine-only",
+      "weakReasons": [
+        "no-active-runtime-font",
+        "benchmark-not-runtime-selectable"
+      ]
+    },
+    {
+      "id": "display_sans_pressure_release",
+      "label": "Display Sans Pressure Release",
+      "targetCount": 1,
+      "benchmarkCandidateId": null,
+      "benchmarkRuntimeSelectable": false,
+      "activeRuntimeCandidateIds": [],
+      "legacyRuntimeCandidateIds": [],
+      "doctrineOnlyCandidateIds": [
+        "sokoli",
+        "anton",
+        "bebas-neue"
+      ],
+      "fallbackRoleIds": [
+        "neutral_sans_core",
+        "editorial_serif_support"
+      ],
+      "laneStatus": "doctrine-only",
+      "weakReasons": [
+        "no-active-runtime-font"
+      ]
+    }
+  ],
+  "doctrineOnlyFonts": [
+    {
+      "id": "jugendreisen",
+      "name": "Jugendreisen",
+      "source": "reference-pool",
+      "stage": "benchmark",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_primary"
+      ],
+      "benchmarkForRole": "hero_serif_primary",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.98,
+      "restraintSignal": 0.9,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Primary benchmark for hero serif taste.",
+        "High-contrast prestige with strong identity.",
+        "Future hero candidates must beat or complement this benchmark, not merely resemble it.",
+        "Not a general alternate lane fallback."
+      ]
+    },
+    {
+      "id": "louize",
+      "name": "Louize",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_alternate"
+      ],
+      "benchmarkForRole": "hero_serif_alternate",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.9,
+      "restraintSignal": 0.84,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the alternate hero serif role.",
+        "The soft counterpoint to Jugendreisen.",
+        "No longer dual-purposed as a routine editorial support default."
+      ]
+    },
+    {
+      "id": "ivar-script",
+      "name": "Ivar Script",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": "script_accent_rare",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.94,
+      "restraintSignal": 0.7,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the rare script accent role.",
+        "Should only survive if it behaves well in very short isolated moments."
+      ]
+    },
+    {
+      "id": "bs-acapulko",
+      "name": "BS Acapulko",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.88,
+      "restraintSignal": 0.66,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Challenger to Ivar Script for the rare accent slot.",
+        "Stylish accent candidate, but risks becoming noisy if overused."
+      ]
+    },
+    {
+      "id": "sokoli",
+      "name": "Sokoli",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "decorative"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.79,
+      "restraintSignal": 0.58,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Could become a pressure-release face if it earns a very narrow directive role."
+      ]
+    },
+    {
+      "id": "anton",
+      "name": "Anton",
+      "source": "current-system",
+      "stage": "legacy",
+      "categories": [
+        "display-sans"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.46,
+      "restraintSignal": 0.35,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Legacy pressure font.",
+        "Only survives if a harder commercial/directive lane truly needs it."
+      ]
+    },
+    {
+      "id": "bebas-neue",
+      "name": "Bebas Neue",
+      "source": "current-system",
+      "stage": "legacy",
+      "categories": [
+        "display-sans"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.38,
+      "restraintSignal": 0.28,
+      "motionTolerance": "high",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "The old default hero language.",
+        "Now explicitly demoted out of the main house voice."
+      ]
+    }
+  ],
+  "runtimeMissingFonts": [
+    {
+      "id": "jugendreisen",
+      "name": "Jugendreisen",
+      "source": "reference-pool",
+      "stage": "benchmark",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_primary"
+      ],
+      "benchmarkForRole": "hero_serif_primary",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.98,
+      "restraintSignal": 0.9,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Primary benchmark for hero serif taste.",
+        "High-contrast prestige with strong identity.",
+        "Future hero candidates must beat or complement this benchmark, not merely resemble it.",
+        "Not a general alternate lane fallback."
+      ]
+    },
+    {
+      "id": "louize",
+      "name": "Louize",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_alternate"
+      ],
+      "benchmarkForRole": "hero_serif_alternate",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.9,
+      "restraintSignal": 0.84,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the alternate hero serif role.",
+        "The soft counterpoint to Jugendreisen.",
+        "No longer dual-purposed as a routine editorial support default."
+      ]
+    },
+    {
+      "id": "ivar-script",
+      "name": "Ivar Script",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": "script_accent_rare",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.94,
+      "restraintSignal": 0.7,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the rare script accent role.",
+        "Should only survive if it behaves well in very short isolated moments."
+      ]
+    },
+    {
+      "id": "bs-acapulko",
+      "name": "BS Acapulko",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.88,
+      "restraintSignal": 0.66,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Challenger to Ivar Script for the rare accent slot.",
+        "Stylish accent candidate, but risks becoming noisy if overused."
+      ]
+    },
+    {
+      "id": "sokoli",
+      "name": "Sokoli",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "decorative"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.79,
+      "restraintSignal": 0.58,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Could become a pressure-release face if it earns a very narrow directive role."
+      ]
+    }
+  ],
+  "unresolvedPlaceholders": [
+    {
+      "id": "jugendreisen",
+      "name": "Jugendreisen",
+      "source": "reference-pool",
+      "stage": "benchmark",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_primary"
+      ],
+      "benchmarkForRole": "hero_serif_primary",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.98,
+      "restraintSignal": 0.9,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Primary benchmark for hero serif taste.",
+        "High-contrast prestige with strong identity.",
+        "Future hero candidates must beat or complement this benchmark, not merely resemble it.",
+        "Not a general alternate lane fallback."
+      ]
+    },
+    {
+      "id": "louize",
+      "name": "Louize",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "display-serif"
+      ],
+      "doctrineRoles": [
+        "hero_serif_alternate"
+      ],
+      "benchmarkForRole": "hero_serif_alternate",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.9,
+      "restraintSignal": 0.84,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the alternate hero serif role.",
+        "The soft counterpoint to Jugendreisen.",
+        "No longer dual-purposed as a routine editorial support default."
+      ]
+    },
+    {
+      "id": "ivar-script",
+      "name": "Ivar Script",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": "script_accent_rare",
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.94,
+      "restraintSignal": 0.7,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Benchmark candidate for the rare script accent role.",
+        "Should only survive if it behaves well in very short isolated moments."
+      ]
+    },
+    {
+      "id": "bs-acapulko",
+      "name": "BS Acapulko",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "script"
+      ],
+      "doctrineRoles": [
+        "script_accent_rare"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.88,
+      "restraintSignal": 0.66,
+      "motionTolerance": "low",
+      "intensityFit": [
+        "low",
+        "medium"
+      ],
+      "notes": [
+        "Challenger to Ivar Script for the rare accent slot.",
+        "Stylish accent candidate, but risks becoming noisy if overused."
+      ]
+    },
+    {
+      "id": "sokoli",
+      "name": "Sokoli",
+      "source": "reference-pool",
+      "stage": "candidate",
+      "categories": [
+        "decorative"
+      ],
+      "doctrineRoles": [
+        "display_sans_pressure_release"
+      ],
+      "benchmarkForRole": null,
+      "runtimeSelectable": false,
+      "runtimeStatus": "doctrine-only",
+      "runtimePaletteId": null,
+      "doctrineOnly": true,
+      "premiumSignal": 0.79,
+      "restraintSignal": 0.58,
+      "motionTolerance": "medium",
+      "intensityFit": [
+        "medium",
+        "high"
+      ],
+      "notes": [
+        "Could become a pressure-release face if it earns a very narrow directive role."
+      ]
+    }
+  ],
+  "recommendedNextLoads": [
+    {
+      "candidateId": "jugendreisen",
+      "name": "Jugendreisen",
+      "reason": "Benchmark for hero_serif_primary exists only in doctrine right now.",
+      "targetRoleId": "hero_serif_primary"
+    },
+    {
+      "candidateId": "louize",
+      "name": "Louize",
+      "reason": "Benchmark for hero_serif_alternate exists only in doctrine right now.",
+      "targetRoleId": "hero_serif_alternate"
+    },
+    {
+      "candidateId": "ivar-script",
+      "name": "Ivar Script",
+      "reason": "Benchmark for script_accent_rare exists only in doctrine right now.",
+      "targetRoleId": "script_accent_rare"
+    },
+    {
+      "candidateId": "sokoli",
+      "name": "Sokoli",
+      "reason": "Pressure-release lane has no active runtime house face.",
+      "targetRoleId": "display_sans_pressure_release"
+    }
+  ]
+}

@@ -224,7 +224,7 @@ export const TargetFocusZoomShowcase: React.FC = () => {
                 border: "1px solid rgba(255,255,255,0.12)",
                 background: "rgba(255,255,255,0.05)",
                 color: "rgba(230,239,255,0.82)",
-                fontFamily: "\"Manrope\", sans-serif",
+                fontFamily: "\"DM Sans\", sans-serif",
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: "0.18em",
@@ -273,7 +273,7 @@ export const TargetFocusZoomShowcase: React.FC = () => {
                 gap: 12,
                 maxWidth: "min(70vw, 860px)",
                 color: "rgba(228,236,250,0.78)",
-                fontFamily: "\"Manrope\", sans-serif",
+                fontFamily: "\"DM Sans\", sans-serif",
                 fontSize: 12,
                 fontWeight: 700,
                 letterSpacing: "0.18em",
@@ -376,7 +376,7 @@ export const TargetFocusZoomShowcase: React.FC = () => {
               <div
                 style={{
                   color: "rgba(220, 231, 250, 0.8)",
-                  fontFamily: "\"Manrope\", sans-serif",
+                  fontFamily: "\"DM Sans\", sans-serif",
                   fontSize: 14,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase"
@@ -399,7 +399,7 @@ export const TargetFocusZoomShowcase: React.FC = () => {
                 border: "1px solid rgba(255,255,255,0.08)",
                 background: "rgba(255,255,255,0.05)",
                 color: "rgba(228,236,250,0.78)",
-                fontFamily: "\"Manrope\", sans-serif",
+                fontFamily: "\"DM Sans\", sans-serif",
                 fontSize: 14,
                 lineHeight: 1.45
               }}

@@ -11,6 +11,7 @@ import {
   LONGFORM_DRAFT_COMPOSITION_ID,
   LONGFORM_DRAFT_VIDEO_ASSET
 } from "./lib/draft-preview";
+import {HouseFontBootstrap} from "./lib/cinematic-typography/house-font-loader";
 import {getPresentationPreset} from "./lib/presentation-presets";
 import {normalizeCaptionStyleProfileId} from "./lib/stylebooks/caption-style-profiles";
 
@@ -46,6 +47,7 @@ const cinematicPiPShowcaseVideoMetadata = {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <HouseFontBootstrap />
       <Composition
         id="FemaleCoachDeanGraziosi"
         component={FemaleCoachDeanGraziosi}
