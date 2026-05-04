@@ -67,3 +67,10 @@ STRUCTURED ANIMATION/
 SVG animations/
 TEXT SVG ANIMATIONS/
 TRANSITION/
+FONTS/
+font-intelligence/extracted-fonts/
+font-intelligence/raw-zips/
+font-intelligence/specimens/
+font-intelligence/outputs/font-embeddings.jsonl
+font-intelligence/outputs/font-manifest.json
+font-intelligence/outputs/font-descriptors.jsonl

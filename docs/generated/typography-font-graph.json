@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-04T03:57:47.196Z",
+  "generatedAt": "2026-05-04T07:54:08.163Z",
   "phases": {
     "phase1": "done",
     "phase2": "started",
@@ -412,6 +412,7 @@
       "label": "Hero Serif Primary",
       "targetCount": 1,
       "benchmarkCandidateId": "jugendreisen",
+      "runtimeBenchmarkCandidateId": null,
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [],
       "legacyRuntimeCandidateIds": [],
@@ -434,6 +435,7 @@
       "label": "Hero Serif Alternate",
       "targetCount": 1,
       "benchmarkCandidateId": "louize",
+      "runtimeBenchmarkCandidateId": "noto-serif-display",
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [
         "noto-serif-display"
@@ -456,6 +458,7 @@
       "label": "Editorial Serif Support",
       "targetCount": 1,
       "benchmarkCandidateId": "fraunces",
+      "runtimeBenchmarkCandidateId": "playfair-display",
       "benchmarkRuntimeSelectable": true,
       "activeRuntimeCandidateIds": [
         "playfair-display",
@@ -478,6 +481,7 @@
       "label": "Neutral Sans Core",
       "targetCount": 1,
       "benchmarkCandidateId": "dm-sans",
+      "runtimeBenchmarkCandidateId": "dm-sans",
       "benchmarkRuntimeSelectable": true,
       "activeRuntimeCandidateIds": [
         "dm-sans"
@@ -493,6 +497,7 @@
       "label": "Script Accent Rare",
       "targetCount": 1,
       "benchmarkCandidateId": "ivar-script",
+      "runtimeBenchmarkCandidateId": null,
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [],
       "legacyRuntimeCandidateIds": [],
@@ -515,6 +520,7 @@
       "label": "Display Sans Pressure Release",
       "targetCount": 1,
       "benchmarkCandidateId": null,
+      "runtimeBenchmarkCandidateId": null,
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [],
       "legacyRuntimeCandidateIds": [],
@@ -534,54 +540,6 @@
     }
   ],
   "compatibilityEdges": [
-    {
-      "id": "jugendreisen-dm-sans-supports",
-      "from": "jugendreisen",
-      "to": "dm-sans",
-      "relation": "supports",
-      "score": 0.96,
-      "rationale": "This is the current north-star pairing: prestige hero serif anchored by clean neutral utility support."
-    },
-    {
-      "id": "jugendreisen-ivar-script-contrast",
-      "from": "jugendreisen",
-      "to": "ivar-script",
-      "relation": "contrast",
-      "score": 0.78,
-      "rationale": "Promising luxury contrast, but only for very rare accent insertions."
-    },
-    {
-      "id": "jugendreisen-bs-acapulko-avoid",
-      "from": "jugendreisen",
-      "to": "bs-acapulko",
-      "relation": "avoid",
-      "score": 0.34,
-      "rationale": "Too much ornamental glamour too quickly; likely to turn into premium costume instead of premium structure."
-    },
-    {
-      "id": "jugendreisen-louize-fallback",
-      "from": "jugendreisen",
-      "to": "louize",
-      "relation": "fallback",
-      "score": 0.81,
-      "rationale": "Louize can act as a softer alternate hero serif if it stays visibly distinct from the benchmark."
-    },
-    {
-      "id": "jugendreisen-noto-display-fallback",
-      "from": "jugendreisen",
-      "to": "noto-serif-display",
-      "relation": "fallback",
-      "score": 0.73,
-      "rationale": "Noto Serif Display can serve monumental statement duty, but it must not flatten into a generic substitute."
-    },
-    {
-      "id": "jugendreisen-playfair-redundant",
-      "from": "jugendreisen",
-      "to": "playfair-display",
-      "relation": "redundant",
-      "score": 0.48,
-      "rationale": "Playfair is capable, but risks occupying too similar a prestige niche without adding enough identity."
-    },
     {
       "id": "fraunces-dm-sans-supports",
       "from": "fraunces",
@@ -623,28 +581,36 @@
       "rationale": "Strong documentary and explanatory support relationship."
     },
     {
-      "id": "sokoli-dm-sans-contrast",
-      "from": "sokoli",
+      "id": "noto-serif-display-dm-sans-supports",
+      "from": "noto-serif-display",
       "to": "dm-sans",
-      "relation": "contrast",
-      "score": 0.67,
-      "rationale": "Could work as a pressure-release directive contrast, but should stay in a tightly bounded lane."
+      "relation": "supports",
+      "score": 0.84,
+      "rationale": "When Noto Serif Display carries the monument lane, DM Sans keeps support information precise and stable."
     },
     {
-      "id": "anton-jugendreisen-avoid",
-      "from": "anton",
-      "to": "jugendreisen",
-      "relation": "avoid",
-      "score": 0.29,
-      "rationale": "This pairing exposes the old habit of swapping authority for blunt force."
+      "id": "noto-serif-display-fraunces-fallback",
+      "from": "noto-serif-display",
+      "to": "fraunces",
+      "relation": "fallback",
+      "score": 0.77,
+      "rationale": "Fraunces gives Noto Serif Display a warmer editorial support partner without competing for the same hero silhouette."
     },
     {
-      "id": "bebas-neue-jugendreisen-avoid",
-      "from": "bebas-neue",
-      "to": "jugendreisen",
-      "relation": "avoid",
-      "score": 0.18,
-      "rationale": "Directly conflicts with the new serif-led doctrine if treated as an equal hero language."
+      "id": "playfair-display-dm-sans-supports",
+      "from": "playfair-display",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.79,
+      "rationale": "Playfair Display can still ride with DM Sans when the scene wants lighter prestige and clear utility text."
+    },
+    {
+      "id": "instrument-serif-dm-sans-supports",
+      "from": "instrument-serif",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.76,
+      "rationale": "Instrument Serif remains a hush-luxury support voice when DM Sans handles clarity and pace."
     }
   ],
   "fallbackEdges": [
@@ -701,14 +667,6 @@
   ],
   "strongestPairings": [
     {
-      "id": "jugendreisen-dm-sans-supports",
-      "from": "jugendreisen",
-      "to": "dm-sans",
-      "relation": "supports",
-      "score": 0.96,
-      "rationale": "This is the current north-star pairing: prestige hero serif anchored by clean neutral utility support."
-    },
-    {
       "id": "fraunces-dm-sans-supports",
       "from": "fraunces",
       "to": "dm-sans",
@@ -733,20 +691,36 @@
       "rationale": "Strong documentary and explanatory support relationship."
     },
     {
-      "id": "jugendreisen-louize-fallback",
-      "from": "jugendreisen",
-      "to": "louize",
-      "relation": "fallback",
-      "score": 0.81,
-      "rationale": "Louize can act as a softer alternate hero serif if it stays visibly distinct from the benchmark."
+      "id": "noto-serif-display-dm-sans-supports",
+      "from": "noto-serif-display",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.84,
+      "rationale": "When Noto Serif Display carries the monument lane, DM Sans keeps support information precise and stable."
     },
     {
-      "id": "jugendreisen-ivar-script-contrast",
-      "from": "jugendreisen",
-      "to": "ivar-script",
-      "relation": "contrast",
-      "score": 0.78,
-      "rationale": "Promising luxury contrast, but only for very rare accent insertions."
+      "id": "playfair-display-dm-sans-supports",
+      "from": "playfair-display",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.79,
+      "rationale": "Playfair Display can still ride with DM Sans when the scene wants lighter prestige and clear utility text."
+    },
+    {
+      "id": "noto-serif-display-fraunces-fallback",
+      "from": "noto-serif-display",
+      "to": "fraunces",
+      "relation": "fallback",
+      "score": 0.77,
+      "rationale": "Fraunces gives Noto Serif Display a warmer editorial support partner without competing for the same hero silhouette."
+    },
+    {
+      "id": "instrument-serif-dm-sans-supports",
+      "from": "instrument-serif",
+      "to": "dm-sans",
+      "relation": "supports",
+      "score": 0.76,
+      "rationale": "Instrument Serif remains a hush-luxury support voice when DM Sans handles clarity and pace."
     },
     {
       "id": "fraunces-instrument-serif-fallback",
@@ -755,14 +729,6 @@
       "relation": "fallback",
       "score": 0.74,
       "rationale": "Instrument Serif can soften support moments, but it belongs in a hush-luxury support lane rather than competing for hero authority."
-    },
-    {
-      "id": "jugendreisen-noto-display-fallback",
-      "from": "jugendreisen",
-      "to": "noto-serif-display",
-      "relation": "fallback",
-      "score": 0.73,
-      "rationale": "Noto Serif Display can serve monumental statement duty, but it must not flatten into a generic substitute."
     }
   ],
   "weakOrMissingLanes": [
@@ -771,6 +737,7 @@
       "label": "Hero Serif Primary",
       "targetCount": 1,
       "benchmarkCandidateId": "jugendreisen",
+      "runtimeBenchmarkCandidateId": null,
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [],
       "legacyRuntimeCandidateIds": [],
@@ -793,6 +760,7 @@
       "label": "Hero Serif Alternate",
       "targetCount": 1,
       "benchmarkCandidateId": "louize",
+      "runtimeBenchmarkCandidateId": "noto-serif-display",
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [
         "noto-serif-display"
@@ -815,6 +783,7 @@
       "label": "Script Accent Rare",
       "targetCount": 1,
       "benchmarkCandidateId": "ivar-script",
+      "runtimeBenchmarkCandidateId": null,
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [],
       "legacyRuntimeCandidateIds": [],
@@ -837,6 +806,7 @@
       "label": "Display Sans Pressure Release",
       "targetCount": 1,
       "benchmarkCandidateId": null,
+      "runtimeBenchmarkCandidateId": null,
       "benchmarkRuntimeSelectable": false,
       "activeRuntimeCandidateIds": [],
       "legacyRuntimeCandidateIds": [],

@@ -45,17 +45,12 @@ graph TD
   role_display_sans_pressure_release --> sokoli
   role_display_sans_pressure_release --> anton
   role_display_sans_pressure_release --> bebas_neue
-  jugendreisen -->|supports| dm_sans
-  jugendreisen -->|contrast| ivar_script
-  jugendreisen -. avoid .-> bs_acapulko
-  jugendreisen -->|fallback| louize
-  jugendreisen -->|fallback| noto_serif_display
-  jugendreisen -. redundant .-> playfair_display
   fraunces -->|supports| dm_sans
   fraunces -->|fallback| crimson_pro
   fraunces -->|fallback| instrument_serif
   fraunces -. redundant .-> cormorant_garamond
   crimson_pro -->|supports| dm_sans
-  sokoli -->|contrast| dm_sans
-  anton -. avoid .-> jugendreisen
-  bebas_neue -. avoid .-> jugendreisen
+  noto_serif_display -->|supports| dm_sans
+  noto_serif_display -->|fallback| fraunces
+  playfair_display -->|supports| dm_sans
+  instrument_serif -->|supports| dm_sans

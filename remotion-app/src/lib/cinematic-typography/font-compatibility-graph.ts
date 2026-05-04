@@ -1,4 +1,5 @@
 import type {FontCategory} from "./font-system";
+import {getRuntimePaletteIdForTypographyCandidate} from "./font-runtime-registry";
 import {
   TYPOGRAPHY_DOCTRINE_V1,
   getTypographyBenchmarkForRole,
@@ -33,7 +34,8 @@ export type FontCompatibilityEdge = {
 
 export type RoleCompatibilityProfile = {
   roleId: TypographyRoleSlotId;
-  benchmarkNodeId: string | null;
+  doctrineBenchmarkNodeId: string | null;
+  runtimeBenchmarkNodeId: string | null;
   candidateNodeIds: string[];
   approvedNodeIds: string[];
   rejectedNodeIds: string[];
@@ -52,7 +54,7 @@ export const FONT_COMPATIBILITY_NODES: FontCompatibilityNode[] = TYPOGRAPHY_DOCT
   notes: candidate.notes
 }));
 
-export const FONT_COMPATIBILITY_EDGES: FontCompatibilityEdge[] = [
+export const DOCTRINE_FONT_COMPATIBILITY_EDGES: FontCompatibilityEdge[] = [
   {
     id: "jugendreisen-dm-sans-supports",
     from: "jugendreisen",
@@ -167,12 +169,87 @@ export const FONT_COMPATIBILITY_EDGES: FontCompatibilityEdge[] = [
   }
 ];
 
+const isRuntimeSelectableNodeId = (candidateId: string): boolean => {
+  return Boolean(getRuntimePaletteIdForTypographyCandidate(candidateId));
+};
+
+const RUNTIME_CURATED_FONT_COMPATIBILITY_EDGES: FontCompatibilityEdge[] = [
+  {
+    id: "noto-serif-display-dm-sans-supports",
+    from: "noto-serif-display",
+    to: "dm-sans",
+    relation: "supports",
+    score: 0.84,
+    rationale: "When Noto Serif Display carries the monument lane, DM Sans keeps support information precise and stable."
+  },
+  {
+    id: "noto-serif-display-fraunces-fallback",
+    from: "noto-serif-display",
+    to: "fraunces",
+    relation: "fallback",
+    score: 0.77,
+    rationale: "Fraunces gives Noto Serif Display a warmer editorial support partner without competing for the same hero silhouette."
+  },
+  {
+    id: "playfair-display-dm-sans-supports",
+    from: "playfair-display",
+    to: "dm-sans",
+    relation: "supports",
+    score: 0.79,
+    rationale: "Playfair Display can still ride with DM Sans when the scene wants lighter prestige and clear utility text."
+  },
+  {
+    id: "instrument-serif-dm-sans-supports",
+    from: "instrument-serif",
+    to: "dm-sans",
+    relation: "supports",
+    score: 0.76,
+    rationale: "Instrument Serif remains a hush-luxury support voice when DM Sans handles clarity and pace."
+  }
+];
+
+export const FONT_COMPATIBILITY_EDGES: FontCompatibilityEdge[] = [
+  ...DOCTRINE_FONT_COMPATIBILITY_EDGES.filter((edge) => isRuntimeSelectableNodeId(edge.from) && isRuntimeSelectableNodeId(edge.to)),
+  ...RUNTIME_CURATED_FONT_COMPATIBILITY_EDGES
+];
+
+const candidateStageRank = (candidate: TypographyFontCandidate): number => {
+  if (candidate.stage === "benchmark") return 4;
+  if (candidate.stage === "approved") return 3;
+  if (candidate.stage === "candidate") return 2;
+  if (candidate.stage === "legacy") return 1;
+  return 0;
+};
+
+const getOperationalBenchmarkForRole = (roleId: TypographyRoleSlotId): TypographyFontCandidate | null => {
+  const doctrineBenchmark = getTypographyBenchmarkForRole(roleId);
+  if (doctrineBenchmark && isRuntimeSelectableNodeId(doctrineBenchmark.id)) {
+    return doctrineBenchmark;
+  }
+
+  const runtimeCandidates = getTypographyCandidatesForRole(roleId)
+    .filter((candidate) => isRuntimeSelectableNodeId(candidate.id) && candidate.stage !== "rejected" && candidate.stage !== "legacy")
+    .sort((left, right) => {
+      const stageDelta = candidateStageRank(right) - candidateStageRank(left);
+      if (stageDelta !== 0) {
+        return stageDelta;
+      }
+      const rightScore = right.premiumSignal * 0.65 + right.restraintSignal * 0.35;
+      const leftScore = left.premiumSignal * 0.65 + left.restraintSignal * 0.35;
+      return rightScore - leftScore || left.name.localeCompare(right.name);
+    });
+
+  return runtimeCandidates[0] ?? null;
+};
+
 export const ROLE_COMPATIBILITY_PROFILES: RoleCompatibilityProfile[] = TYPOGRAPHY_DOCTRINE_V1.roleSlots.map((role) => {
   const candidates = getTypographyCandidatesForRole(role.id);
-  const benchmark = getTypographyBenchmarkForRole(role.id);
+  const doctrineBenchmark = getTypographyBenchmarkForRole(role.id);
+  const runtimeBenchmark = getOperationalBenchmarkForRole(role.id);
   return {
     roleId: role.id,
-    benchmarkNodeId: benchmark?.id ?? null,
+    doctrineBenchmarkNodeId: doctrineBenchmark?.id ?? null,
+    runtimeBenchmarkNodeId: runtimeBenchmark?.id ?? null,
     candidateNodeIds: candidates.filter((candidate) => candidate.stage === "candidate").map((candidate) => candidate.id),
     approvedNodeIds: candidates.filter((candidate) => candidate.stage === "approved").map((candidate) => candidate.id),
     rejectedNodeIds: candidates.filter((candidate) => candidate.stage === "rejected" || candidate.stage === "legacy").map((candidate) => candidate.id)
@@ -180,7 +257,7 @@ export const ROLE_COMPATIBILITY_PROFILES: RoleCompatibilityProfile[] = TYPOGRAPH
 });
 
 export const rankTypographyCandidatesForRole = (roleId: TypographyRoleSlotId): FontCompatibilityNode[] => {
-  const benchmark = getTypographyBenchmarkForRole(roleId);
+  const benchmark = getOperationalBenchmarkForRole(roleId);
   const benchmarkEdges = benchmark
     ? FONT_COMPATIBILITY_EDGES.filter((edge) => edge.from === benchmark.id || edge.to === benchmark.id)
     : [];

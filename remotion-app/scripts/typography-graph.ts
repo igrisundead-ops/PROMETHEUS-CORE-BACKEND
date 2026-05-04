@@ -41,6 +41,7 @@ type GraphRoleNode = {
   label: string;
   targetCount: number;
   benchmarkCandidateId: string | null;
+  runtimeBenchmarkCandidateId: string | null;
   benchmarkRuntimeSelectable: boolean;
   activeRuntimeCandidateIds: string[];
   legacyRuntimeCandidateIds: string[];
@@ -143,6 +144,11 @@ const buildRoleNodes = (fontNodes: GraphFontNode[]): GraphRoleNode[] => {
       .filter((font) => font.runtimeStatus === "doctrine-only")
       .map((font) => font.id);
     const benchmark = roleFonts.find((font) => font.benchmarkForRole === role.id) ?? null;
+    const runtimeBenchmark =
+      roleFonts.find((font) => font.runtimeStatus === "active-runtime" && font.stage === "benchmark") ??
+      roleFonts.find((font) => font.runtimeStatus === "active-runtime" && font.stage === "approved") ??
+      roleFonts.find((font) => font.runtimeStatus === "active-runtime") ??
+      null;
     const weakReasons: string[] = [];
 
     if (activeRuntimeCandidateIds.length === 0) {
@@ -167,6 +173,7 @@ const buildRoleNodes = (fontNodes: GraphFontNode[]): GraphRoleNode[] => {
       label: role.label,
       targetCount: role.targetCount,
       benchmarkCandidateId: benchmark?.id ?? null,
+      runtimeBenchmarkCandidateId: runtimeBenchmark?.id ?? null,
       benchmarkRuntimeSelectable: Boolean(benchmark?.runtimeSelectable),
       activeRuntimeCandidateIds,
       legacyRuntimeCandidateIds,
@@ -282,9 +289,10 @@ const renderFontSummaryLine = (font: GraphFontNode): string => {
 
 const renderRoleSummaryLine = (role: GraphRoleNode): string => {
   const benchmark = role.benchmarkCandidateId ?? "none";
+  const runtimeBenchmark = role.runtimeBenchmarkCandidateId ?? "none";
   const active = role.activeRuntimeCandidateIds.join(", ") || "none";
   const doctrineOnly = role.doctrineOnlyCandidateIds.join(", ") || "none";
-  return `- \`${role.id}\`: status=${role.laneStatus}; benchmark=${benchmark}; active=${active}; doctrine-only=${doctrineOnly}`;
+  return `- \`${role.id}\`: status=${role.laneStatus}; doctrine-benchmark=${benchmark}; runtime-benchmark=${runtimeBenchmark}; active=${active}; doctrine-only=${doctrineOnly}`;
 };
 
 const renderPairingLine = (pairing: GraphExport["strongestPairings"][number]): string => {
