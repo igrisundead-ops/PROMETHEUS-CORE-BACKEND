@@ -30,7 +30,8 @@ const transcriptStatusSchema = z.object({
     .optional()
 });
 
-const baseUrl = "https://api.assemblyai.com/v2";
+const transcriptionBaseUrl = "https://api.assemblyai.com/v2";
+const streamingBaseUrl = "https://streaming.assemblyai.com";
 
 const jsonHeaders = (apiKey: string): HeadersInit => ({
   authorization: apiKey,
@@ -64,7 +65,7 @@ export const transcribeWithAssemblyAI = async ({
   }) => void | Promise<void>;
 }): Promise<TranscribedWord[]> => {
   const fileBuffer = await readFile(filePath);
-  const uploadResponse = await fetchImpl(`${baseUrl}/upload`, {
+  const uploadResponse = await fetchImpl(`${transcriptionBaseUrl}/upload`, {
     method: "POST",
     headers: uploadHeaders(apiKey),
     body: fileBuffer
@@ -74,7 +75,7 @@ export const transcribeWithAssemblyAI = async ({
   }
   const uploadPayload = uploadResponseSchema.parse(await uploadResponse.json());
 
-  const createResponse = await fetchImpl(`${baseUrl}/transcript`, {
+  const createResponse = await fetchImpl(`${transcriptionBaseUrl}/transcript`, {
     method: "POST",
     headers: jsonHeaders(apiKey),
     body: JSON.stringify({
@@ -88,7 +89,7 @@ export const transcribeWithAssemblyAI = async ({
   const createPayload = createTranscriptResponseSchema.parse(await createResponse.json());
 
   for (let attempt = 0; attempt < maxPollAttempts; attempt += 1) {
-    const statusResponse = await fetchImpl(`${baseUrl}/transcript/${createPayload.id}`, {
+    const statusResponse = await fetchImpl(`${transcriptionBaseUrl}/transcript/${createPayload.id}`, {
       method: "GET",
       headers: {authorization: apiKey}
     });
@@ -213,7 +214,7 @@ export const streamAudioBufferWithAssemblyAI = async ({
     throw new Error("AssemblyAI streaming requires an API key.");
   }
 
-  const tokenResponse = await fetchImpl(`${baseUrl}/v3/token?expires_in_seconds=${encodeURIComponent(String(tokenExpiresInSeconds))}`, {
+  const tokenResponse = await fetchImpl(`${streamingBaseUrl}/v3/token?expires_in_seconds=${encodeURIComponent(String(tokenExpiresInSeconds))}`, {
     method: "GET",
     headers: {
       authorization: apiKey
