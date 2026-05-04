@@ -18,6 +18,7 @@ import {registerEditSessionRoutes} from "./edit-sessions/routes";
 import {createR2TransferService, type R2TransferService} from "./integrations/r2";
 import {registerUploadRoutes} from "./upload-routes";
 import {GodService, registerGodRoutes} from "./god";
+import {registerThumbnailRoutes} from "./thumbnail";
 import {AssetRetrievalService} from "./assets/service";
 import {registerAssetRoutes} from "./assets/routes";
 import {VectorRetrievalService} from "./assets/vector-service";
@@ -574,6 +575,15 @@ export const createBackendApp = async ({
 
   await registerEditSessionRoutes(app, editSessions, editSessionStore);
   await registerGodRoutes(app, god);
+  await registerThumbnailRoutes(app, {
+    app,
+    service,
+    repository,
+    queue,
+    editSessions,
+    god,
+    env
+  });
   await registerUploadRoutes(app, {
     env,
     queue,

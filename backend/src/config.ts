@@ -15,6 +15,7 @@ const envSchema = z.object({
     ),
   ASSEMBLYAI_API_KEY: z.string().default(""),
   GROQ_API_KEY: z.string().default(""),
+  GOOGLE_AI_STUDIO_API_KEY: z.string().default(""),
   GROQ_MODEL: z.string().default("llama-3.3-70b-versatile"),
   GROQ_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.2),
   GROQ_MAX_TOKENS: z.coerce.number().int().positive().default(1600),
