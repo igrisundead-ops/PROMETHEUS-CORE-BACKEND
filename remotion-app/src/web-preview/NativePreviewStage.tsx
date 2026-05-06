@@ -94,6 +94,7 @@ type NativePreviewStageProps = {
   model: MotionCompositionModel;
   captionProfileId: CaptionStyleProfileId;
   previewPerformanceMode: PreviewPerformanceMode;
+  suppressCaptions?: boolean;
   onHealthChange?: (health: PreviewPlaybackHealth) => void;
   onErrorMessageChange?: (message: string | null) => void;
   onTelemetryUpdate?: (telemetry: PreviewTelemetry) => void;
@@ -2250,6 +2251,7 @@ export const NativePreviewOverlayStage: React.FC<{
         captionBias={model.captionBias}
         model={model}
         previewViewportScale={previewViewportScale}
+        suppressCaptions={suppressCaptions}
       />
     </div>
   );
@@ -2262,6 +2264,7 @@ export const NativePreviewStage: React.FC<NativePreviewStageProps> = ({
   model,
   captionProfileId,
   previewPerformanceMode,
+  suppressCaptions = false,
   onHealthChange,
   onErrorMessageChange,
   onTelemetryUpdate
@@ -2809,7 +2812,7 @@ export const NativePreviewStage: React.FC<NativePreviewStageProps> = ({
           captionBias={model.captionBias}
           model={model}
           previewViewportScale={previewViewportScale}
-          suppressCaptions={false}
+          suppressCaptions={suppressCaptions}
         />
 
         {showMotionGraphicsDebugOverlay && activeMotionGraphicsDecision ? (

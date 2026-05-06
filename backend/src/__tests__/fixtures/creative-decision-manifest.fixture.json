@@ -1,0 +1,103 @@
+{
+  "manifestVersion": "1.0.0",
+  "jobId": "job_123",
+  "sceneId": "scene_001",
+  "source": {
+    "videoUrl": "/media/source.mp4",
+    "transcriptSegment": {
+      "text": "I want you to build premium systems.",
+      "startMs": 0,
+      "endMs": 10000,
+      "words": [
+        {"text": "I", "startMs": 0, "endMs": 120, "confidence": 0.99},
+        {"text": "want", "startMs": 121, "endMs": 360, "confidence": 0.97}
+      ]
+    }
+  },
+  "scene": {
+    "durationMs": 10000,
+    "aspectRatio": "16:9",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "intent": {
+    "rhetoricalIntent": "authority",
+    "emotionalTone": "cinematic",
+    "intensity": 0.78
+  },
+  "typography": {
+    "mode": "svg_longform_typography_v1",
+    "primaryFont": {
+      "family": "Satoshi",
+      "source": "custom_ingested",
+      "fileUrl": "/fonts/satoshi/Satoshi-Bold.otf",
+      "role": "headline"
+    },
+    "secondaryFont": {
+      "family": "Canela",
+      "source": "custom_ingested",
+      "fileUrl": "/fonts/canela/Canela-Regular.otf",
+      "role": "support"
+    },
+    "fontPairing": {
+      "graphUsed": true,
+      "score": 0.91,
+      "reason": "High clarity contrast and premium editorial balance."
+    },
+    "coreWords": [
+      {"word": "premium", "reason": "Core thesis emphasis.", "treatment": "mask_reveal"},
+      {"word": "systems", "reason": "Outcome emphasis.", "treatment": "weight"}
+    ],
+    "linePlan": {
+      "lines": ["I want you to build", "premium systems."],
+      "maxLines": 2,
+      "maxCharsPerLine": 24,
+      "allowWidows": false
+    }
+  },
+  "animation": {
+    "engine": "gsap",
+    "family": "custom_retrieved",
+    "retrievedFromMilvus": true,
+    "retrievedAnimationId": "anim_445",
+    "easing": "power3.out",
+    "staggerMs": 52,
+    "entryMs": 420,
+    "holdMs": 6400,
+    "exitMs": 360,
+    "motionIntensity": 0.55,
+    "avoid": ["generic_caption_bounce"]
+  },
+  "layout": {
+    "region": "center",
+    "safeArea": {"top": 72, "right": 96, "bottom": 84, "left": 96},
+    "maxWidthPercent": 72,
+    "alignment": "center",
+    "preventOverlap": true,
+    "zIndexPlan": [
+      {"layer": "video", "zIndex": 1},
+      {"layer": "typography", "zIndex": 20}
+    ]
+  },
+  "renderBudget": {
+    "previewResolution": "720p",
+    "previewFps": 30,
+    "finalResolution": "1080p",
+    "allowHeavyEffectsInPreview": false,
+    "finalOnlyEffects": ["high_blur_glow"]
+  },
+  "diagnostics": {
+    "manifestCreatedAt": "2026-05-05T00:00:00.000Z",
+    "milvusUsed": true,
+    "fontGraphUsed": true,
+    "customFontsUsed": true,
+    "fallbackUsed": false,
+    "fallbackReasons": [],
+    "legacyOverlayUsed": false,
+    "remotionUsed": false,
+    "hyperframesUsed": true,
+    "overlapCheckPassed": true,
+    "warnings": []
+  }
+}

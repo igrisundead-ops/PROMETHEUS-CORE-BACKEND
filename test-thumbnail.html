@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Thumbnail API Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #111; color: #fff; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+    #result { margin-top: 20px; padding: 15px; background: #222; border-radius: 4px; font-family: monospace; white-space: pre-wrap; }
+    img { max-width: 100%; margin-top: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body>
+  <h1>Test Thumbnail API</h1>
+  <p>Hitting the endpoint for job: <strong>job_moa9dt1q_d84fb0a3e2</strong></p>
+  <button id="btn">Generate Thumbnail</button>
+  
+  <div id="result"></div>
+  <img id="thumb" style="display:none;" />
+
+  <script>
+    document.getElementById('btn').addEventListener('click', async () => {
+      const btn = document.getElementById('btn');
+      const resultDiv = document.getElementById('result');
+      const img = document.getElementById('thumb');
+      
+      btn.innerText = "Generating...";
+      btn.disabled = true;
+      resultDiv.innerText = "Requesting Google AI Studio via backend...";
+      
+      try {
+        const response = await fetch("http://localhost:8000/api/jobs/job_mnpxouq1_800bae92ed/thumbnail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            styleReferenceName: "default"
+          })
+        });
+        
+        const data = await response.json();
+        resultDiv.innerText = JSON.stringify(data, null, 2);
+        
+        if (data.public_url) {
+          img.src = data.public_url;
+          img.style.display = 'block';
+        }
+      } catch (err) {
+        resultDiv.innerText = "Error: " + err.message;
+      } finally {
+        btn.innerText = "Generate Thumbnail";
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

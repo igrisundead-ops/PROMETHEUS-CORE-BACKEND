@@ -1,6 +1,6 @@
 export const LOCAL_PREVIEW_CAPTION_PROFILE_IDS = [
-  "longform_eve_typography_v1",
   "longform_svg_typography_v1",
+  "longform_eve_typography_v1",
   "longform_docked_inverse_v1",
   "longform_semantic_sidecall_v1"
 ] as const;
@@ -8,7 +8,7 @@ export const LOCAL_PREVIEW_CAPTION_PROFILE_IDS = [
 export type LocalPreviewCaptionProfileId = (typeof LOCAL_PREVIEW_CAPTION_PROFILE_IDS)[number];
 
 export const DEFAULT_LOCAL_PREVIEW_CAPTION_PROFILE_ID: LocalPreviewCaptionProfileId =
-  "longform_eve_typography_v1";
+  "longform_svg_typography_v1";
 
 const LOCAL_PREVIEW_CAPTION_PROFILE_ALIASES: Record<string, LocalPreviewCaptionProfileId> = {
   eve_typography_v1: "longform_eve_typography_v1",

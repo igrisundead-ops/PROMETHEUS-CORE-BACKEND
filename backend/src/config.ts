@@ -77,7 +77,60 @@ const envSchema = z.object({
   BGE_M3_LOCAL_USE_FP16: z
     .union([z.literal("true"), z.literal("false"), z.boolean()])
     .transform((value) => value === true || value === "true")
-    .default(false)
+    .default(false),
+  PREVIEW_ENGINE: z.enum(["hyperframes", "remotion"]).default("hyperframes"),
+  ENABLE_LEGACY_OVERLAY: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  ENABLE_LIVE_BROWSER_OVERLAY: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  ENABLE_REMOTION_PREVIEW: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  ENABLE_HYPERFRAMES_PREVIEW: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true),
+  ENABLE_MANIFEST_TYPOGRAPHY: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true),
+  ENABLE_FONT_GRAPH: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true),
+  ENABLE_MILVUS_ANIMATION_RETRIEVAL: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true),
+  ENABLE_SERVER_RENDERED_PREVIEW: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true),
+  ENABLE_PREVIEW_DIAGNOSTICS: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true),
+  ENABLE_AUDIO_ONLY_PREVIEW: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  ENABLE_DARK_AUDIO_PREVIEW: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  ENABLE_BLACK_PREVIEW_BACKGROUND: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(false),
+  ENABLE_PREVIEW_PIPELINE_TRACE: z
+    .union([z.literal("true"), z.literal("false"), z.boolean()])
+    .transform((value) => value === true || value === "true")
+    .default(true)
 });
 
 export type BackendEnv = z.infer<typeof envSchema>;

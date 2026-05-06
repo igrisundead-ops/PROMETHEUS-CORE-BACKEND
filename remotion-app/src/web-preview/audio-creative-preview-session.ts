@@ -1,4 +1,3 @@
-import {buildCreativeOrchestrationPlan} from "../creative-orchestration";
 import {buildCreativePreviewCaptionChunks} from "../creative-orchestration/preview";
 import type {CreativeOrchestrationDebugReport, CreativeTimeline} from "../creative-orchestration/types";
 import type {CreativeRenderMode} from "../creative-orchestration/render/creative-timeline-to-remotion";
@@ -34,6 +33,47 @@ const DEFAULT_AUDIO_PREVIEW_FALLBACK_LINES = [
   "Build the message first",
   "Then scale the motion"
 ];
+
+const createEmptyCreativeTimeline = ({
+  jobId,
+  durationMs
+}: {
+  jobId: string;
+  durationMs: number;
+}): CreativeTimeline => ({
+  id: `${jobId}-lite-preview-timeline`,
+  sourceJobId: jobId,
+  durationMs,
+  moments: [],
+  decisions: [],
+  tracks: [],
+  diagnostics: {
+    proposalCount: 0,
+    approvedCount: 0,
+    rejectedCount: 0,
+    renderCost: "low",
+    mattingWindows: [],
+    warnings: ["Preview Governor selected the lite preview path."]
+  }
+});
+
+const createLiteDebugReport = ({
+  jobId,
+  timeline
+}: {
+  jobId: string;
+  timeline: CreativeTimeline;
+}): CreativeOrchestrationDebugReport => ({
+  jobId,
+  moments: [],
+  allProposals: [],
+  directorDecisions: [],
+  editDecisionPlans: [],
+  judgmentAuditTrail: [],
+  feedbackSignals: [],
+  criticReview: {status: "approved", score: 100, issues: []},
+  finalCreativeTimeline: timeline
+});
 
 const collectRetrievedMotionCatalogAssets = (tracks: Array<{payload: Record<string, unknown>}>): MotionAssetManifest[] => {
   const seen = new Set<string>();
@@ -311,6 +351,10 @@ export const buildAudioCreativePreviewSession = async (input: {
     creativeOrchestrationV1?: boolean;
   };
 }): Promise<AudioCreativePreviewSession> => {
+  if (input.featureFlags?.creativeOrchestrationV1 === false) {
+    return buildFastAudioCreativePreviewSession(input);
+  }
+
   const captionChunks = buildCaptionChunksFromLiveSource({
     captionProfileId: input.captionProfileId,
     presentationMode: input.presentationMode,
@@ -329,6 +373,7 @@ export const buildAudioCreativePreviewSession = async (input: {
   const resolvedRenderMode = resolveCreativePreviewRenderMode({
     baseVideoMetadata: input.baseVideoMetadata
   });
+  const {buildCreativeOrchestrationPlan} = await import("../creative-orchestration");
   const orchestration = await buildCreativeOrchestrationPlan({
     jobId: input.jobId,
     captionChunks,
@@ -372,6 +417,70 @@ export const buildAudioCreativePreviewSession = async (input: {
     captionChunks: orchestration.captionChunks,
     creativeTimeline: orchestration.finalCreativeTimeline,
     debugReport: orchestration.debugReport,
+    motionModel,
+    videoMetadata,
+    durationMs,
+    renderMode: resolvedRenderMode
+  };
+};
+
+export const buildFastAudioCreativePreviewSession = async (input: {
+  jobId: string;
+  captionProfileId: CaptionStyleProfileId;
+  motionTier: MotionTier | "auto";
+  presentationMode?: PresentationModeSetting | null;
+  baseVideoMetadata?: Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames"> | null;
+  transcriptWords?: LivePreviewBackendWord[];
+  previewLines?: string[];
+  previewMotionSequence?: LivePreviewMotionCue[];
+  allowFallbackDemoData?: boolean;
+}): Promise<AudioCreativePreviewSession> => {
+  const captionChunks = buildCaptionChunksFromLiveSource({
+    captionProfileId: input.captionProfileId,
+    presentationMode: input.presentationMode,
+    transcriptWords: input.transcriptWords,
+    previewLines: input.previewLines,
+    previewMotionSequence: input.previewMotionSequence,
+    allowFallbackDemoData: input.allowFallbackDemoData
+  });
+  const resolvedVideoMetadata = resolveAudioCreativePreviewVideoMetadata({
+    presentationMode: input.presentationMode,
+    baseVideoMetadata: input.baseVideoMetadata
+  });
+  const resolvedRenderMode = resolveCreativePreviewRenderMode({
+    baseVideoMetadata: input.baseVideoMetadata
+  });
+  const lastCaptionEndMs = captionChunks.reduce((max, chunk) => Math.max(max, chunk.endMs), 0);
+  const durationMs = resolveAudioCreativePreviewDurationMs({
+    lastCaptionEndMs,
+    fallbackDurationMs: input.baseVideoMetadata?.durationSeconds
+      ? input.baseVideoMetadata.durationSeconds * 1000
+      : null
+  });
+  const videoMetadata = resolveAudioCreativePreviewVideoMetadata({
+    presentationMode: input.presentationMode,
+    durationMs,
+    baseVideoMetadata: input.baseVideoMetadata
+  });
+  const creativeTimeline = createEmptyCreativeTimeline({
+    jobId: input.jobId,
+    durationMs
+  });
+  const motionModel = buildMotionCompositionModel({
+    chunks: captionChunks,
+    tier: input.motionTier,
+    fps: videoMetadata.fps,
+    videoMetadata,
+    captionProfileId: input.captionProfileId
+  });
+
+  return {
+    captionChunks,
+    creativeTimeline,
+    debugReport: createLiteDebugReport({
+      jobId: input.jobId,
+      timeline: creativeTimeline
+    }),
     motionModel,
     videoMetadata,
     durationMs,

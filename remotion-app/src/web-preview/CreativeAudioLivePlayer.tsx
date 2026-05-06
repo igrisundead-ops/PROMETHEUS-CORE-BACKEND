@@ -14,6 +14,7 @@ import type {
 } from "../lib/types";
 import {
   buildAudioCreativePreviewSession,
+  buildFastAudioCreativePreviewSession,
   type AudioCreativePreviewAudioStatus,
   type AudioCreativePreviewSession,
   type AudioCreativePreviewState,
@@ -54,6 +55,34 @@ export type CreativeAudioLivePlayerProps = {
 
 type BuildState = "idle" | "building-timeline" | "ready" | "error";
 
+type PreviewGovernorMode = "lite-preview" | "full-live-preview";
+
+type PreviewTimingState = {
+  runId: string;
+  startedAtMs: number;
+  requestPostedAtMs: number | null;
+  sessionId: string | null;
+  firstBackendStateAtMs: number | null;
+  firstRenderableAtMs: number | null;
+  firstReadyAtMs: number | null;
+  fullReadyAtMs: number | null;
+};
+
+const STATUS_FALLBACK_POLL_INTERVAL_MS = 4000;
+const BACKEND_UPDATE_STALE_AFTER_MS = 3200;
+const FULL_PREVIEW_MIN_TRANSCRIPT_WORDS = 12;
+const EDIT_SESSION_EVENT_TYPES = [
+  "preview_initializing",
+  "preview_placeholder_ready",
+  "preview_text_ready",
+  "transcript_started",
+  "transcript_progress",
+  "transcript_ready",
+  "analysis_ready",
+  "motion_graphics_ready",
+  "failed"
+] as const;
+
 type LiveEditSessionPublicState = {
   id: string;
   status: string;
@@ -76,6 +105,15 @@ type LiveEditSessionPublicState = {
   sourceHeight?: number | null;
   sourceFps?: number | null;
   sourceHasVideo?: boolean;
+};
+
+type LivePreviewPayload = {
+  id: string;
+  status: string;
+  previewArtifactUrl?: string | null;
+  previewArtifactKind?: "html_composition" | "video" | null;
+  previewArtifactContentType?: string | null;
+  diagnostics?: Record<string, unknown>;
 };
 
 export type LiveAudioPreviewBackendState = {
@@ -302,6 +340,39 @@ const buildSessionSignature = (
   });
 };
 
+const shouldUseFullPreviewBuild = (state: LiveEditSessionPublicState): boolean => {
+  return state.transcriptStatus === "full_transcript_ready" || state.transcriptWords.length >= FULL_PREVIEW_MIN_TRANSCRIPT_WORDS;
+};
+
+const createPreviewTimingState = (jobId: string, resetVersion: number): PreviewTimingState => ({
+  runId: `${jobId}:${resetVersion}:${Date.now()}`,
+  startedAtMs: performance.now(),
+  requestPostedAtMs: null,
+  sessionId: null,
+  firstBackendStateAtMs: null,
+  firstRenderableAtMs: null,
+  firstReadyAtMs: null,
+  fullReadyAtMs: null
+});
+
+const logPreviewGovernorStage = (
+  timing: PreviewTimingState | null,
+  stage: string,
+  detail: Record<string, unknown> = {}
+): void => {
+  if (!timing) {
+    return;
+  }
+
+  console.info("[preview-governor]", {
+    runId: timing.runId,
+    sessionId: timing.sessionId,
+    stage,
+    elapsedMs: Math.round(performance.now() - timing.startedAtMs),
+    ...detail
+  });
+};
+
 const toActionableBuildErrorMessage = (message: string, apiBase: string): string => {
   return /failed to fetch|networkerror|load failed/i.test(message)
     ? `Cannot reach the local backend at ${apiBase.replace(/\/+$/, "")}. Start the backend so AssemblyAI captions and live motion can load.`
@@ -359,6 +430,10 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
   const [playbackSourceError, setPlaybackSourceError] = useState<string | null>(null);
   const [liveSessionState, setLiveSessionState] = useState<LiveEditSessionPublicState | null>(null);
   const [previewManifest, setPreviewManifest] = useState<HyperframesPreviewManifest | null>(null);
+  const [previewArtifactUrl, setPreviewArtifactUrl] = useState<string | null>(null);
+  const [previewArtifactKind, setPreviewArtifactKind] = useState<"html_composition" | "video" | null>(null);
+  const [previewArtifactContentType, setPreviewArtifactContentType] = useState<string | null>(null);
+  const [previewDiagnostics, setPreviewDiagnostics] = useState<Record<string, unknown> | null>(null);
   const [browserVideoMetadata, setBrowserVideoMetadata] = useState<Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames"> | null>(null);
   const [nativePreviewHealth, setNativePreviewHealth] = useState<PreviewPlaybackHealth>("booting");
   const [nativePreviewErrorMessage, setNativePreviewErrorMessage] = useState<string | null>(null);
@@ -367,6 +442,8 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
   const audioStatusCallbackRef = useRef(onAudioStatusChange);
   const liveSessionCallbackRef = useRef(onLiveSessionChange);
   const sessionBuildSignatureRef = useRef("");
+  const previewTimingRef = useRef<PreviewTimingState | null>(null);
+  const lastBackendUpdateAtRef = useRef(0);
   const sourcePlan = useMemo(
     () =>
       planAudioPreviewSource({
@@ -465,7 +542,11 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
             previewLineCount: current.previewLines.length,
             previewMotionCueCount: current.previewMotionSequence.length,
             transcriptWordCount: current.transcriptWords.length,
-            overlayReady: Boolean(session && session.creativeTimeline.tracks.length > 0 && session.creativeTimeline.moments.length > 0),
+            overlayReady: Boolean(
+              session &&
+              (session.captionChunks.length > 0 ||
+                (session.creativeTimeline.tracks.length > 0 && session.creativeTimeline.moments.length > 0))
+            ),
             momentCount: session?.creativeTimeline.moments.length ?? 0,
             trackCount: session?.creativeTimeline.tracks.length ?? 0,
             errorMessage: current.errorMessage,
@@ -484,6 +565,10 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     setNativePreviewHealth("booting");
     setNativePreviewErrorMessage(null);
     setDisplayGodFallbackReason(null);
+    setPreviewArtifactUrl(null);
+    setPreviewArtifactKind(null);
+    setPreviewArtifactContentType(null);
+    setPreviewDiagnostics(null);
   }, [previewTimelineResetVersion, resolvedVideoSrc]);
 
   useEffect(() => {
@@ -540,6 +625,62 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
       }
     };
   }, [apiBase, liveSessionState?.id, previewTimelineResetVersion]);
+
+  useEffect(() => {
+    const sessionId = liveSessionState?.id;
+    if (!sessionId) {
+      setPreviewArtifactUrl(null);
+      setPreviewDiagnostics(null);
+      return;
+    }
+
+    let cancelled = false;
+    let intervalId = 0;
+    const abortController = new AbortController();
+    const endpoint = `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${sessionId}/preview`;
+
+    const refresh = async (): Promise<void> => {
+      try {
+        const response = await fetch(endpoint, {
+          cache: "no-store",
+          signal: abortController.signal
+        });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = await response.json() as LivePreviewPayload;
+        if (cancelled) {
+          return;
+        }
+
+        const nextUrl = typeof payload.previewArtifactUrl === "string" && payload.previewArtifactUrl.trim()
+          ? `${apiBase.replace(/\/+$/, "")}${payload.previewArtifactUrl}`
+          : null;
+        setPreviewArtifactUrl(nextUrl);
+        setPreviewArtifactKind(payload.previewArtifactKind ?? null);
+        setPreviewArtifactContentType(payload.previewArtifactContentType ?? null);
+        setPreviewDiagnostics(payload.diagnostics ?? null);
+      } catch {
+        if (!cancelled && !abortController.signal.aborted) {
+          // Keep the last successful artifact payload.
+        }
+      }
+    };
+
+    void refresh();
+    intervalId = window.setInterval(() => {
+      void refresh();
+    }, 1200);
+
+    return () => {
+      cancelled = true;
+      abortController.abort();
+      if (intervalId !== 0) {
+        window.clearInterval(intervalId);
+      }
+    };
+  }, [apiBase, liveSessionState?.id]);
 
   useEffect(() => {
     if (!directBrowserVideoSrc || typeof document === "undefined") {
@@ -735,6 +876,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
   useEffect(() => {
     let cancelled = false;
     let intervalId = 0;
+    let eventSource: EventSource | null = null;
     const abortController = new AbortController();
 
     const updateSessionFromBackend = async (payload: LiveEditSessionPublicState): Promise<void> => {
@@ -743,6 +885,18 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
       }
 
       const nextState = normalizeSessionSnapshot(payload);
+      const timing = previewTimingRef.current;
+      lastBackendUpdateAtRef.current = Date.now();
+      if (timing) {
+        timing.sessionId = nextState.id;
+        if (timing.firstBackendStateAtMs === null) {
+          timing.firstBackendStateAtMs = performance.now();
+          logPreviewGovernorStage(timing, "backend_state_received", {
+            previewStatus: nextState.previewStatus,
+            transcriptStatus: nextState.transcriptStatus
+          });
+        }
+      }
       setLiveSessionState(nextState);
 
       const hasRenderableData =
@@ -754,6 +908,15 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
         setBuildState("building-timeline");
         previewStateCallbackRef.current?.("building-timeline");
         return;
+      }
+
+      if (timing && timing.firstRenderableAtMs === null) {
+        timing.firstRenderableAtMs = performance.now();
+        logPreviewGovernorStage(timing, "first_renderable_state", {
+          previewLines: nextState.previewLines.length,
+          previewCues: nextState.previewMotionSequence.length,
+          transcriptWords: nextState.transcriptWords.length
+        });
       }
 
       const nextSignature = buildSessionSignature(nextState, {
@@ -773,17 +936,33 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
 
       try {
         const baseVideoMetadata = buildBaseVideoMetadata(nextState);
-        const nextSession = await buildAudioCreativePreviewSession({
-          jobId: nextState.id,
-          captionProfileId,
-          motionTier,
-          presentationMode,
-          baseVideoMetadata,
-          transcriptWords: nextState.transcriptWords,
-          previewLines: nextState.previewLines,
-          previewMotionSequence: nextState.previewMotionSequence,
-          allowFallbackDemoData: false
-        });
+        const governorMode: PreviewGovernorMode = shouldUseFullPreviewBuild(nextState)
+          ? "full-live-preview"
+          : "lite-preview";
+        const buildStartedAtMs = performance.now();
+        const nextSession = governorMode === "full-live-preview"
+          ? await buildAudioCreativePreviewSession({
+              jobId: nextState.id,
+              captionProfileId,
+              motionTier,
+              presentationMode,
+              baseVideoMetadata,
+              transcriptWords: nextState.transcriptWords,
+              previewLines: nextState.previewLines,
+              previewMotionSequence: nextState.previewMotionSequence,
+              allowFallbackDemoData: false
+            })
+          : await buildFastAudioCreativePreviewSession({
+              jobId: nextState.id,
+              captionProfileId,
+              motionTier,
+              presentationMode,
+              baseVideoMetadata,
+              transcriptWords: nextState.transcriptWords,
+              previewLines: nextState.previewLines,
+              previewMotionSequence: nextState.previewMotionSequence,
+              allowFallbackDemoData: false
+            });
 
         if (cancelled) {
           return;
@@ -794,6 +973,29 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
         setBuildState("ready");
         setBuildError(null);
         previewStateCallbackRef.current?.("ready");
+        if (timing) {
+          const buildElapsedMs = Math.round(performance.now() - buildStartedAtMs);
+          if (timing.firstReadyAtMs === null) {
+            timing.firstReadyAtMs = performance.now();
+            logPreviewGovernorStage(timing, "preview_ready", {
+              governorMode,
+              buildElapsedMs
+            });
+          } else if (governorMode === "full-live-preview" && timing.fullReadyAtMs === null) {
+            timing.fullReadyAtMs = performance.now();
+            logPreviewGovernorStage(timing, "preview_upgraded", {
+              governorMode,
+              buildElapsedMs,
+              transcriptWords: nextState.transcriptWords.length
+            });
+          } else {
+            logPreviewGovernorStage(timing, "preview_rebuilt", {
+              governorMode,
+              buildElapsedMs,
+              transcriptWords: nextState.transcriptWords.length
+            });
+          }
+        }
       } catch (error) {
         if (cancelled) {
           return;
@@ -825,12 +1027,19 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
       setBuildState("building-timeline");
       setBuildError(null);
       sessionBuildSignatureRef.current = "";
+      previewTimingRef.current = createPreviewTimingState(jobId, previewTimelineResetVersion);
+      lastBackendUpdateAtRef.current = 0;
       previewStateCallbackRef.current?.("building-timeline");
 
       try {
         const endpoint = `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/live-preview`;
         const backendSourcePath = sourcePlan.kind === "backend" ? sourcePlan.sourcePath : null;
         let response: Response;
+        previewTimingRef.current!.requestPostedAtMs = performance.now();
+        logPreviewGovernorStage(previewTimingRef.current, "request_started", {
+          sourceKind: sourcePlan.kind,
+          sourceFile: sourceFile?.name ?? null
+        });
 
         if (sourceFile) {
           const formData = new FormData();
@@ -867,17 +1076,25 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
 
         const payload = await response.json() as (LiveEditSessionPublicState & {
           error?: string;
-          urls?: {status?: string};
+          urls?: {status?: string; events?: string};
         });
         if (!response.ok || !payload.id) {
           throw new Error(payload.error ?? `Live preview session request failed with ${response.status}.`);
         }
 
+        logPreviewGovernorStage(previewTimingRef.current, "request_accepted", {
+          status: response.status,
+          previewStatus: payload.previewStatus,
+          transcriptStatus: payload.transcriptStatus
+        });
         await updateSessionFromBackend(payload);
 
         const statusUrl = payload.urls?.status
           ? `${apiBase.replace(/\/+$/, "")}${payload.urls.status}`
           : `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${payload.id}/status`;
+        const eventsUrl = payload.urls?.events
+          ? `${apiBase.replace(/\/+$/, "")}${payload.urls.events}`
+          : null;
 
         const refreshStatus = async (): Promise<void> => {
           try {
@@ -908,9 +1125,37 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
           }
         };
 
+        if (eventsUrl && typeof window !== "undefined" && typeof window.EventSource === "function") {
+          eventSource = new window.EventSource(eventsUrl);
+          const handleEvent = (event: MessageEvent<string>): void => {
+            try {
+              const payload = JSON.parse(event.data) as {session?: LiveEditSessionPublicState};
+              if (payload.session) {
+                void updateSessionFromBackend(payload.session);
+              }
+            } catch (error) {
+              console.warn("[CreativeAudioLivePlayer] Failed to parse live preview event payload", {
+                error: error instanceof Error ? error.message : String(error)
+              });
+            }
+          };
+
+          EDIT_SESSION_EVENT_TYPES.forEach((eventType) => {
+            eventSource?.addEventListener(eventType, handleEvent as EventListener);
+          });
+          eventSource.addEventListener("open", () => {
+            logPreviewGovernorStage(previewTimingRef.current, "event_stream_open");
+          });
+          eventSource.addEventListener("error", () => {
+            logPreviewGovernorStage(previewTimingRef.current, "event_stream_error");
+          });
+        }
+
         intervalId = window.setInterval(() => {
-          void refreshStatus();
-        }, 1200);
+          if (Date.now() - lastBackendUpdateAtRef.current >= BACKEND_UPDATE_STALE_AFTER_MS) {
+            void refreshStatus();
+          }
+        }, STATUS_FALLBACK_POLL_INTERVAL_MS);
 
         void refreshStatus();
       } catch (error) {
@@ -933,6 +1178,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     return () => {
       cancelled = true;
       abortController.abort();
+      eventSource?.close();
       if (intervalId !== 0) {
         window.clearInterval(intervalId);
       }
@@ -990,7 +1236,9 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
       renderJobActive: false,
       videoLoaded: nativePreviewHealth === "ready",
       previewRenderer,
-      manifestReady: Boolean(previewManifest)
+      manifestReady: Boolean(previewManifest),
+      previewArtifactUrl,
+      previewDiagnostics
     });
   }, [
     buildState,
@@ -1003,6 +1251,8 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     playbackSourcePending,
     previewRenderer,
     previewTimelineResetVersion,
+    previewArtifactUrl,
+    previewDiagnostics,
     resolvedAudioSrc,
     resolvedVideoSrc,
     session,
@@ -1023,15 +1273,99 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
           : resolvedAudioSrc
             ? "loading"
             : "missing";
+  const captionsReadyForRender = liveSessionState?.transcriptStatus === "full_transcript_ready";
   const canRenderNativeVideoStage = Boolean(resolvedVideoSrc);
   const shouldUseDisplayGod = Boolean(
     previewRenderer === "hyperframes" &&
     canRenderNativeVideoStage &&
+    captionsReadyForRender &&
     displayTimeline &&
     !displayGodFallbackReason
   );
-  const shouldUseRemotionPreview = Boolean(previewRenderer === "remotion" && canRenderNativeVideoStage);
+  const remotionInteractiveAllowed = previewManifest?.lanes.interactive.includes("remotion") ?? false;
+  const shouldUseRemotionPreview = Boolean(
+    previewRenderer === "remotion" &&
+    remotionInteractiveAllowed &&
+    canRenderNativeVideoStage
+  );
   const stageStatusMessage = nativePreviewErrorMessage ?? buildError;
+  const canRenderArtifact = Boolean(previewArtifactUrl);
+  const allowLegacyInteractiveFallback = Boolean(showDebugOverlay && import.meta.env.DEV);
+  const enforceArtifactOnly = previewRenderer === "hyperframes" && !allowLegacyInteractiveFallback;
+  const shouldRenderVideoArtifact = canRenderArtifact && previewArtifactKind === "video";
+  const artifactWidth = previewManifest?.baseVideo.width ??
+    liveSessionState?.sourceWidth ??
+    browserVideoMetadata?.width ??
+    16;
+  const artifactHeight = previewManifest?.baseVideo.height ??
+    liveSessionState?.sourceHeight ??
+    browserVideoMetadata?.height ??
+    9;
+  const artifactAspectRatio = `${Math.max(1, artifactWidth)} / ${Math.max(1, artifactHeight)}`;
+  const artifactFrameStyles: React.CSSProperties = {
+    width: "100%",
+    aspectRatio: artifactAspectRatio,
+    minHeight: 420,
+    border: "1px solid rgba(148, 163, 184, 0.2)",
+    borderRadius: 16,
+    background: "#020617",
+    display: "block"
+  };
+
+  if (canRenderArtifact && previewArtifactUrl) {
+    return (
+      <div style={{display: "grid", gap: 10}}>
+        {shouldRenderVideoArtifact ? (
+          <video
+            src={previewArtifactUrl}
+            controls
+            playsInline
+            style={artifactFrameStyles}
+          />
+        ) : (
+          <iframe
+            title="HyperFrames Composition Preview"
+            src={previewArtifactUrl}
+            scrolling="no"
+            style={{
+              ...artifactFrameStyles,
+              background: "transparent"
+            }}
+          />
+        )}
+        {previewDiagnostics ? (
+          <pre style={{
+            margin: 0,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px solid rgba(148, 163, 184, 0.2)",
+            background: "rgba(15, 23, 42, 0.78)",
+            color: "#cbd5e1",
+            fontSize: 11,
+            lineHeight: 1.4,
+            maxHeight: 160,
+            overflow: "auto"
+          }}>
+            {JSON.stringify(previewDiagnostics, null, 2)}
+          </pre>
+        ) : null}
+        <div style={{fontSize: 12, color: "#94a3b8"}}>
+          {shouldRenderVideoArtifact
+            ? `Artifact kind: video${previewArtifactContentType ? ` (${previewArtifactContentType})` : ""}`
+            : `Artifact kind: html composition${previewArtifactContentType ? ` (${previewArtifactContentType})` : ""}`}
+        </div>
+      </div>
+    );
+  }
+
+  if (enforceArtifactOnly) {
+    return (
+      <LoadingShell
+        mediaStatus={shellMediaStatus}
+        buildState={buildState === "error" ? "building-timeline" : buildState}
+      />
+    );
+  }
 
   if (buildState === "error" && !canRenderNativeVideoStage) {
     return (
@@ -1096,6 +1430,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
               model={session?.motionModel ?? fallbackMotionModel}
               captionProfileId={captionProfileId}
               previewPerformanceMode="balanced"
+              suppressCaptions={!captionsReadyForRender}
               onHealthChange={(health) => {
                 setNativePreviewHealth(health);
               }}

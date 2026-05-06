@@ -244,27 +244,13 @@ const resolveHttpMilvusEndpoint = (address: string): string => {
 };
 
 export class AssetRetrievalService {
-  private readonly client: MilvusClient | HttpClient | null;
+  private client: MilvusClient | HttpClient | null;
   private readonly useHttpMilvus: boolean;
   private readonly embeddingProvider: EmbeddingProvider | null;
 
   constructor(private readonly env: BackendEnv) {
     this.useHttpMilvus = env.ASSET_MILVUS_ENABLED && isHttpMilvusAddress(env.MILVUS_ADDRESS);
-    this.client = env.ASSET_MILVUS_ENABLED
-      ? this.useHttpMilvus
-        ? new HttpClient({
-            endpoint: resolveHttpMilvusEndpoint(env.MILVUS_ADDRESS),
-            token: env.MILVUS_TOKEN || undefined,
-            database: env.MILVUS_DATABASE || undefined,
-            timeout: 60000
-          })
-        : new MilvusClient({
-            address: env.MILVUS_ADDRESS,
-            token: env.MILVUS_TOKEN || undefined,
-            database: env.MILVUS_DATABASE || undefined,
-            ssl: isHttpMilvusAddress(env.MILVUS_ADDRESS)
-          })
-      : null;
+    this.client = null;
     this.embeddingProvider = env.ASSET_EMBEDDING_PROVIDER === "local-test"
       ? null
       : createEmbeddingProvider({
@@ -286,6 +272,32 @@ export class AssetRetrievalService {
       `[assets:retrieve] Initialized provider=${env.ASSET_EMBEDDING_PROVIDER} model=${env.ASSET_EMBEDDING_MODEL} ` +
       `dims=${env.ASSET_EMBEDDING_DIMENSIONS} milvus=${env.ASSET_MILVUS_ENABLED} collection=${env.MILVUS_COLLECTION_ASSETS}.`
     );
+  }
+
+  private getClient(): MilvusClient | HttpClient {
+    if (!this.env.ASSET_MILVUS_ENABLED) {
+      throw new Error("ASSET_MILVUS_ENABLED=false");
+    }
+
+    if (this.client) {
+      return this.client;
+    }
+
+    this.client = this.useHttpMilvus
+      ? new HttpClient({
+          endpoint: resolveHttpMilvusEndpoint(this.env.MILVUS_ADDRESS),
+          token: this.env.MILVUS_TOKEN || undefined,
+          database: this.env.MILVUS_DATABASE || undefined,
+          timeout: 60000
+        })
+      : new MilvusClient({
+          address: this.env.MILVUS_ADDRESS,
+          token: this.env.MILVUS_TOKEN || undefined,
+          database: this.env.MILVUS_DATABASE || undefined,
+          ssl: isHttpMilvusAddress(this.env.MILVUS_ADDRESS)
+        });
+
+    return this.client;
   }
 
   private async embedQueryText(queryText: string): Promise<number[]> {
@@ -465,17 +477,18 @@ export class AssetRetrievalService {
   }
 
   async retrieve(rawRequest: unknown): Promise<AssetRetrievalResponse> {
-    if (!this.env.ASSET_MILVUS_ENABLED || !this.client) {
+    if (!this.env.ASSET_MILVUS_ENABLED) {
       throw new Error("ASSET_MILVUS_ENABLED=false");
     }
 
+    const client = this.getClient();
     const request = requestSchema.parse(rawRequest);
     const hasCollection = this.useHttpMilvus
-      ? await (this.client as HttpClient).hasCollection({
+      ? await (client as HttpClient).hasCollection({
           collectionName: this.env.MILVUS_COLLECTION_ASSETS,
           dbName: this.env.MILVUS_DATABASE
         })
-      : await (this.client as MilvusClient).hasCollection({
+      : await (client as MilvusClient).hasCollection({
           collection_name: this.env.MILVUS_COLLECTION_ASSETS
         });
     const collectionExists = this.useHttpMilvus
@@ -486,11 +499,11 @@ export class AssetRetrievalService {
     }
 
     if (this.useHttpMilvus) {
-      await (this.client as HttpClient).loadCollection({
+      await (client as HttpClient).loadCollection({
         collectionName: this.env.MILVUS_COLLECTION_ASSETS
       });
     } else {
-      await (this.client as MilvusClient).loadCollection({
+      await (client as MilvusClient).loadCollection({
         collection_name: this.env.MILVUS_COLLECTION_ASSETS
       });
     }
@@ -523,7 +536,7 @@ export class AssetRetrievalService {
     ];
     const rawHits: RawMilvusHit[] = [];
     if (this.useHttpMilvus) {
-      const response = await (this.client as HttpClient).search({
+      const response = await (client as HttpClient).search({
         collectionName: this.env.MILVUS_COLLECTION_ASSETS,
         annsField: "embedding",
         data: [queryVector],
@@ -543,7 +556,7 @@ export class AssetRetrievalService {
         }))
       );
     } else {
-      const rawResult = await (this.client as MilvusClient).search({
+      const rawResult = await (client as MilvusClient).search({
         collection_name: this.env.MILVUS_COLLECTION_ASSETS,
         anns_field: "embedding",
         data: [queryVector],

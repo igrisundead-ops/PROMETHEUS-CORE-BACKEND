@@ -1,15 +1,25 @@
-import {stat} from "node:fs/promises";
+import {createHash} from "node:crypto";
+import {createReadStream} from "node:fs";
+import {mkdir, readFile, stat, writeFile} from "node:fs/promises";
 import path from "node:path";
 
 import type {FastifyRequest} from "fastify";
 
 import type {BackendEnv} from "../config";
+import {resolveRenderConfigFromEnv, type RenderConfig} from "../config/render-flags";
 import {transcribeWithAssemblyAI, streamAudioBufferWithAssemblyAI} from "../integrations/assemblyai";
 import {probeVideoMetadata} from "../integrations/ffprobe";
 import {runFfmpegBufferCommand} from "../sound-engine/ffmpeg";
 import {InProcessQueue} from "../queue";
 import {LocalPreviewRunner} from "../local-preview-runner";
 import {createEditSessionId} from "../utils/ids";
+import {renderDiagnosticsSchema, type RenderDiagnostics} from "../contracts/render-diagnostics";
+import {type CreativeDecisionManifest} from "../contracts/creative-decision-manifest";
+import {generateTypographyDecision} from "../typography/typography-decision-engine";
+import {resolveRequestedOrFallbackFontPair} from "../typography/font-file-resolver";
+import {selectTextAnimation} from "../animation/animation-retrieval-engine";
+import {PreviewRenderService} from "../render/preview-render-service";
+import {resolveRenderAuthority} from "../render/render-authority";
 import {
   editSessionCreateRequestSchema,
   editSessionPreviewManifestSchema,
@@ -36,7 +46,7 @@ const DEFAULT_PREVIEW_SECONDS = 8;
 const PREVIEW_PROMOTION_DEBOUNCE_MS = 180;
 const PREVIEW_PLACEHOLDER_COPY = "Loading the first typographic beat.";
 const PREVIEW_PLACEHOLDER_LINE_2 = "Keep the motion lane warm.";
-const PREVIEW_CAPTION_PROFILE_ID = "longform_eve_typography_v1";
+const PREVIEW_CAPTION_PROFILE_ID = "longform_svg_typography_v1";
 const RENDER_STAGE_PROGRESS: Record<string, number> = {
   idle: 0,
   cleaning: 5,
@@ -53,42 +63,6 @@ const nowIso = (deps: EditSessionDependencies): string => {
 
 const normalizeText = (value: string): string => {
   return value.replace(/\s+/g, " ").trim();
-};
-
-const splitPreviewLines = (text: string): string[] => {
-  const cleaned = normalizeText(text);
-  if (!cleaned) {
-    return [];
-  }
-
-  const sentenceChunks = cleaned
-    .split(/(?<=[.!?])\s+/)
-    .map((chunk) => chunk.trim())
-    .filter(Boolean);
-
-  if (sentenceChunks.length > 1) {
-    return sentenceChunks.slice(0, 3);
-  }
-
-  const words = cleaned.split(/\s+/);
-  if (words.length <= 4) {
-    return [cleaned];
-  }
-
-  if (words.length <= 8) {
-    const midpoint = Math.max(2, Math.ceil(words.length / 2));
-    return [words.slice(0, midpoint).join(" "), words.slice(midpoint).join(" ")].filter(Boolean);
-  }
-
-  return [words.slice(0, 4).join(" "), words.slice(4, 8).join(" "), words.slice(8).join(" ")].filter(Boolean);
-};
-
-const extractEmphasisWords = (text: string): string[] => {
-  return normalizeText(text)
-    .split(/\s+/)
-    .map((word) => word.replace(/^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$/g, ""))
-    .filter((word) => word.length >= 7)
-    .slice(0, 4);
 };
 
 const buildPlaceholder = (
@@ -110,7 +84,9 @@ const buildMotionCue = ({
   lineIndex,
   source,
   createdAt,
-  phase
+  phase,
+  animation,
+  emphasisWords
 }: {
   sessionId: string;
   text: string;
@@ -118,17 +94,10 @@ const buildMotionCue = ({
   source: EditSessionMotionCue["source"];
   createdAt: string;
   phase: EditSessionMotionCue["phase"];
+  animation: EditSessionMotionCue["animation"];
+  emphasisWords: string[];
 }): EditSessionMotionCue => {
   const trimmed = normalizeText(text);
-  const emphasisWords = extractEmphasisWords(trimmed);
-  const animation =
-    phase === "placeholder"
-      ? "fade_up"
-      : lineIndex === 0
-        ? "fade_up"
-        : lineIndex === 1
-          ? "type_lock"
-          : "soft_push";
 
   return {
     cueId: `${sessionId}_${source}_${lineIndex}_${createdAt}`,
@@ -144,41 +113,87 @@ const buildMotionCue = ({
   };
 };
 
-const buildMotionSequence = ({
+const inferRhetoricalIntent = (text: string): "authority" | "emphasis" | "premium_explain" | "neutral" => {
+  const normalized = normalizeText(text).toLowerCase();
+  if (/\bmust|never|always|rule|authority|proof\b/.test(normalized)) {
+    return "authority";
+  }
+  if (/\bnow|important|key|focus|core|critical\b/.test(normalized)) {
+    return "emphasis";
+  }
+  if (/\bexplain|because|how|why\b/.test(normalized)) {
+    return "premium_explain";
+  }
+  return "neutral";
+};
+
+const buildMotionSequenceFromEngines = async ({
   sessionId,
   text,
   source,
-  createdAt
+  createdAt,
+  renderConfig
 }: {
   sessionId: string;
   text: string;
   source: EditSessionMotionCue["source"];
   createdAt: string;
-}): EditSessionMotionCue[] => {
-  const lines = splitPreviewLines(text);
+  renderConfig: RenderConfig;
+}): Promise<{lines: string[]; motionSequence: EditSessionMotionCue[]}> => {
+  const rhetoricalIntent = inferRhetoricalIntent(text);
+  const typographyDecision = generateTypographyDecision({
+    text,
+    rhetoricalIntent,
+    availableFonts: [
+      {family: "Satoshi", source: "custom_ingested"},
+      {family: "Canela", source: "custom_ingested"},
+      {family: "Arial", source: "system"}
+    ],
+    renderConfig,
+    maxLines: 3,
+    maxCharsPerLine: 28,
+    pairingThreshold: 0.8
+  });
+  const lines = typographyDecision.linePlan.lines;
   if (lines.length === 0) {
-    return [
+    return {
+      lines: [PREVIEW_PLACEHOLDER_COPY],
+      motionSequence: [
       buildMotionCue({
         sessionId,
         text: PREVIEW_PLACEHOLDER_COPY,
         lineIndex: 0,
         source: "placeholder",
         createdAt,
-        phase: "placeholder"
+        phase: "placeholder",
+        animation: "fade_up",
+        emphasisWords: []
       })
-    ];
+      ]
+    };
   }
 
-  return lines.map((line, index) =>
+  const animationDecision = await selectTextAnimation({
+    rhetoricalIntent,
+    motionIntensity: rhetoricalIntent === "emphasis" ? 0.7 : 0.5,
+    typographyMode: "svg_longform_typography_v1",
+    renderConfig
+  });
+
+  const emphasisWords = typographyDecision.coreWords;
+  const motionSequence = lines.map((line, index) =>
     buildMotionCue({
       sessionId,
       text: line,
       lineIndex: index,
       source,
       createdAt,
-      phase: index === 0 ? "reveal" : "lock"
+      phase: index === 0 ? "reveal" : "lock",
+      animation: animationDecision.family,
+      emphasisWords
     })
   );
+  return {lines, motionSequence};
 };
 
 const buildAnalysisSummary = ({
@@ -213,6 +228,125 @@ const buildMotionGraphicsSummary = ({
     avoidedStyleFamily: "alex-mozzie",
     renderReady: session.previewStatus === "preview_text_ready" || session.previewStatus === "preview_placeholder_ready"
   };
+};
+
+const buildPreviewDiagnostics = ({
+  session,
+  renderConfig,
+  artifactAvailable,
+  artifactUrl
+}: {
+  session: EditSessionState;
+  renderConfig: RenderConfig;
+  artifactAvailable: boolean;
+  artifactUrl?: string | null;
+}): RenderDiagnostics => {
+  const previewUrl = artifactUrl ?? session.renderOutputUrl ?? null;
+  const remotionUsed = renderConfig.PREVIEW_ENGINE === "remotion" && renderConfig.ENABLE_REMOTION_PREVIEW;
+  const warnings: string[] = [];
+  if (!renderConfig.ENABLE_REMOTION_PREVIEW) {
+    warnings.push("Remotion interactive preview disabled by feature flag.");
+  }
+  if (!renderConfig.ENABLE_LIVE_BROWSER_OVERLAY) {
+    warnings.push("Live browser overlay disabled by feature flag.");
+  }
+
+  const pipelineTrace = renderConfig.ENABLE_PREVIEW_PIPELINE_TRACE
+    ? resolveRenderAuthority({
+      jobId: session.id,
+      previewModeRequested: session.sourceHasVideo ? "video_preview" : "audio_only_preview",
+      renderConfig,
+      artifactAvailable
+    })
+    : undefined;
+  const fallbackReasons: string[] = [];
+  if (pipelineTrace?.oldFallbackTriggered) {
+    fallbackReasons.push(pipelineTrace.fallbackReason ?? "preview_artifact_unavailable");
+  }
+  const metadata = session.metadata as Record<string, unknown>;
+  const fontProofFromMetadata = (metadata.previewFontProof ?? null) as Record<string, unknown> | null;
+  const animationProofFromMetadata = (metadata.previewAnimationProof ?? null) as Record<string, unknown> | null;
+  const previewArtifactKind =
+    metadata.previewArtifactKind === "html_composition" || metadata.previewArtifactKind === "video"
+      ? metadata.previewArtifactKind
+      : null;
+  const previewArtifactContentType =
+    typeof metadata.previewArtifactContentType === "string" && metadata.previewArtifactContentType.trim()
+      ? metadata.previewArtifactContentType.trim()
+      : null;
+  const previewArtifactWarnings = Array.isArray(metadata.previewArtifactWarnings)
+    ? metadata.previewArtifactWarnings.filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    : [];
+
+  return renderDiagnosticsSchema.parse({
+    jobId: session.id,
+    previewEngine: renderConfig.PREVIEW_ENGINE,
+    previewUrl,
+    previewArtifactKind,
+    previewArtifactContentType,
+    manifestVersion: "hyperframes-preview-manifest/v1",
+    renderTimeMs: null,
+    compositionGenerationTimeMs: null,
+    fontsUsed: Array.isArray(fontProofFromMetadata?.fontsRequestedFromManifest)
+      ? fontProofFromMetadata.fontsRequestedFromManifest as string[]
+      : [],
+    fontGraphUsed: renderConfig.ENABLE_FONT_GRAPH,
+    customFontsUsed: Boolean(fontProofFromMetadata && Array.isArray(fontProofFromMetadata.fontFilesLoadedIntoComposition)
+      && (fontProofFromMetadata.fontFilesLoadedIntoComposition as unknown[]).length > 0),
+    milvusUsed: renderConfig.ENABLE_MILVUS_ANIMATION_RETRIEVAL,
+    retrievedAnimationId: typeof animationProofFromMetadata?.retrievedAnimationId === "string"
+      ? animationProofFromMetadata.retrievedAnimationId
+      : null,
+    animationFamily: typeof animationProofFromMetadata?.animationRequestedFromManifest === "string"
+      ? animationProofFromMetadata.animationRequestedFromManifest
+      : null,
+    fallbackUsed: fallbackReasons.length > 0,
+    fallbackReasons,
+    legacyOverlayUsed: renderConfig.ENABLE_LEGACY_OVERLAY,
+    remotionUsed,
+    hyperframesUsed: renderConfig.PREVIEW_ENGINE === "hyperframes",
+    overlapCheckPassed: null,
+    fontProof: {
+      fontsRequestedFromManifest: Array.isArray(fontProofFromMetadata?.fontsRequestedFromManifest)
+        ? fontProofFromMetadata.fontsRequestedFromManifest as string[]
+        : [],
+      fontFilesResolved: Array.isArray(fontProofFromMetadata?.fontFilesResolved)
+        ? fontProofFromMetadata.fontFilesResolved as string[]
+        : [],
+      fontFilesLoadedIntoComposition: Array.isArray(fontProofFromMetadata?.fontFilesLoadedIntoComposition)
+        ? fontProofFromMetadata.fontFilesLoadedIntoComposition as string[]
+        : [],
+      fontCssGenerated: Boolean(fontProofFromMetadata?.fontCssGenerated),
+      fallbackFontsUsed: Array.isArray(fontProofFromMetadata?.fallbackFontsUsed)
+        ? fontProofFromMetadata.fallbackFontsUsed as string[]
+        : [],
+      fallbackReasons: Array.isArray(fontProofFromMetadata?.fallbackReasons)
+        ? fontProofFromMetadata.fallbackReasons as string[]
+        : []
+    },
+    animationProof: {
+      animationRequestedFromManifest: typeof animationProofFromMetadata?.animationRequestedFromManifest === "string"
+        ? animationProofFromMetadata.animationRequestedFromManifest
+        : null,
+      animationRetrievedFromMilvus: Boolean(animationProofFromMetadata?.animationRetrievedFromMilvus),
+      retrievedAnimationId: typeof animationProofFromMetadata?.retrievedAnimationId === "string"
+        ? animationProofFromMetadata.retrievedAnimationId
+        : null,
+      gsapTimelineGenerated: Boolean(animationProofFromMetadata?.gsapTimelineGenerated),
+      fallbackAnimationUsed: Boolean(animationProofFromMetadata?.fallbackAnimationUsed),
+      fallbackReasons: Array.isArray(animationProofFromMetadata?.fallbackReasons)
+        ? animationProofFromMetadata.fallbackReasons as string[]
+        : []
+    },
+    warnings: [
+      ...warnings,
+      ...previewArtifactWarnings,
+      ...(previewArtifactKind === "html_composition"
+        ? ["Preview artifact is currently an HTML composition, not a rendered video file."]
+        : [])
+    ],
+    pipelineTrace
+  });
 };
 
 const toPublicSession = (session: EditSessionState): EditSessionPublicState => {
@@ -319,6 +453,27 @@ const resolvePreviewManifestSourceUrl = (session: EditSessionState): string | nu
   return null;
 };
 
+type TranscriptCacheEntry = {
+  fingerprint: string;
+  transcriptWords: EditSessionState["transcriptWords"];
+  transcriptText: string;
+  cachedAt: string;
+  sourceFilename: string | null;
+};
+
+const hashFileSha1 = async (filePath: string): Promise<string> => {
+  const hash = createHash("sha1");
+  await new Promise<void>((resolve, reject) => {
+    const stream = createReadStream(filePath);
+    stream.on("data", (chunk) => {
+      hash.update(chunk);
+    });
+    stream.on("end", () => resolve());
+    stream.on("error", reject);
+  });
+  return hash.digest("hex");
+};
+
 const extractPreviewAudioBuffer = async ({
   sourcePath,
   previewSeconds
@@ -362,6 +517,11 @@ export type EditSessionSourceMediaAsset = {
   fileSizeBytes: number;
   contentType: string;
   hasVideo: boolean;
+};
+
+export type EditSessionPreviewArtifactAsset = {
+  filePath: string;
+  contentType: string;
 };
 
 export type EditSessionRenderDriver = {
@@ -443,17 +603,20 @@ export type EditSessionDependencies = {
   streamPreviewAudio?: typeof streamAudioBufferWithAssemblyAI;
   transcribeMedia?: typeof transcribeWithAssemblyAI;
   renderDriver?: EditSessionRenderDriver;
+  previewRenderService?: PreviewRenderService;
 };
 
 export class EditSessionManager {
   private readonly store: EditSessionStore;
   private readonly env: BackendEnv;
+  private readonly renderConfig: RenderConfig;
   private readonly deps: EditSessionDependencies;
   private readonly sessions = new Map<string, EditSessionState>();
   private readonly subscribers = new Map<string, Set<(event: EditSessionEvent) => void>>();
   private readonly persistChains = new Map<string, Promise<void>>();
   private readonly renderQueue = new InProcessQueue(1);
   private readonly renderDriver: EditSessionRenderDriver;
+  private readonly previewRenderService: PreviewRenderService;
 
   public constructor({
     store,
@@ -466,12 +629,60 @@ export class EditSessionManager {
   }) {
     this.store = store;
     this.env = env;
+    this.renderConfig = resolveRenderConfigFromEnv(env);
     this.deps = deps ?? {};
     this.renderDriver = this.deps.renderDriver ?? createDefaultRenderDriver();
+    this.previewRenderService = this.deps.previewRenderService ?? new PreviewRenderService();
   }
 
   public async initialize(): Promise<void> {
     await this.store.initialize();
+  }
+
+  private transcriptCacheDir(): string {
+    return path.join(this.store.sessionsRootDir(), "_transcript-cache");
+  }
+
+  private transcriptCacheFilePath(fingerprint: string): string {
+    return path.join(this.transcriptCacheDir(), `${fingerprint}.json`);
+  }
+
+  private async resolveTranscriptFingerprint(session: EditSessionState, sourcePath: string): Promise<string> {
+    const existing = typeof session.metadata.sourceFingerprint === "string" ? session.metadata.sourceFingerprint.trim() : "";
+    if (existing) {
+      return existing;
+    }
+
+    return hashFileSha1(sourcePath);
+  }
+
+  private async readTranscriptCache(fingerprint: string): Promise<TranscriptCacheEntry | null> {
+    try {
+      const raw = await readFile(this.transcriptCacheFilePath(fingerprint), "utf-8");
+      return JSON.parse(raw) as TranscriptCacheEntry;
+    } catch {
+      return null;
+    }
+  }
+
+  private async writeTranscriptCache(entry: TranscriptCacheEntry): Promise<void> {
+    await mkdir(this.transcriptCacheDir(), {recursive: true});
+    await writeFile(this.transcriptCacheFilePath(entry.fingerprint), `${JSON.stringify(entry, null, 2)}\n`, "utf-8");
+  }
+
+  private logPreviewStage(sessionId: string, stage: string, detail: Record<string, unknown> = {}): void {
+    const session = this.sessions.get(sessionId);
+    const createdAtMs = session?.createdAt ? Date.parse(session.createdAt) : Number.NaN;
+    const elapsedMs = Number.isFinite(createdAtMs) ? Date.now() - createdAtMs : null;
+    console.info("[edit-session-preview]", {
+      sessionId,
+      stage,
+      elapsedMs,
+      previewStatus: session?.previewStatus ?? null,
+      transcriptStatus: session?.transcriptStatus ?? null,
+      transcriptWords: session?.transcriptWords.length ?? 0,
+      ...detail
+    });
   }
 
   public async createSession(payload: unknown): Promise<EditSessionPublicState> {
@@ -541,7 +752,22 @@ export class EditSessionManager {
   }
 
   public async getPreview(sessionId: string): Promise<Record<string, unknown>> {
-    const session = await this.loadSession(sessionId);
+    let session = await this.loadSession(sessionId);
+    let artifactUrl: string | null = null;
+    try {
+      artifactUrl = await this.ensurePreviewArtifact(session);
+      if (artifactUrl) {
+        session = await this.loadSession(sessionId);
+      }
+    } catch {
+      artifactUrl = null;
+    }
+    const diagnostics = buildPreviewDiagnostics({
+      session,
+      renderConfig: this.renderConfig,
+      artifactAvailable: Boolean(artifactUrl),
+      artifactUrl
+    });
     return {
       id: session.id,
       status: session.previewStatus,
@@ -554,12 +780,31 @@ export class EditSessionManager {
       lastTurnAt: session.lastPreviewUpdateAt,
       readyAt: session.previewStatus === "preview_text_ready" ? session.lastPreviewUpdateAt : null,
       analysisStatus: session.analysisStatus,
-      motionGraphicsStatus: session.motionGraphicsStatus
+      motionGraphicsStatus: session.motionGraphicsStatus,
+      previewArtifactUrl: artifactUrl,
+      previewArtifactKind:
+        session.metadata.previewArtifactKind === "html_composition" || session.metadata.previewArtifactKind === "video"
+          ? session.metadata.previewArtifactKind
+          : null,
+      previewArtifactContentType:
+        typeof session.metadata.previewArtifactContentType === "string"
+          ? session.metadata.previewArtifactContentType
+          : null,
+      diagnostics
     };
   }
 
   public async getPreviewManifest(sessionId: string): Promise<EditSessionPreviewManifest> {
-    const session = await this.loadSession(sessionId);
+    let session = await this.loadSession(sessionId);
+    let artifactUrl: string | null = null;
+    try {
+      artifactUrl = await this.ensurePreviewArtifact(session);
+      if (artifactUrl) {
+        session = await this.loadSession(sessionId);
+      }
+    } catch {
+      artifactUrl = null;
+    }
     const sourceUrl = resolvePreviewManifestSourceUrl(session);
     const sourceKind = resolvePreviewManifestSourceKind(session);
     const sourceLabel =
@@ -570,14 +815,21 @@ export class EditSessionManager {
     const baseVideoSrc = hasVideo ? sourceUrl : null;
     const separateAudioSrc = hasVideo ? null : sourceUrl;
 
+    const interactiveLanes = this.renderConfig.ENABLE_REMOTION_PREVIEW
+      ? ["hyperframes", "remotion"] as const
+      : ["hyperframes"] as const;
+    const defaultInteractive = this.renderConfig.PREVIEW_ENGINE === "remotion" && this.renderConfig.ENABLE_REMOTION_PREVIEW
+      ? "remotion"
+      : "hyperframes";
+
     return editSessionPreviewManifestSchema.parse({
       schemaVersion: "hyperframes-preview-manifest/v1",
       sessionId: session.id,
       captionProfileId: session.captionProfileId,
       motionTier: session.motionTier,
       lanes: {
-        defaultInteractive: "hyperframes",
-        interactive: ["hyperframes", "remotion"],
+        defaultInteractive,
+        interactive: [...interactiveLanes],
         export: "remotion"
       },
       routes: {
@@ -609,6 +861,12 @@ export class EditSessionManager {
         transcriptWords: session.transcriptWords,
         placeholder: session.previewPlaceholder
       },
+      diagnostics: buildPreviewDiagnostics({
+        session,
+        renderConfig: this.renderConfig,
+        artifactAvailable: Boolean(artifactUrl),
+        artifactUrl
+      }),
       export: {
         remotion: {
           available: true,
@@ -616,8 +874,40 @@ export class EditSessionManager {
           outputUrl: session.renderOutputUrl,
           outputPath: session.renderOutputPath
         }
-      }
+      },
+      previewArtifactUrl: artifactUrl,
+      previewArtifactKind:
+        session.metadata.previewArtifactKind === "html_composition" || session.metadata.previewArtifactKind === "video"
+          ? session.metadata.previewArtifactKind
+          : null,
+      previewArtifactContentType:
+        typeof session.metadata.previewArtifactContentType === "string"
+          ? session.metadata.previewArtifactContentType
+          : null
     });
+  }
+
+  public async getPreviewArtifact(sessionId: string): Promise<EditSessionPreviewArtifactAsset> {
+    let session = await this.loadSession(sessionId);
+    const artifactUrl = await this.ensurePreviewArtifact(session);
+    if (!artifactUrl) {
+      throw new Error("Preview artifact not available.");
+    }
+    session = await this.loadSession(sessionId);
+
+    const relativePath = String(session.metadata.previewArtifactRelativePath ?? "").trim();
+    if (!relativePath) {
+      throw new Error("Preview artifact path missing.");
+    }
+    const filePath = path.join(this.store.renderDir(session.id), relativePath);
+    await stat(filePath);
+    return {
+      filePath,
+      contentType:
+        typeof session.metadata.previewArtifactContentType === "string" && session.metadata.previewArtifactContentType.trim()
+          ? session.metadata.previewArtifactContentType
+          : "application/octet-stream"
+    };
   }
 
   public async getRenderStatus(sessionId: string): Promise<Record<string, unknown>> {
@@ -893,6 +1183,196 @@ export class EditSessionManager {
     };
   }
 
+  private buildCreativeDecisionManifest(session: EditSessionState): CreativeDecisionManifest | null {
+    const sourceUrl = resolvePreviewManifestSourceUrl(session);
+    const transcriptText = normalizeText(session.previewText ?? session.transcriptText ?? "");
+    const fallbackPlaceholder = normalizeText(session.previewPlaceholder.copy || PREVIEW_PLACEHOLDER_COPY);
+    const sceneText = transcriptText || fallbackPlaceholder || PREVIEW_PLACEHOLDER_COPY;
+    if (!sourceUrl) {
+      return null;
+    }
+
+    const words = session.transcriptWords.map((word) => ({
+      text: word.text,
+      startMs: word.start_ms,
+      endMs: word.end_ms,
+      confidence: word.confidence
+    }));
+    const resolvedFontPair = resolveRequestedOrFallbackFontPair("Satoshi", "Canela");
+    const primaryFont = resolvedFontPair?.primary ?? {
+      family: "Arial",
+      filePath: undefined,
+      readabilityScore: 0,
+      expressivenessScore: 0,
+      roles: []
+    };
+    const secondaryFont = resolvedFontPair?.secondary;
+    const fontFallbackReasons = resolvedFontPair?.fallbackReasons ?? ["No ingested custom font pair could be resolved."];
+    const fallbackUsed = transcriptText.length === 0 || fontFallbackReasons.length > 0;
+    const sceneWidth = session.sourceWidth ?? 1920;
+    const sceneHeight = session.sourceHeight ?? 1080;
+    const isPortrait = sceneHeight > sceneWidth;
+    const isSquare = sceneWidth === sceneHeight;
+    const sceneAspectRatio = isSquare ? "1:1" : isPortrait ? "9:16" : "16:9";
+    const safeArea = isPortrait
+      ? {top: 112, right: 72, bottom: 144, left: 72}
+      : {top: 72, right: 96, bottom: 84, left: 96};
+    const maxWidthPercent = isPortrait ? 58 : isSquare ? 64 : 72;
+
+    return {
+      manifestVersion: "1.0.0",
+      jobId: session.id,
+      sceneId: `${session.id}-scene-1`,
+      source: {
+        videoUrl: sourceUrl,
+        transcriptSegment: {
+          text: sceneText,
+          startMs: 0,
+          endMs: session.sourceDurationMs ?? 8000,
+          words
+        }
+      },
+      scene: {
+        durationMs: session.sourceDurationMs ?? 8000,
+        aspectRatio: sceneAspectRatio,
+        width: sceneWidth,
+        height: sceneHeight,
+        fps: session.sourceFps ?? 30
+      },
+      intent: {
+        rhetoricalIntent: "premium_explain",
+        emotionalTone: "cinematic",
+        intensity: 0.62
+      },
+      typography: {
+        mode: "svg_longform_typography_v1",
+        primaryFont: {
+          family: primaryFont.family,
+          source: primaryFont.filePath ? "custom_ingested" : "fallback",
+          fileUrl: primaryFont.filePath,
+          role: "headline"
+        },
+        secondaryFont: secondaryFont ? {
+          family: secondaryFont.family,
+          source: secondaryFont.filePath ? "custom_ingested" : "fallback",
+          fileUrl: secondaryFont.filePath,
+          role: "support"
+        } : undefined,
+        fontPairing: {
+          graphUsed: this.renderConfig.ENABLE_FONT_GRAPH,
+          score: 0.9,
+          reason: resolvedFontPair?.reason ?? "Could not resolve requested ingested font pair during manifest bridge phase."
+        },
+        coreWords: [],
+        linePlan: {
+          lines: session.previewLines.length > 0 ? session.previewLines : [sceneText],
+          maxLines: 3,
+          maxCharsPerLine: 28,
+          allowWidows: false
+        }
+      },
+      animation: {
+        engine: "gsap",
+        family: "svg_longform_typography_v1",
+        retrievedFromMilvus: this.renderConfig.ENABLE_MILVUS_ANIMATION_RETRIEVAL,
+        easing: "power3.out",
+        staggerMs: 50,
+        entryMs: 300,
+        holdMs: 700,
+        exitMs: 250,
+        motionIntensity: 0.55,
+        avoid: []
+      },
+      layout: {
+        region: "center",
+        safeArea,
+        maxWidthPercent,
+        alignment: "center",
+        preventOverlap: true,
+        zIndexPlan: [
+          {layer: "video", zIndex: 1},
+          {layer: "typography", zIndex: 20}
+        ]
+      },
+      renderBudget: {
+        previewResolution: "720p",
+        previewFps: 30,
+        finalResolution: "1080p",
+        allowHeavyEffectsInPreview: false,
+        finalOnlyEffects: []
+      },
+      diagnostics: {
+        manifestCreatedAt: nowIso(this.deps),
+        milvusUsed: this.renderConfig.ENABLE_MILVUS_ANIMATION_RETRIEVAL,
+        fontGraphUsed: this.renderConfig.ENABLE_FONT_GRAPH,
+        customFontsUsed: Boolean(primaryFont.filePath),
+        fallbackUsed,
+        fallbackReasons: [
+          ...(transcriptText.length === 0 ? ["Transcript not ready; using placeholder typography copy."] : []),
+          ...fontFallbackReasons
+        ],
+        legacyOverlayUsed: this.renderConfig.ENABLE_LEGACY_OVERLAY,
+        remotionUsed: false,
+        hyperframesUsed: true,
+        overlapCheckPassed: undefined,
+        warnings: [
+          ...(transcriptText.length === 0 ? ["Preview built from placeholder copy while transcript resolves."] : []),
+          ...(fontFallbackReasons.length > 0 ? ["Preview typography requested unavailable families and used explicit ingested fallback files."] : [])
+        ]
+      }
+    };
+  }
+
+  private async ensurePreviewArtifact(session: EditSessionState): Promise<string | null> {
+    if (!this.renderConfig.ENABLE_SERVER_RENDERED_PREVIEW) {
+      return null;
+    }
+    const manifest = this.buildCreativeDecisionManifest(session);
+    if (!manifest) {
+      return null;
+    }
+
+    const signature = JSON.stringify({
+      previewText: session.previewText ?? "",
+      previewLines: session.previewLines,
+      transcriptWords: session.transcriptWords.length,
+      sourceDurationMs: session.sourceDurationMs ?? null
+    });
+    const existingSignature = typeof session.metadata.previewArtifactSignature === "string"
+      ? session.metadata.previewArtifactSignature
+      : "";
+    const existingUrl = typeof session.metadata.previewArtifactUrl === "string"
+      ? session.metadata.previewArtifactUrl
+      : "";
+    if (existingSignature === signature && existingUrl) {
+      return existingUrl;
+    }
+
+    const rendered = await this.previewRenderService.createPreviewArtifact({
+      manifest,
+      sessionRenderDir: this.store.renderDir(session.id),
+      sourceMediaPath: resolveLocalSourcePath(session)
+    });
+
+    const relativePath = path.relative(this.store.renderDir(session.id), rendered.localPath);
+    await this.updateSession(session.id, (current) => ({
+      metadata: {
+        ...current.metadata,
+        previewArtifactUrl: rendered.previewUrl,
+        previewArtifactRelativePath: relativePath,
+        previewArtifactSignature: signature,
+        previewArtifactKind: rendered.artifactKind,
+        previewArtifactContentType: rendered.contentType,
+        previewArtifactWarnings: rendered.diagnostics.warnings,
+        previewCompositionGenerationTimeMs: rendered.compositionGenerationTimeMs,
+        previewRenderTimeMs: rendered.renderTimeMs,
+        previewFontProof: rendered.diagnostics.fontProof,
+        previewAnimationProof: rendered.diagnostics.animationProof
+      }
+    }));
+    return rendered.previewUrl;
+  }
+
   private async runPreviewWorker(
     sessionId: string,
     previewSeconds: number,
@@ -934,7 +1414,7 @@ export class EditSessionManager {
               streamSessionId: incomingSessionId
             }));
           },
-          onTurn: (turn) => {
+          onTurn: async (turn) => {
             const candidate = normalizeText(turn.utterance || turn.transcript);
             if (!candidate) {
               return;
@@ -953,57 +1433,69 @@ export class EditSessionManager {
 
             publishedPreviewText = candidate;
             lastPromotedAt = now;
-            const lines = splitPreviewLines(candidate);
-            const motionSequence = buildMotionSequence({
+            const previewPlan = await buildMotionSequenceFromEngines({
               sessionId,
               text: candidate,
               source: turn.endOfTurn ? "final_transcript" : "streaming_turn",
-              createdAt
+              createdAt,
+              renderConfig: this.renderConfig
             });
+            const lines = previewPlan.lines;
+            const motionSequence = previewPlan.motionSequence;
+            let shouldLogPreviewReady = false;
 
-            void this.updateSession(sessionId, (current) => ({
-              previewStatus: "preview_text_ready",
-              status: "preview_text_ready",
-              previewText: lines.join("\n"),
-              previewLines: lines,
-              previewMotionSequence: motionSequence,
-              previewPlaceholder: {
-                ...current.previewPlaceholder,
-                active: false,
-                reason: "waiting_for_audio",
-                copy: lines.join("\n"),
-                line1: lines[0] ?? current.previewPlaceholder.line1,
-                line2: lines[1] ?? null
-              },
-              lastPreviewUpdateAt: nowIso(this.deps),
-              analysisStatus: "analysis_ready",
-              motionGraphicsStatus: "motion_graphics_ready",
-              analysisCompletedAt: nowIso(this.deps),
-              motionGraphicsCompletedAt: nowIso(this.deps),
-              analysisSummary: buildAnalysisSummary({
-                session: {
-                  ...current,
-                  previewStatus: "preview_text_ready",
-                  previewText: lines.join("\n"),
-                  previewLines: lines,
-                  previewMotionSequence: motionSequence
+            void this.updateSession(sessionId, (current) => {
+              shouldLogPreviewReady = current.previewStatus !== "preview_text_ready";
+              return {
+                previewStatus: "preview_text_ready",
+                status: "preview_text_ready",
+                previewText: lines.join("\n"),
+                previewLines: lines,
+                previewMotionSequence: motionSequence,
+                previewPlaceholder: {
+                  ...current.previewPlaceholder,
+                  active: false,
+                  reason: "waiting_for_audio",
+                  copy: lines.join("\n"),
+                  line1: lines[0] ?? current.previewPlaceholder.line1,
+                  line2: lines[1] ?? null
                 },
-                source: "preview"
-              }),
-              motionGraphicsSummary: buildMotionGraphicsSummary({
-                session: {
-                  ...current,
-                  previewStatus: "preview_text_ready",
-                  previewText: lines.join("\n"),
-                  previewLines: lines,
-                  previewMotionSequence: motionSequence
-                },
-                source: "preview"
-              }),
-              lastEventType: "preview_text_ready"
-            }), "preview_text_ready", {
+                lastPreviewUpdateAt: nowIso(this.deps),
+                analysisStatus: "analysis_ready",
+                motionGraphicsStatus: "motion_graphics_ready",
+                analysisCompletedAt: nowIso(this.deps),
+                motionGraphicsCompletedAt: nowIso(this.deps),
+                analysisSummary: buildAnalysisSummary({
+                  session: {
+                    ...current,
+                    previewStatus: "preview_text_ready",
+                    previewText: lines.join("\n"),
+                    previewLines: lines,
+                    previewMotionSequence: motionSequence
+                  },
+                  source: "preview"
+                }),
+                motionGraphicsSummary: buildMotionGraphicsSummary({
+                  session: {
+                    ...current,
+                    previewStatus: "preview_text_ready",
+                    previewText: lines.join("\n"),
+                    previewLines: lines,
+                    previewMotionSequence: motionSequence
+                  },
+                  source: "preview"
+                }),
+                lastEventType: "preview_text_ready"
+              };
+            }, "preview_text_ready", {
               turnOrder: turn.turnOrder,
               endOfTurn: turn.endOfTurn
+            }).then(() => {
+              if (shouldLogPreviewReady) {
+                this.logPreviewStage(sessionId, "preview_text_ready", {
+                  source: turn.endOfTurn ? "final_transcript" : "streaming_turn"
+                });
+              }
             });
           },
           onTermination: ({audioDurationSeconds}) => {
@@ -1088,42 +1580,30 @@ export class EditSessionManager {
       transcriptStatus: "full_transcript_pending",
       transcriptProgress: Math.max(current.transcriptProgress, 1)
     }), "transcript_started");
+    this.logPreviewStage(sessionId, "transcript_started");
 
-    const transcribeImpl = this.deps.transcribeMedia ?? transcribeWithAssemblyAI;
-    try {
-      const words = await transcribeImpl({
-        filePath: sourcePath,
-        apiKey: this.env.ASSEMBLYAI_API_KEY,
-        fetchImpl: this.deps.fetchImpl,
-        onPoll: ({attempt, maxPollAttempts, status}) => {
-          const progress = status === "completed" ? 100 : Math.min(95, Math.round((attempt / Math.max(1, maxPollAttempts)) * 100));
-          void this.updateSession(sessionId, () => ({
-            transcriptProgress: progress,
-            transcriptStatus: status === "error" ? "failed" : "full_transcript_pending",
-            lastTranscriptUpdateAt: nowIso(this.deps)
-          }), "transcript_progress", {
-            attempt,
-            status
-          });
-        }
-      });
-
+    const applyTranscriptResult = async (
+      words: EditSessionState["transcriptWords"],
+      source: "assemblyai" | "cache"
+    ): Promise<void> => {
       const transcriptText = normalizeText(words.map((word) => word.text).join(" "));
+      const previewPlan = await buildMotionSequenceFromEngines({
+        sessionId,
+        text: transcriptText,
+        source: "final_transcript",
+        createdAt: nowIso(this.deps),
+        renderConfig: this.renderConfig
+      });
       await this.updateSession(sessionId, (current) => {
         const previewLines =
           current.previewStatus === "preview_text_ready" && current.previewLines.length > 0
             ? current.previewLines
-            : splitPreviewLines(transcriptText);
+            : previewPlan.lines;
         const previewText = current.previewText ?? previewLines.join("\n");
         const previewMotionSequence =
           current.previewMotionSequence.length > 0
             ? current.previewMotionSequence
-            : buildMotionSequence({
-                sessionId,
-                text: previewText,
-                source: "final_transcript",
-                createdAt: nowIso(this.deps)
-              });
+            : previewPlan.motionSequence;
         const sessionSnapshot = {
           ...current,
           previewText,
@@ -1163,7 +1643,63 @@ export class EditSessionManager {
           }),
           status: "full_transcript_ready"
         };
-      }, "transcript_ready");
+      }, "transcript_ready", {
+        source
+      });
+      this.logPreviewStage(sessionId, "transcript_ready", {
+        source,
+        transcriptWords: words.length
+      });
+    };
+
+    const session = await this.loadSession(sessionId);
+    const fingerprint = await this.resolveTranscriptFingerprint(session, sourcePath);
+    await this.updateSession(sessionId, (current) => ({
+      metadata: {
+        ...current.metadata,
+        sourceFingerprint: fingerprint
+      }
+    }));
+
+    const forceFreshTranscript = session.metadata.forceFreshTranscript === true;
+    const cachedTranscript = forceFreshTranscript ? null : await this.readTranscriptCache(fingerprint);
+    if (cachedTranscript && cachedTranscript.transcriptWords.length > 0) {
+      this.logPreviewStage(sessionId, "transcript_cache_hit", {
+        fingerprint,
+        transcriptWords: cachedTranscript.transcriptWords.length
+      });
+      await applyTranscriptResult(cachedTranscript.transcriptWords, "cache");
+      return;
+    }
+
+    const transcribeImpl = this.deps.transcribeMedia ?? transcribeWithAssemblyAI;
+    try {
+      const words = await transcribeImpl({
+        filePath: sourcePath,
+        apiKey: this.env.ASSEMBLYAI_API_KEY,
+        fetchImpl: this.deps.fetchImpl,
+        onPoll: ({attempt, maxPollAttempts, status}) => {
+          const progress = status === "completed" ? 100 : Math.min(95, Math.round((attempt / Math.max(1, maxPollAttempts)) * 100));
+          void this.updateSession(sessionId, () => ({
+            transcriptProgress: progress,
+            transcriptStatus: status === "error" ? "failed" : "full_transcript_pending",
+            lastTranscriptUpdateAt: nowIso(this.deps)
+          }), "transcript_progress", {
+            attempt,
+            status
+          });
+        }
+      });
+      if (!forceFreshTranscript) {
+        await this.writeTranscriptCache({
+          fingerprint,
+          transcriptWords: words,
+          transcriptText: normalizeText(words.map((word) => word.text).join(" ")),
+          cachedAt: nowIso(this.deps),
+          sourceFilename: session.sourceFilename
+        });
+      }
+      await applyTranscriptResult(words, "assemblyai");
     } catch (error) {
       await this.updateSession(sessionId, (current) => ({
         transcriptStatus: "failed",
@@ -1280,6 +1816,9 @@ export class EditSessionManager {
   ): Promise<EditSessionPublicState> {
     const input = editSessionPreviewStartRequestSchema.parse(payload ?? {});
     const current = await this.loadSession(sessionId);
+    if (current.sourceHasVideo !== true) {
+      throw new Error("Live compositor requires a video file with a real video track. Audio-only sources are not allowed in this lane.");
+    }
     if (current.previewStartedAt) {
       return toPublicSession(current);
     }
@@ -1329,6 +1868,7 @@ export class EditSessionManager {
         source: "placeholder"
       })
     }), "preview_placeholder_ready");
+    this.logPreviewStage(sessionId, "preview_placeholder_ready");
 
     await this.updateSession(sessionId, (session) => ({
       analysisStatus: "analysis_ready",

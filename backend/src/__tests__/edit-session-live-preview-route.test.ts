@@ -34,7 +34,7 @@ describe("edit session live preview route", () => {
     await cleanupTempDir(tempDir);
   });
 
-  it("starts a multipart live preview session and drives transcript + preview stages", async () => {
+  it("rejects audio-only uploads for the live compositor lane", async () => {
     const deps: BackendDependencies = {
       extractPreviewAudioBuffer: async ({sourcePath}) => {
         expect(path.basename(sourcePath)).toContain("speaker.mp3");
@@ -92,42 +92,9 @@ describe("edit session live preview route", () => {
       }
     });
 
-    expect(response.statusCode).toBe(202);
-    const body = response.json() as {
-      id: string;
-      captionProfileId: string;
-      previewStatus: string;
-      transcriptStatus: string;
-      urls: {status: string};
-    };
-    expect(body.captionProfileId).toBe("longform_eve_typography_v1");
-    expect(body.previewStatus).toMatch(/preview_/);
-    expect(body.urls.status).toBe(`/api/edit-sessions/${body.id}/status`);
-
-    let settledStatus: Record<string, unknown> | null = null;
-    await waitFor(async () => {
-      const statusResponse = await context!.app.inject({
-        method: "GET",
-        url: body.urls.status
-      });
-      expect(statusResponse.statusCode).toBe(200);
-      settledStatus = statusResponse.json() as Record<string, unknown>;
-      return settledStatus["transcriptStatus"] === "full_transcript_ready";
-    });
-
-    expect(settledStatus).not.toBeNull();
-    expect(settledStatus?.["previewStatus"]).toBe("preview_text_ready");
-    expect(settledStatus?.["transcriptStatus"]).toBe("full_transcript_ready");
-    expect(settledStatus?.["analysisStatus"]).toBe("analysis_ready");
-    expect(settledStatus?.["motionGraphicsStatus"]).toBe("motion_graphics_ready");
-    expect(Array.isArray(settledStatus?.["previewLines"])).toBe(true);
-    const previewLines = Array.isArray(settledStatus?.["previewLines"]) ? settledStatus["previewLines"] as string[] : [];
-    expect(previewLines.length).toBeGreaterThan(0);
-    expect(Array.isArray(settledStatus?.["transcriptWords"])).toBe(true);
-    const transcriptWords = Array.isArray(settledStatus?.["transcriptWords"])
-      ? settledStatus["transcriptWords"] as Array<Record<string, unknown>>
-      : [];
-    expect(transcriptWords.length).toBe(4);
+    expect(response.statusCode).toBe(400);
+    const body = response.json() as {error?: string};
+    expect(body.error).toContain("video file");
   });
 
   it("exposes the source media stream and probed video metadata for compositor previews", async () => {

@@ -8,12 +8,10 @@ import type {
 import {getCaptionStyleProfile} from "../lib/stylebooks/caption-style-profiles";
 
 type CaptionProfileId =
-  | "longform_eve_typography_v1"
   | "longform_svg_typography_v1"
-  | "longform_docked_inverse_v1";
 type MotionTier = "premium" | "hero" | "editorial";
 type DeliveryMode = "speed-draft" | "master-render";
-type LivePreviewRenderer = "hyperframes" | "remotion";
+type LivePreviewRenderer = "hyperframes";
 type BackendHealth = "checking" | "connected" | "offline";
 type LocalPreviewState = "idle" | "running" | "completed" | "failed";
 type LocalPreviewStage = "idle" | "cleaning" | "ingesting" | "drafting" | "mastering" | "completed" | "failed";
@@ -106,30 +104,11 @@ type InstantPreviewPayload = {
 
 const API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://127.0.0.1:8000").replace(/\/+$/, "");
 
-const readLivePreviewRendererFromLocation = (): LivePreviewRenderer => {
-  if (typeof window === "undefined") {
-    return "hyperframes";
-  }
-
-  const value = new URLSearchParams(window.location.search).get("previewLane");
-  return value === "remotion" ? "remotion" : "hyperframes";
-};
-
 const captionOptions: Array<{value: CaptionProfileId; label: string; description: string}> = [
   {
-    value: "longform_eve_typography_v1",
-    label: "EVE House Style",
-    description: "Recommended. The main long-form editorial system with moment-level variation and cleaner restraint."
-  },
-  {
     value: "longform_svg_typography_v1",
-    label: "Legacy SVG",
-    description: "Older long-form SVG treatment kept for comparison and fallback, not the primary house style."
-  },
-  {
-    value: "longform_docked_inverse_v1",
-    label: "Docked Inverse",
-    description: "A steadier lower-third treatment for calmer sections that need breathing room."
+    label: "Governed SVG Typography",
+    description: "Locked premium preview lane. Session-coherent SVG typography with no alternate caption renderer routing."
   }
 ];
 
@@ -155,7 +134,7 @@ const deliveryModeOptions: Array<{value: DeliveryMode; label: string; descriptio
   {
     value: "speed-draft",
     label: "Live Compositor",
-    description: "Recommended. Hyperframes keeps the source browser-native while the live editorial overlay stays fast."
+    description: "Recommended. Hyperframes builds the governed preview composition while the backend prepares the first artifact."
   },
   {
     value: "master-render",
@@ -174,7 +153,7 @@ const emptyStatus: LocalPreviewStatus = {
   deliveryMode: "speed-draft",
   activeOutputKind: "none",
   cleanRun: true,
-  captionProfileId: "longform_eve_typography_v1",
+  captionProfileId: "longform_svg_typography_v1",
   motionTier: "premium",
   transcriptionMode: "assemblyai",
   startedAt: null,
@@ -442,10 +421,10 @@ export const PreviewApp: React.FC = () => {
   const [sourcePath, setSourcePath] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFilePreviewUrl, setSelectedFilePreviewUrl] = useState<string | null>(null);
-  const [captionProfileId, setCaptionProfileId] = useState<CaptionProfileId>("longform_eve_typography_v1");
+  const [captionProfileId, setCaptionProfileId] = useState<CaptionProfileId>("longform_svg_typography_v1");
   const [motionTier, setMotionTier] = useState<MotionTier>("premium");
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>("speed-draft");
-  const [livePreviewRenderer, setLivePreviewRenderer] = useState<LivePreviewRenderer>(() => readLivePreviewRendererFromLocation());
+  const [livePreviewRenderer] = useState<LivePreviewRenderer>("hyperframes");
   const [cleanRun, setCleanRun] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -692,9 +671,9 @@ export const PreviewApp: React.FC = () => {
               ? `The overlay timeline is still live while the source media is being recovered or replaced. ${audioPreviewAudioError ?? "The source media could not be loaded."}`
               : hasLiveAudioPreview
                 ? liveOverlayReady
-                  ? "The browser composition is live and ready to play with transcript-driven typography."
-                  : "The browser composition is open and waiting for the first AssemblyAI-driven animation pass."
-                : "Click Run Live Preview to open the browser compositor."
+                  ? "The governed preview composition is ready and the first artifact is being refreshed."
+                  : "The governed preview lane is waiting for the first transcript-driven manifest pass."
+                : "Click Run Live Preview to request the first governed preview artifact."
     : status.stage === "mastering" && status.draftOutputUrl
       ? "The live compositor is already running here while the heavier final render continues in the background."
       : hasInstantPreview
@@ -704,9 +683,9 @@ export const PreviewApp: React.FC = () => {
           : "The first baked output will land here as soon as the selected lane finishes.";
   const previewStageLabel = isLiveAudioPreviewLane(deliveryMode)
     ? audioPreviewState === "building-timeline"
-      ? "Building live preview"
+      ? "Building preview"
       : audioPreviewState === "playing"
-        ? "Live browser compositor"
+        ? "Preview active"
         : audioPreviewState === "error"
           ? "Preview error"
         : hasLiveAudioPreview
@@ -896,11 +875,10 @@ export const PreviewApp: React.FC = () => {
         <header className="quick-stage-header">
           <div>
             <p className="quick-kicker">Prometheus Long-Form Render Control</p>
-            <h1>Pick the lane. Preview should feel like a native video player with a live cinematic overlay stack.</h1>
+            <h1>Pick the lane. Preview should converge on a governed cinematic artifact, not a browser overlay hack.</h1>
             <p className="quick-copy">
-              The frontend now acts like the control room: it keeps the base video on the browser playback path, mounts
-              the editorial overlay above it in real time, and only hands off to the heavier Remotion export lane when
-              you explicitly want a final render.
+              The frontend should request preview jobs, receive governed output, and show diagnostics. The backend owns
+              typography, motion decisions, and render authority.
             </p>
           </div>
           <div className={`quick-status-pill is-${stageTone}`}>
@@ -987,7 +965,7 @@ export const PreviewApp: React.FC = () => {
               ) : (
                 <div className="quick-preview-empty">
                   <strong>No live preview started yet.</strong>
-                  <span>Run the live preview and the browser compositor will mount as soon as the creative timeline exists.</span>
+                  <span>Run the live preview and the first governed preview artifact will appear here when the backend finishes the pass.</span>
                 </div>
               )
             ) : hasInstantPreview ? (
@@ -1067,19 +1045,10 @@ export const PreviewApp: React.FC = () => {
             <div className="quick-compare-grid">
               <button
                 type="button"
-                className={`quick-mode-card quick-compare-card ${livePreviewRenderer === "hyperframes" ? "is-active" : ""}`}
-                onClick={() => setLivePreviewRenderer("hyperframes")}
+                className="quick-mode-card quick-compare-card is-active"
               >
                 <strong>Hyperframes Preview</strong>
-                <span>Fast default lane. Native HTML video with live DOM, GSAP, iframe, and WebGL overlays above the source stream.</span>
-              </button>
-              <button
-                type="button"
-                className={`quick-mode-card quick-compare-card ${livePreviewRenderer === "remotion" ? "is-active" : ""}`}
-                onClick={() => setLivePreviewRenderer("remotion")}
-              >
-                <strong>Remotion Preview</strong>
-                <span>Parity lane. Use it to compare the live decisions against the cinematic Remotion render model.</span>
+                <span>Locked default lane. Preview stays on the governed Hyperframes path and reports its artifact type explicitly.</span>
               </button>
             </div>
           ) : null}
@@ -1088,7 +1057,7 @@ export const PreviewApp: React.FC = () => {
             <span>Choose video or media</span>
             <input
               type="file"
-              accept="audio/*,video/*"
+              accept="video/*"
               onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
             />
           </label>

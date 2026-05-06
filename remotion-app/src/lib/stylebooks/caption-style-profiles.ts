@@ -346,9 +346,7 @@ export const getLongformCaptionRenderModeForChunk = (
   }
 
   if (normalized === LONGFORM_SVG_TYPOGRAPHY_PROFILE_ID) {
-    if (chunk && resolveCaptionEditorialDecision({chunk, ...editorialContext}).mode !== "normal") {
-      return "semantic-sidecall";
-    }
+    // Premium preview lane governance: keep longform SVG authoritative per chunk.
     return "word-by-word";
   }
 
@@ -391,6 +389,10 @@ export const getLongformWordByWordFallbackModeForProfile = (
   }
 
   if (!isSparseLongformWordByWordChunk(chunk)) {
+    return null;
+  }
+
+  if (normalized === LONGFORM_SVG_TYPOGRAPHY_PROFILE_ID) {
     return null;
   }
 

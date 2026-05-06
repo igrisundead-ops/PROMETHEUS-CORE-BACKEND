@@ -32,4 +32,29 @@ describe("backend startup", () => {
       await appContext.app.close();
     }
   });
+
+  it("starts and serves health even when Milvus-backed retrieval is enabled but unreachable", async () => {
+    const storageDir = await makeTempDir();
+    tempDirs.push(storageDir);
+
+    const appContext = await createTestApp({
+      storageDir,
+      envOverrides: {
+        ASSET_MILVUS_ENABLED: "true",
+        MILVUS_ADDRESS: "https://unresolvable-prometheus-test-host.invalid"
+      }
+    });
+
+    try {
+      const response = await appContext.app.inject({
+        method: "GET",
+        url: "/health"
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ok: true});
+    } finally {
+      await appContext.app.close();
+    }
+  });
 });

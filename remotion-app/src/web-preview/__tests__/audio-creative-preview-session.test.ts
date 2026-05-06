@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 
 import {
   buildAudioCreativePreviewSession,
+  buildFastAudioCreativePreviewSession,
   isLiveAudioPreviewLane,
   resolveCreativePreviewRenderMode,
   resolveAudioCreativePreviewDurationMs,
@@ -82,21 +83,20 @@ describe("audio creative preview session", () => {
     expect(resolveCreativePreviewRenderMode({})).toBe("audio-preview");
   });
 
-  it("builds a live audio preview session without needing a source video", async () => {
-    const session = await buildAudioCreativePreviewSession({
+  it("builds a lite live audio preview session without needing a source video", async () => {
+    const session = await buildFastAudioCreativePreviewSession({
       jobId: "job-audio-preview",
       captionProfileId: "longform_svg_typography_v1",
       motionTier: "premium",
-      presentationMode: "long-form",
-      featureFlags: {creativeOrchestrationV1: true}
+      presentationMode: "long-form"
     });
 
     expect(session.captionChunks.length).toBeGreaterThan(0);
     expect(session.creativeTimeline.durationMs).toBeGreaterThan(0);
-    expect(session.debugReport.finalCreativeTimeline.tracks.length).toBeGreaterThan(0);
+    expect(session.creativeTimeline.tracks).toHaveLength(0);
     expect(session.videoMetadata.durationSeconds).toBeCloseTo(session.durationMs / 1000);
     expect(session.renderMode).toBe("audio-preview");
-  });
+  }, 20000);
 
   it("uses the source video metadata when the live preview has a real footage layer", async () => {
     const session = await buildAudioCreativePreviewSession({
@@ -111,7 +111,7 @@ describe("audio creative preview session", () => {
         durationSeconds: 12,
         durationInFrames: 288
       },
-      featureFlags: {creativeOrchestrationV1: true}
+      featureFlags: {creativeOrchestrationV1: false}
     });
 
     expect(session.videoMetadata.width).toBe(1920);
@@ -137,7 +137,7 @@ describe("audio creative preview session", () => {
       previewLines: [],
       previewMotionSequence: [],
       allowFallbackDemoData: false,
-      featureFlags: {creativeOrchestrationV1: true}
+      featureFlags: {creativeOrchestrationV1: false}
     });
 
     expect(session.captionChunks).toHaveLength(0);

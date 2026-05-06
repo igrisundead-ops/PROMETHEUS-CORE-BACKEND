@@ -2,6 +2,7 @@ import {createWriteStream} from "node:fs";
 import {mkdir} from "node:fs/promises";
 import path from "node:path";
 import {pipeline as streamPipeline} from "node:stream/promises";
+import {createReadStream} from "node:fs";
 
 import type {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 
@@ -71,12 +72,15 @@ export const registerEditSessionRoutes = async (
       }
 
       const sourceFilename = uploadedFileName ?? path.basename(sourcePath);
+      const runNonce = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const session = await manager.createSession({
         sourceFilename,
         captionProfileId: fields.captionProfileId,
         motionTier: fields.motionTier,
         metadata: {
           livePreviewLane: true,
+          forceFreshTranscript: true,
+          runNonce,
           uploadedFromBrowser: Boolean(uploadedFilePath),
           sourceDisplayName: sourceFilename
         }
@@ -87,6 +91,8 @@ export const registerEditSessionRoutes = async (
         sourceFilename,
         metadata: {
           livePreviewLane: true,
+          forceFreshTranscript: true,
+          runNonce,
           uploadedFromBrowser: Boolean(uploadedFilePath),
           sourceDisplayName: sourceFilename
         },
@@ -103,6 +109,7 @@ export const registerEditSessionRoutes = async (
         urls: {
           status: `/api/edit-sessions/${session.id}/status`,
           previewManifest: `/api/edit-sessions/${session.id}/preview-manifest`,
+          previewArtifact: `/api/edit-sessions/${session.id}/preview-artifact`,
           preview: `/api/edit-sessions/${session.id}/preview`,
           render: `/api/edit-sessions/${session.id}/render`,
           events: `/api/edit-sessions/${session.id}/events`
@@ -125,6 +132,7 @@ export const registerEditSessionRoutes = async (
         urls: {
           status: `/api/edit-sessions/${session.id}/status`,
           previewManifest: `/api/edit-sessions/${session.id}/preview-manifest`,
+          previewArtifact: `/api/edit-sessions/${session.id}/preview-artifact`,
           preview: `/api/edit-sessions/${session.id}/preview`,
           render: `/api/edit-sessions/${session.id}/render`,
           events: `/api/edit-sessions/${session.id}/events`
@@ -182,6 +190,21 @@ export const registerEditSessionRoutes = async (
     try {
       const params = req.params as {id: string};
       return await manager.getPreviewManifest(params.id);
+    } catch (error) {
+      reply.code(404);
+      return {
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  });
+
+  app.get("/api/edit-sessions/:id/preview-artifact", async (req, reply) => {
+    try {
+      const params = req.params as {id: string};
+      const asset = await manager.getPreviewArtifact(params.id);
+      reply.header("Content-Type", asset.contentType);
+      reply.header("Cache-Control", "no-store");
+      return reply.send(createReadStream(asset.filePath));
     } catch (error) {
       reply.code(404);
       return {

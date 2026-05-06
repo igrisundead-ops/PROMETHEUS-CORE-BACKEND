@@ -13,7 +13,7 @@ export const registerAssetRoutes = (
       return await service.retrieve(request.body);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      reply.code(/does not exist|enabled=false/i.test(message) ? 503 : 400);
+      reply.code(/does not exist|enabled=false|unavailable|name resolution/i.test(message) ? 503 : 400);
       return {
         error: message
       };
@@ -29,7 +29,7 @@ export const registerAssetRoutes = (
       return await vectorService.retrieve(request.body);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      reply.code(/does not exist|enabled=false/i.test(message) ? 503 : 400);
+      reply.code(/does not exist|enabled=false|unavailable|name resolution/i.test(message) ? 503 : 400);
       return {
         error: message
       };

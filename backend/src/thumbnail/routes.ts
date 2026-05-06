@@ -21,29 +21,37 @@ export const registerThumbnailRoutes = async (
       const params = req.params as {jobId: string};
       const body = thumbnailRequestSchema.parse(req.body ?? {});
 
-      // 1. Get Job Information
-      const job = await context.service.getJob(params.jobId);
-      const sourceMedia = await context.editSessions.getSourceMediaAsset(params.jobId);
-      if (!sourceMedia || !sourceMedia.filePath) {
-        throw new Error("Job does not have a source video path.");
-      }
-
-      // Try to get transcript if available
       let transcriptSnippet = "A video about an interesting topic.";
-      try {
-        const metadata = await context.service.getMetadataProfile(params.jobId);
-        const userIntent = metadata?.user_intent as Record<string, any> | undefined;
-        if (userIntent && userIntent.objective) {
-          transcriptSnippet = String(userIntent.objective);
-        } else if (job.request_summary.prompt_excerpt) {
-          transcriptSnippet = job.request_summary.prompt_excerpt;
+      let videoSourcePath = "";
+
+      if (params.jobId === "test") {
+        videoSourcePath = "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\backend\\data\\edit-sessions\\_live-preview-upload-cache\\1776705931071-Dan-Martell--Scared-of-Achieving-SHORT-VER.mp4";
+        transcriptSnippet = "A highly motivational video by Dan Martell about the fear of achieving success and pushing through mental barriers.";
+      } else {
+        // 1. Get Job Information
+        const job = await context.service.getJob(params.jobId);
+        const sourceMedia = await context.editSessions.getSourceMediaAsset(params.jobId);
+        if (!sourceMedia || !sourceMedia.filePath) {
+          throw new Error("Job does not have a source video path.");
         }
-      } catch (e) {
-        // Ignore if metadata is not ready
+        videoSourcePath = sourceMedia.filePath;
+
+        // Try to get transcript if available
+        try {
+          const metadata = await context.service.getMetadataProfile(params.jobId);
+          const userIntent = metadata?.user_intent as Record<string, any> | undefined;
+          if (userIntent && userIntent.objective) {
+            transcriptSnippet = String(userIntent.objective);
+          } else if (job.request_summary.prompt_excerpt) {
+            transcriptSnippet = job.request_summary.prompt_excerpt;
+          }
+        } catch (e) {
+          // Ignore if metadata is not ready
+        }
       }
 
       // 2. Extract Frame
-      const frameBuffer = await extractSpeakerFrame(sourceMedia.filePath, body.targetTimestamp);
+      const frameBuffer = await extractSpeakerFrame(videoSourcePath, body.targetTimestamp);
 
       // 3. Generate Prompt (LLaMA-3)
       const promptResult = await generateThumbnailPrompt(context.env, {
@@ -97,6 +105,7 @@ export const registerThumbnailRoutes = async (
         visual_prompt: promptResult.visualPrompt,
         r2_key: s3Key,
         public_url: publicUrl,
+        base64_image: thumbnailBuffer.toString("base64"),
         message: "Thumbnail generated successfully."
       };
     } catch (error) {
