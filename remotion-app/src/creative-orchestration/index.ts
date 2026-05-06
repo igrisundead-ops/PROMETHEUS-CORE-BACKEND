@@ -3,6 +3,7 @@ import {routeStyleForWords} from "../lib/style-routing";
 import type {CaptionChunk, CaptionStyleProfileId} from "../lib/types";
 import {isCreativeOrchestrationEnabled} from "../lib/env";
 import {MomentSegmentationAgent} from "./segmentation/moment-segmentation-agent";
+import {orchestrateSequence} from "../lib/sequence-director-engine";
 import {TextAgent} from "./agents/text-agent";
 import {AssetAgent} from "./agents/asset-agent";
 import {BackgroundOverlayAgent} from "./agents/background-overlay-agent";
@@ -81,6 +82,7 @@ const applyDecisionToChunk = (chunk: CaptionChunk, decision: DirectorDecision): 
     motionKey: routed.motionKey,
     layoutVariant: routed.layoutVariant,
     suppressDefault,
+    governedPhysics: decision.governedPhysics,
     semantic: {
       ...(chunk.semantic ?? {
         intent: "default",
@@ -108,6 +110,7 @@ export const buildCreativeOrchestrationPlan = async (input: {
   featureFlags?: CreativeContext["featureFlags"];
 }): Promise<CreativeOrchestrationResult> => {
   const enabled = input.featureFlags?.creativeOrchestrationV1 ?? isCreativeOrchestrationEnabled();
+  const sequencePlan = orchestrateSequence(input.captionChunks);
   const context: CreativeContext = {
     jobId: input.jobId,
     sourceJobId: input.sourceJobId,
@@ -121,6 +124,7 @@ export const buildCreativeOrchestrationPlan = async (input: {
     patternMemory: input.patternMemory,
     judgmentInput: input.judgmentInput,
     featureFlags: input.featureFlags,
+    sequencePlan,
     revisionPass: 0
   };
 
@@ -132,6 +136,7 @@ export const buildCreativeOrchestrationPlan = async (input: {
       moments: [],
       decisions: [],
       tracks: [],
+      sequencePlan,
       diagnostics: {
         proposalCount: 0,
         approvedCount: 0,
@@ -175,7 +180,8 @@ export const buildCreativeOrchestrationPlan = async (input: {
   const judgmentDirectives = await orchestratorAdapter.buildDirectives(context, moments);
   const governedContext: CreativeContext = {
     ...context,
-    judgmentDirectives
+    judgmentDirectives,
+    sequencePlan
   };
   const patternMemoryAgent = new PatternMemoryAgent(input.patternMemory ?? []);
   const agents = [
@@ -271,7 +277,10 @@ export const buildCreativeOrchestrationPlan = async (input: {
     judgmentAuditTrail: finalDecisionSet.judgmentAuditTrail ?? [],
     feedbackSignals: finalDecisionSet.feedbackSignals ?? [],
     criticReview,
-    finalCreativeTimeline: finalDecisionSet.timeline
+    finalCreativeTimeline: {
+      ...finalDecisionSet.timeline,
+      sequencePlan
+    }
   };
 
   return {
@@ -284,7 +293,10 @@ export const buildCreativeOrchestrationPlan = async (input: {
     judgmentAuditTrail: finalDecisionSet.judgmentAuditTrail ?? [],
     feedbackSignals: finalDecisionSet.feedbackSignals ?? [],
     criticReview,
-    finalCreativeTimeline: finalDecisionSet.timeline,
+    finalCreativeTimeline: {
+      ...finalDecisionSet.timeline,
+      sequencePlan
+    },
     captionChunks,
     debugReport
   };

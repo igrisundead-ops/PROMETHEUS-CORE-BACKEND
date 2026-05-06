@@ -1,5 +1,4 @@
-import type { GovernorResolution } from "../types";
-import type { CinematicExpectations } from "./deviation-types";
+import type { GovernorResolution, CinematicExpectations } from "../types";
 
 export class ExpectationMemoryEngine {
   private history: GovernorResolution[] = [];

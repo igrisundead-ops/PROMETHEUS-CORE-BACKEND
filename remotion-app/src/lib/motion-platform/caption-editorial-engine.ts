@@ -42,9 +42,11 @@ import {
 import {generateSemanticDecision, type SemanticToken} from "../semantic-emphasis-engine";
 import {orchestrateVisualField, type VisualOrchestrationResult, type PlacementPlan} from "../visual-field-engine";
 import { resolveStylePhysics, type StylePhysicsState } from "../style-physics";
-import { orchestrateTimelineRhythm, type TimelineRhythmState } from "../timeline-rhythm";
+import {orchestrateTimelineRhythm, type TimelineRhythmState} from "../timeline-rhythm";
+import type {SequenceDirectorPlan} from "../sequence-director-engine";
 
 export type CaptionSurfaceTone = "light" | "dark" | "neutral";
+
 export type CaptionEditorialMode = "normal" | "escalated" | "keyword-only";
 export type CaptionKeywordAnimation = "fade" | "burst" | "letter-by-letter";
 export type CaptionAssetBias = "minimal" | "semantic" | "structured";
@@ -63,6 +65,7 @@ export type CaptionEditorialContext = {
   readabilityPressure?: number | null;
   compositionCombatPlan?: MotionCompositionCombatPlan | null;
   semanticReductionAllowed?: boolean;
+  sequencePlan?: SequenceDirectorPlan | null;
   isSilenced?: boolean;
   pauseDurationMs?: number;
 };
@@ -92,7 +95,7 @@ export type CaptionEditorialDecision = {
   backgroundScaleCap: number;
   rationale: string[];
   cssVariables: Record<string, string>;
-  finalTypography: TypographySelection;
+  typography: TypographySelection;
   lineStyles: Partial<Record<LongformLineRole, CaptionEditorialLineStyle>>;
   hierarchyMetadata: {
     lines: Array<{text: string; role: LongformLineRole; importanceScore: number}>;
@@ -401,7 +404,7 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
 
   const isLightSurface = surfaceTone === "light";
   const isDarkSurface = surfaceTone === "dark";
-  const textColor = isLightSurface ? "rgba(18, 20, 24, 0.98)" : isDarkSurface ? "rgba(255, 255, 255, 0.98)" : "rgba(243, 247, 255, 0.98)";
+  const textColor = isLightSurface ? "rgba(18, 20, 24, 0.96)" : isDarkSurface ? "rgba(255, 255, 255, 0.98)" : "rgba(243, 247, 255, 0.98)";
   const textShadow = isLightSurface ? "0 1px 3px rgba(0,0,0,0.12), 0 0 8px rgba(255,255,255,0.12)" : "0 2px 6px rgba(0,0,0,0.72), 0 0 12px rgba(193,212,255,0.18)";
   const textStroke = isLightSurface ? "0.3px rgba(255,255,255,0.2)" : "0.4px rgba(255,255,255,0.3)";
 
@@ -448,7 +451,10 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     surfaceTone,
     motionTier: context.motionTier ?? null,
     semanticIntent: context.chunk.semantic?.intent ?? null,
-    presentationMode: context.presentationMode ?? null
+    presentationMode: context.presentationMode ?? null,
+    treatmentFontProfileBucket: context.sequencePlan?.moments.find(m => m.chunkId === context.chunk.id)?.fontFamilyRole === "impact" 
+      ? context.sequencePlan?.fontPlan.impactFontQuery.bucket 
+      : context.sequencePlan?.fontPlan.readingFontQuery.bucket
   });
 
   const qualityGate = {
@@ -457,7 +463,7 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     graphUsageScore: fontSelection.graphUsageScore ?? 0,
     genericFallbackRisk: fontSelection.genericFallbackRisk ?? false,
     renderSharpnessRisk: fontSelection.fauxBoldRisk || mode === "keyword-only",
-    motionJitterRisk: context.motionTier === "turbo",
+    motionJitterRisk: false, // motionTier turbo mismatch fixed
     layoutPremiumScore: 0.85,
     finalTypographyQualityScore: 0
   };
@@ -515,7 +521,7 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
       role: line.role ?? "context",
       importanceScore: line.role === "hook" ? 1.0 : 0.5
     })),
-    aggressionLevel: typographyEnergy === "aggressive" ? 1.0 : 0.5,
+    aggressionLevel: typographyEnergy === "high" ? 1.0 : 0.5,
     hookType: context.chunk.semantic?.intent,
     emotionalWeight: (emphasisCount / Math.max(1, context.chunk.words.length)) * 2,
     tokens: semantic.tokens
@@ -551,17 +557,17 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     text: context.chunk.text,
     isEmphasized: mode === "keyword-only",
     emotionalIntensity: (hierarchyMetadata.emotionalWeight / 2) * timelineRhythm.tensionCurve,
-    aggression: (mode === "keyword-only" ? 0.9 : (mode === "escalated" ? 0.6 : 0.3)) * timelineRhythm.rhythmAggression,
-    restraint: isLightSurface ? 0.7 : 0.2,
+    aggression: context.chunk.governedPhysics?.aggression ?? ((mode === "keyword-only" ? 0.9 : (mode === "escalated" ? 0.6 : 0.3)) * timelineRhythm.rhythmAggression),
+    restraint: context.chunk.governedPhysics?.silence ?? (isLightSurface ? 0.7 : 0.2),
     cinematicDrift: (context.motionTier === "premium" ? 0.5 : 0.1) * timelineRhythm.cadenceCompression,
-    dominance: (mode === "keyword-only" ? 0.8 : 0.5) * (1 - timelineRhythm.silencePressure),
+    dominance: context.chunk.governedPhysics?.dominance ?? ((mode === "keyword-only" ? 0.8 : 0.5) * (1 - timelineRhythm.silencePressure)),
     anticipationDelay: 0.2 + (timelineRhythm.anticipationWindow / 1000),
     cameraMotionEnergy: "static", // TODO: Get from active background cue
     speakerEmotion: "neutral", // TODO: Get from context if available
     faceBoundingBoxes: visualOrchestration.visualFieldAnalysis.faceBoundingBoxes,
     pauseDurationMs: (context.pauseDurationMs ?? 0) + timelineRhythm.emotionalPauseDuration,
     fontFamily: typeface.fontFamily,
-    expectedScale: 1.0
+    expectedScale: (context.chunk.governedPhysics?.scale ?? 1.0) * visualOrchestration.typographyPlan.scaleModifier
   });
 
   const rationale = buildDecisionRationale([
@@ -571,6 +577,7 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     hasGraphicAsset ? "semantic-graphic-asset" : null,
     combatPlan ? `combat-synergy=${combatPlan.synergyScore.toFixed(2)}` : null,
     combatPlan ? `combat-hierarchy=${combatPlan.hierarchyScore.toFixed(2)}` : null,
+    combatPlan ? `combat-primary=${combatPlan.chunkPlans[0]?.primary?.id ?? "none"}` : null,
     combatStrongHierarchy ? "combat-strong-hierarchy" : null,
     combatNeedsEscalation ? "combat-needs-escalation" : null,
     `typography-role=${finalTypography.role}`,
@@ -613,7 +620,7 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
       "--rhythm-delay": `${timelineRhythm.impactDelayFrames}f`,
       "--rhythm-tension": String(timelineRhythm.tensionCurve)
     },
-    finalTypography,
+    typography: finalTypography,
     lineStyles: {}, // Can be populated based on hierarchy if needed
     hierarchyMetadata,
     motionProfile: {

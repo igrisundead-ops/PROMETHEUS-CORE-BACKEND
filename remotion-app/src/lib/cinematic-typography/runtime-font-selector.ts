@@ -37,6 +37,7 @@ export type RuntimeFontSelectionInput = {
   presentationMode?: PresentationMode | null;
   treatmentFontProfileHint?: EditorialFontPaletteId | null;
   treatmentFallbackFontProfileHint?: EditorialFontPaletteId | null;
+  treatmentFontProfileBucket?: string | null;
 };
 
 export type RuntimeFontSelection = {
@@ -47,6 +48,8 @@ export type RuntimeFontSelection = {
   palette: EditorialFontPalette;
   intensityBand: TypographyIntensityBand;
   motionDemand: RuntimeFontMotionDemand;
+  requestedWeight?: number;
+  resolvedWeight?: number;
   rationale: string[];
 };
 
@@ -65,6 +68,22 @@ const toNumericBand = (value: RuntimeFontMotionDemand | TypographyIntensityBand 
 };
 
 const inferRequestedRoleId = (input: RuntimeFontSelectionInput): TypographyRoleSlotId => {
+  if (input.treatmentFontProfileBucket === "hero_impact") {
+    return "hero_serif_primary";
+  }
+  if (input.treatmentFontProfileBucket === "editorial_authority") {
+    return "hero_serif_alternate";
+  }
+  if (input.treatmentFontProfileBucket === "neutral_reading") {
+    return "neutral_sans_core";
+  }
+  if (input.treatmentFontProfileBucket === "accent_script_or_italic") {
+    return "script_accent_rare";
+  }
+  if (input.treatmentFontProfileBucket === "kinetic_display") {
+    return "display_sans_pressure_release";
+  }
+
   if (input.typographyRole === "tech-overlay") {
     return "neutral_sans_core";
   }

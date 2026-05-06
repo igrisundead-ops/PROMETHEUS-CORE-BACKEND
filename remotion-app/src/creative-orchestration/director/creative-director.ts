@@ -48,16 +48,35 @@ export class CreativeDirector {
       const governedProposals = proposals.map(p => {
         if (!resolution) return p;
         const governedPayload = { ...p.payload };
-        if (p.type === "text" || p.type === "motion") {
+        if (p.type === "text" || p.type === "motion" || p.type === "layout") {
           governedPayload["aggression"] = resolution.finalAggression;
           governedPayload["motion"] = resolution.finalMotion;
+          governedPayload["scale"] = resolution.finalScale;
+          governedPayload["dominance"] = resolution.finalDominance;
+          governedPayload["opacity"] = resolution.finalOpacity;
+          governedPayload["timing"] = resolution.finalTiming;
+          governedPayload["pacing"] = resolution.finalPacing;
+          governedPayload["silence"] = resolution.finalSilence;
           governedPayload["governorRationale"] = resolution.explainability.join(" | ");
         }
         return { ...p, payload: governedPayload };
       });
 
       const decisionSet = await this.adapter.decideMoment(context, moment, governedProposals, criticIssues, sequenceHistory);
-      decisions.push(decisionSet.decision);
+      const decision: DirectorDecision = {
+        ...decisionSet.decision,
+        governedPhysics: resolution ? {
+          aggression: resolution.finalAggression,
+          motion: resolution.finalMotion,
+          scale: resolution.finalScale,
+          dominance: resolution.finalDominance,
+          opacity: resolution.finalOpacity,
+          timing: resolution.finalTiming,
+          pacing: resolution.finalPacing,
+          silence: resolution.finalSilence,
+        } : undefined
+      };
+      decisions.push(decision);
       selectedProposals.push(...decisionSet.selectedProposals);
       rejectedProposals.push(...decisionSet.rejectedProposals);
       tracks.push(...decisionSet.tracks);

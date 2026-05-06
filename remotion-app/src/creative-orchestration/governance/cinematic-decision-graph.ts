@@ -23,6 +23,7 @@ export class CinematicDecisionGraph {
       finalRestraint: this.resolveWeightedField(sorted, "restraint", state),
       finalTiming: this.resolveWeightedField(sorted, "timing", state),
       state,
+      deviation: null,
       explainability: [],
     };
 

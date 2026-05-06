@@ -20,11 +20,12 @@ export class LongformStabilityEngine {
       }
 
       // 2. Prevent Climax Exhaustion
-      if (globalState.emotionalExhaustion > 0.8 && sanitized.intent.intensity && sanitized.intent.intensity > 0.4) {
+      if (globalState.emotionalExhaustion > 0.8 && sanitized.intent.aggression && sanitized.intent.aggression > 0.4) {
         sanitized.intent.aggression = (sanitized.intent.aggression ?? 0.5) * 0.5;
         sanitized.intent.motion = (sanitized.intent.motion ?? 0.5) * 0.5;
         sanitized.reasoning += " [Long-form stability: reducing intensity due to emotional exhaustion]";
       }
+
 
       return sanitized;
     });
