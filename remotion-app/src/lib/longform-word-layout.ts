@@ -1,4 +1,7 @@
+import {generateSemanticDecision} from "./semantic-emphasis-engine";
 import type {TranscribedWord} from "./types";
+
+export type LongformLineRole = "hook" | "context" | "reinforcement" | "cta";
 
 export type LongformWordLine = {
   id: string;
@@ -6,6 +9,7 @@ export type LongformWordLine = {
   startMs: number;
   endMs: number;
   estimatedUnits: number;
+  role?: LongformLineRole;
 };
 
 const helperWords = new Set([
@@ -46,7 +50,7 @@ export const estimateLongformWordUnits = (word: TranscribedWord): number => {
   return (rawLength + punctuationBonus + uppercaseBonus + numericBonus) * helperMultiplier;
 };
 
-const buildLine = (id: string, words: TranscribedWord[]): LongformWordLine => {
+const buildLine = (id: string, words: TranscribedWord[], role?: LongformLineRole): LongformWordLine => {
   return {
     id,
     words,
@@ -54,7 +58,8 @@ const buildLine = (id: string, words: TranscribedWord[]): LongformWordLine => {
     endMs: words[words.length - 1]?.endMs ?? 0,
     estimatedUnits: words.reduce((sum, word, index) => {
       return sum + estimateLongformWordUnits(word) + (index > 0 ? 1.25 : 0);
-    }, 0)
+    }, 0),
+    role
   };
 };
 
@@ -93,7 +98,7 @@ const shouldUseTwoLineLayout = (words: TranscribedWord[]): boolean => {
 
 export const splitLongformWordsIntoLines = (words: TranscribedWord[]): LongformWordLine[] => {
   if (!shouldUseTwoLineLayout(words)) {
-    return [buildLine("line-1", words)];
+    return [buildLine("line-1", words, "hook")];
   }
 
   let bestCandidate: {first: LongformWordLine; second: LongformWordLine; score: number} | null = null;
@@ -109,10 +114,46 @@ export const splitLongformWordsIntoLines = (words: TranscribedWord[]): LongformW
   }
 
   if (!bestCandidate) {
-    return [buildLine("line-1", words)];
+    return [buildLine("line-1", words, "hook")];
   }
 
-  return [bestCandidate.first, bestCandidate.second];
+  const {first, second} = bestCandidate;
+  const firstIsHook = first.estimatedUnits <= second.estimatedUnits * 1.15 || /^[A-Z]/.test(first.words[0]?.text ?? "");
+
+  first.role = firstIsHook ? "hook" : "context";
+  second.role = firstIsHook ? "context" : "hook";
+
+  return [first, second];
+};
+
+export const semanticSplitLongformWords = (words: TranscribedWord[], semanticReductionAllowed: boolean = true): LongformWordLine[] => {
+  if (words.length <= 1) {
+    return [buildLine("line-1", words, "hook")];
+  }
+
+  if (!semanticReductionAllowed) {
+    return splitLongformWordsIntoLines(words);
+  }
+
+  const semantic = generateSemanticDecision(words);
+  const hookIndices = new Set(semantic.tokens.filter(t => t.importanceScore >= 0.8).map(t => t.index));
+  
+  if (hookIndices.size === 0) {
+    return splitLongformWordsIntoLines(words);
+  }
+
+  const hookWords = words.filter((_, i) => hookIndices.has(i));
+  const contextWords = words.filter((_, i) => !hookIndices.has(i));
+
+  const lines: LongformWordLine[] = [];
+  if (hookWords.length > 0) {
+    lines.push(buildLine("hook-line", hookWords, "hook"));
+  }
+  if (contextWords.length > 0) {
+    lines.push(buildLine("context-line", contextWords, "context"));
+  }
+
+  return lines;
 };
 
 const sameWord = (left: TranscribedWord, right: TranscribedWord): boolean => {

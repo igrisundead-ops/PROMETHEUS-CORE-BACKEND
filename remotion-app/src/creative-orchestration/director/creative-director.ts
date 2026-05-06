@@ -6,6 +6,7 @@ import type {
   CreativeTimeline,
   DirectorDecision
 } from "../types";
+import type {GovernorResolution} from "../governance/types";
 import {hashString} from "../utils";
 import {ExistingAgentOrchestratorAdapter} from "../judgment";
 import type {EditDecisionPlan} from "../judgment/types";
@@ -18,7 +19,8 @@ export class CreativeDirector {
     moments: CreativeMoment[],
     proposalsByMoment: Map<string, AgentProposal[]>,
     revisionPass: number = 0,
-    criticIssues: CreativeDiagnostics["warnings"] = []
+    criticIssues: CreativeDiagnostics["warnings"] = [],
+    resolutions: GovernorResolution[] = []
   ): Promise<{
     decisions: DirectorDecision[];
     selectedProposals: AgentProposal[];
@@ -38,9 +40,23 @@ export class CreativeDirector {
     const warnings = [...criticIssues];
     const sequenceHistory: Array<{plan: EditDecisionPlan; moment: CreativeMoment}> = [];
 
-    for (const moment of moments) {
+    for (let i = 0; i < moments.length; i++) {
+      const moment = moments[i];
+      const resolution = resolutions[i];
       const proposals = proposalsByMoment.get(moment.id) ?? [];
-      const decisionSet = await this.adapter.decideMoment(context, moment, proposals, criticIssues, sequenceHistory);
+
+      const governedProposals = proposals.map(p => {
+        if (!resolution) return p;
+        const governedPayload = { ...p.payload };
+        if (p.type === "text" || p.type === "motion") {
+          governedPayload["aggression"] = resolution.finalAggression;
+          governedPayload["motion"] = resolution.finalMotion;
+          governedPayload["governorRationale"] = resolution.explainability.join(" | ");
+        }
+        return { ...p, payload: governedPayload };
+      });
+
+      const decisionSet = await this.adapter.decideMoment(context, moment, governedProposals, criticIssues, sequenceHistory);
       decisions.push(decisionSet.decision);
       selectedProposals.push(...decisionSet.selectedProposals);
       rejectedProposals.push(...decisionSet.rejectedProposals);

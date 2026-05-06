@@ -199,6 +199,18 @@ const resolveOperationalRoleId = (requestedRoleId: TypographyRoleSlotId): Typogr
   return "neutral_sans_core";
 };
 
+const resolveNearestAvailableWeight = (requested: number, available: number[]): {resolved: number; fauxBoldRisk: boolean} => {
+  if (available.length === 0) {
+    return {resolved: requested, fauxBoldRisk: true};
+  }
+
+  const sorted = [...available].sort((left, right) => Math.abs(left - requested) - Math.abs(right - requested));
+  const nearest = sorted[0];
+  const fauxBoldRisk = nearest !== requested && requested > Math.max(...available);
+
+  return {resolved: nearest, fauxBoldRisk};
+};
+
 const scoreCandidate = ({
   candidate,
   roleId,
@@ -213,9 +225,10 @@ const scoreCandidate = ({
   intensityBand: TypographyIntensityBand;
   motionDemand: RuntimeFontMotionDemand;
   input: RuntimeFontSelectionInput;
-}): number => {
+}): {score: number; rationale: string[]} => {
   const paletteId = getRuntimePaletteIdForTypographyCandidate(candidate.id)!;
   const palette = getEditorialFontPalette(paletteId);
+  const rationale: string[] = [];
 
   let score = Math.max(0, 7 - rankIndex) * 0.7;
   score += candidate.eligibleRoles.includes(roleId) ? 0.5 : 0;
@@ -232,6 +245,12 @@ const scoreCandidate = ({
   score += input.targetMoods.filter((mood) => palette.moodTags.includes(mood)).length * 0.3;
   score += paletteId === input.treatmentFontProfileHint ? 0.85 : 0;
   score += paletteId === input.treatmentFallbackFontProfileHint ? 0.35 : 0;
+
+  // Balanced safety prior for DM Sans (singular neutral sans core)
+  if (candidate.id === "dm-sans" && roleId === "neutral_sans_core") {
+    score += 0.12; // Cap generic safety bonus to 0.12
+    rationale.push("neutral-sans-safety-prior");
+  }
 
   if (candidate.id === "crimson-pro" && (input.patternMood === "documentary" || input.patternMood === "emotional")) {
     score += 0.95;
@@ -254,17 +273,18 @@ const scoreCandidate = ({
   if (candidate.id === "playfair-display" && intensityBand === "high") {
     score -= 0.45;
   }
-  if (candidate.id === "dm-sans" && roleId === "neutral_sans_core") {
-    score += 0.95;
-  }
-  if (candidate.id === "dm-sans" && input.typographyRole === "tech-overlay") {
-    score += 0.95;
-  }
 
-  return score;
+  return {score, rationale};
 };
 
-export const selectRuntimeFontSelection = (input: RuntimeFontSelectionInput): RuntimeFontSelection => {
+export const selectRuntimeFontSelection = (input: RuntimeFontSelectionInput): RuntimeFontSelection & {
+  requestedWeight: number;
+  resolvedWeight: number;
+  availableWeights: number[];
+  fauxBoldRisk: boolean;
+  graphUsageScore: number;
+  genericFallbackRisk: boolean;
+} => {
   const requestedRoleId = inferRequestedRoleId(input);
   const selectedRoleId = resolveOperationalRoleId(requestedRoleId);
   const intensityBand = inferIntensityBand(input);
@@ -272,29 +292,42 @@ export const selectRuntimeFontSelection = (input: RuntimeFontSelectionInput): Ru
   const candidates = getRuntimeCandidatesForRole(selectedRoleId);
 
   const rankedCandidates = candidates
-    .map((candidate, rankIndex) => ({
-      candidate,
-      score: scoreCandidate({
+    .map((candidate, rankIndex) => {
+      const evaluation = scoreCandidate({
         candidate,
         roleId: selectedRoleId,
         rankIndex,
         intensityBand,
         motionDemand,
         input
-      })
-    }))
+      });
+      return {
+        candidate,
+        score: evaluation.score,
+        evaluationRationale: evaluation.rationale
+      };
+    })
     .sort((left, right) => right.score - left.score || left.candidate.name.localeCompare(right.candidate.name));
 
-  const selectedCandidate = rankedCandidates[0]?.candidate ?? candidateById.get("dm-sans")!;
+  const selectedEntry = rankedCandidates[0];
+  const selectedCandidate = selectedEntry?.candidate ?? candidateById.get("dm-sans")!;
   const fontPaletteId = getRuntimePaletteIdForTypographyCandidate(selectedCandidate.id) ?? "dm-sans-core";
   const palette = getEditorialFontPalette(fontPaletteId);
+
+  // Phase 1: Resolve Weight
+  const baseRequestedWeight = (input.mode === "keyword-only" || input.typographyRole === "headline" || input.typographyRole === "hook")
+    ? palette.displayWeight
+    : palette.supportWeight;
+  const weightResolution = resolveNearestAvailableWeight(baseRequestedWeight, palette.availableWeights);
+
   const rationale = [
     `requested-role=${requestedRoleId}`,
     requestedRoleId !== selectedRoleId ? `role-fallback=${selectedRoleId}` : `selected-role=${selectedRoleId}`,
     `font-candidate=${selectedCandidate.id}`,
     `font-palette=${fontPaletteId}`,
     `font-intensity=${intensityBand}`,
-    `font-motion-demand=${motionDemand}`
+    `font-motion-demand=${motionDemand}`,
+    ...selectedEntry.evaluationRationale
   ];
 
   if (requestedRoleId === "display_sans_pressure_release" && selectedRoleId !== requestedRoleId) {
@@ -312,6 +345,12 @@ export const selectRuntimeFontSelection = (input: RuntimeFontSelectionInput): Ru
     palette,
     intensityBand,
     motionDemand,
-    rationale
+    rationale,
+    requestedWeight: baseRequestedWeight,
+    resolvedWeight: weightResolution.resolved,
+    availableWeights: palette.availableWeights,
+    fauxBoldRisk: weightResolution.fauxBoldRisk,
+    graphUsageScore: selectedEntry ? 1 : 0,
+    genericFallbackRisk: selectedCandidate.id === "dm-sans" && requestedRoleId !== "neutral_sans_core"
   };
 };

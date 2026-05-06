@@ -31,6 +31,8 @@ const FONT_LOAD_OPTIONS = {
   ignoreTooManyRequestsWarning: true
 };
 
+const CORE_WEIGHTS = ["400", "500", "600", "700", "800"] as const;
+
 let editorialFontsLoaded = false;
 
 export const loadEditorialCaptionFonts = (): void => {
@@ -40,21 +42,24 @@ export const loadEditorialCaptionFonts = (): void => {
 
   editorialFontsLoaded = true;
 
-  loadFraunces("normal", FONT_LOAD_OPTIONS);
-  loadFraunces("italic", FONT_LOAD_OPTIONS);
-  loadPlayfairDisplay("normal", FONT_LOAD_OPTIONS);
-  loadPlayfairDisplay("italic", FONT_LOAD_OPTIONS);
-  loadCormorantGaramond("normal", FONT_LOAD_OPTIONS);
-  loadCormorantGaramond("italic", FONT_LOAD_OPTIONS);
-  loadCrimsonPro("normal", FONT_LOAD_OPTIONS);
-  loadCrimsonPro("italic", FONT_LOAD_OPTIONS);
-  loadLora("normal", FONT_LOAD_OPTIONS);
-  loadLora("italic", FONT_LOAD_OPTIONS);
-  loadInstrumentSerif("normal", FONT_LOAD_OPTIONS);
-  loadInstrumentSerif("italic", FONT_LOAD_OPTIONS);
-  loadNotoSerifDisplay("normal", FONT_LOAD_OPTIONS);
-  loadNotoSerifDisplay("italic", FONT_LOAD_OPTIONS);
-  loadDMSans("normal", FONT_LOAD_OPTIONS);
-  loadDMSans("italic", FONT_LOAD_OPTIONS);
+  CORE_WEIGHTS.forEach((weight) => {
+    loadFraunces(weight as any, FONT_LOAD_OPTIONS);
+    loadFraunces(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadPlayfairDisplay(weight as any, FONT_LOAD_OPTIONS);
+    loadPlayfairDisplay(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadCormorantGaramond(weight as any, FONT_LOAD_OPTIONS);
+    loadCormorantGaramond(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadCrimsonPro(weight as any, FONT_LOAD_OPTIONS);
+    loadCrimsonPro(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadLora(weight as any, FONT_LOAD_OPTIONS);
+    loadLora(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadInstrumentSerif(weight as any, FONT_LOAD_OPTIONS);
+    loadInstrumentSerif(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadNotoSerifDisplay(weight as any, FONT_LOAD_OPTIONS);
+    loadNotoSerifDisplay(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+    loadDMSans(weight as any, FONT_LOAD_OPTIONS);
+    loadDMSans(`${weight}italic` as any, FONT_LOAD_OPTIONS);
+  });
+
   loadHouseTypographyFonts();
 };

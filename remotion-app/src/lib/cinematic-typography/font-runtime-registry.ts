@@ -22,6 +22,7 @@ export type EditorialFontPalette = {
   italicFamily: string;
   displayWeight: number;
   supportWeight: number;
+  availableWeights: number[];
   moodTags: string[];
   doctrineRoleIds: TypographyRoleSlotId[];
 };
@@ -34,6 +35,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Jugendreisen\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["luxury", "prestige", "cinematic"],
     doctrineRoleIds: ["hero_serif_primary"]
   },
@@ -44,6 +46,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Louize\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["luxury", "editorial", "soft-focus"],
     doctrineRoleIds: ["hero_serif_alternate"]
   },
@@ -54,6 +57,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Ivar Script\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["luxury", "editorial", "accent"],
     doctrineRoleIds: ["script_accent_rare"]
   },
@@ -64,6 +68,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Sokoli\", \"Arial Narrow\", sans-serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["directive", "pressure", "display"],
     doctrineRoleIds: ["display_sans_pressure_release"]
   },
@@ -74,6 +79,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Fraunces\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["editorial", "luxury", "cinematic"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -84,6 +90,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Playfair Display\", \"Times New Roman\", serif",
     displayWeight: 700,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["editorial", "dramatic", "headline"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -94,6 +101,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Cormorant Garamond\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["luxury", "poetic", "emotional"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -104,6 +112,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Crimson Pro\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["documentary", "editorial", "human"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -114,6 +123,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Lora\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["documentary", "thoughtful", "clear"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -124,6 +134,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Instrument Serif\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["luxury", "premium", "soft-focus"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -134,6 +145,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Noto Serif Display\", \"Times New Roman\", serif",
     displayWeight: 700,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["monument", "prestige", "statement"],
     doctrineRoleIds: ["hero_serif_alternate"]
   },
@@ -144,6 +156,7 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     italicFamily: "\"Fraunces\", \"Times New Roman\", serif",
     displayWeight: 700,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["modern", "precision", "directive"],
     doctrineRoleIds: ["neutral_sans_core"]
   }

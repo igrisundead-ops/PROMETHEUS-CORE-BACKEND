@@ -13,6 +13,9 @@ import {MattingDepthAgent} from "./agents/matting-depth-agent";
 import {RenderBudgetAgent} from "./agents/render-budget-agent";
 import {PatternMemoryAgent} from "./agents/pattern-memory-agent";
 import {CreativeDirector} from "./director/creative-director";
+import {CinematicGovernor} from "./governance/cinematic-governor";
+import {CinematicPriorityHierarchy} from "./governance/cinematic-priority-hierarchy";
+import {SubsystemProposal} from "./governance/types";
 import {AestheticCritic} from "./director/aesthetic-critic";
 import {ExistingAgentOrchestratorAdapter} from "./judgment";
 import {getUnifiedCreativeAssetCatalog} from "../lib/assets/catalog";
@@ -195,15 +198,35 @@ export const buildCreativeOrchestrationPlan = async (input: {
     )
   ).flat();
   const proposalsByMoment = new Map<string, AgentProposal[]>();
+  const subsystemProposalsByMoment = new Map<string, SubsystemProposal[]>();
   for (const proposal of allProposals) {
     const bucket = proposalsByMoment.get(proposal.momentId) ?? [];
     bucket.push(proposal);
     proposalsByMoment.set(proposal.momentId, bucket);
+
+    const subBucket = subsystemProposalsByMoment.get(proposal.momentId) ?? [];
+    subBucket.push({
+      subsystemId: proposal.agentId,
+      momentId: proposal.momentId,
+      intent: {
+        aggression: (proposal.payload["aggression"] as number) ?? (proposal.type === "text" ? 0.7 : 0.5),
+        motion: (proposal.payload["motion"] as number) ?? (proposal.type === "motion" ? 0.8 : 0.5),
+        pacing: (proposal.payload["pacing"] as number) ?? 0.5,
+        dominance: (proposal.payload["dominance"] as number) ?? 0.5,
+      },
+      priority: CinematicPriorityHierarchy.getPriority(proposal.agentId),
+      confidence: proposal.confidence,
+      reasoning: proposal.reasoning,
+    });
+    subsystemProposalsByMoment.set(proposal.momentId, subBucket);
   }
+
+  const governor = new CinematicGovernor();
+  const resolutions = governor.govern(moments, subsystemProposalsByMoment);
 
   const director = new CreativeDirector();
   const critic = new AestheticCritic();
-  const firstPass = await director.decide(governedContext, moments, proposalsByMoment, 0, []);
+  const firstPass = await director.decide(governedContext, moments, proposalsByMoment, 0, [], resolutions);
   let criticReview = critic.review(firstPass.timeline, governedContext);
   let finalDecisionSet = firstPass;
 
