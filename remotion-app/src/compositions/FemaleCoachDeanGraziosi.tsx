@@ -110,6 +110,8 @@ export type FemaleCoachDeanGraziosiProps = {
   readonly previewPerformanceMode?: PreviewPerformanceMode;
   readonly respectPreviewPerformanceModeDuringRender?: boolean;
   readonly motionModelOverride?: MotionCompositionModel | null;
+  readonly debugSelectedFontId?: string | null;
+  readonly debugSelectedFont?: ManualSelectedRuntimeFont | null;
   readonly selectedFontId?: string | null;
   readonly selectedFont?: ManualSelectedRuntimeFont | null;
 };
@@ -138,6 +140,8 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
   previewPerformanceMode = "full",
   respectPreviewPerformanceModeDuringRender = false,
   motionModelOverride = null,
+  debugSelectedFontId,
+  debugSelectedFont,
   selectedFontId,
   selectedFont
 }) => {
@@ -212,9 +216,13 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     captionBias: motionModel.captionBias,
     motionTier: motionModel.tier,
     compositionCombatPlan: motionModel.compositionCombatPlan,
+    debugSelectedFontId,
+    debugSelectedFont,
     selectedFontId,
     selectedFont
   }), [
+    debugSelectedFont,
+    debugSelectedFontId,
     motionModel.backgroundOverlayPlan,
     motionModel.captionBias,
     motionModel.compositionCombatPlan,

@@ -6,7 +6,7 @@ import type {AddressInfo} from "node:net";
 import path from "node:path";
 
 import {
-  PHASE_2A_PROOF_RUNTIME_FONT_ID,
+  DEBUG_RUNTIME_FONT_ID,
   buildRuntimeFontFaceCss,
   buildRuntimeFontFaceCssForFamily,
   createRuntimeFontRegistry,
@@ -15,6 +15,7 @@ import {
   resolveRuntimeFontById,
   type RuntimeFontAssetRecord
 } from "../src/lib/font-intelligence/font-runtime-registry";
+import {ensureSelectedRuntimeFontLoaded} from "../src/lib/font-intelligence/font-runtime-loader";
 import {
   getManifestBackedPaletteForCandidate,
   getManifestBackedPaletteForFamilyName,
@@ -79,7 +80,7 @@ const buildBrowserProofHtml = ({
     <title>Runtime font smoke test</title>
   </head>
   <body>
-    <div id="font-proof" style="font-family: '${escapeForInlineScript(proofFamily)}', sans-serif;">Phase 2A runtime font proof</div>
+    <div id="font-proof" style="font-family: '${escapeForInlineScript(proofFamily)}', sans-serif;">Runtime font proof</div>
     <script>
       window.__fontSmokeResult = null;
       (async () => {
@@ -293,9 +294,7 @@ const main = async (): Promise<void> => {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as unknown;
   const registry = createRuntimeFontRegistry(manifest);
   const renderableRecords = registry.records;
-  const proofRecord = PHASE_2A_PROOF_RUNTIME_FONT_ID
-    ? resolveRuntimeFontById(PHASE_2A_PROOF_RUNTIME_FONT_ID, registry).selectedFont?.primaryRecord ?? renderableRecords[0]!
-    : renderableRecords[0]!;
+  const proofRecord = renderableRecords[0]!;
 
   if (!proofRecord) {
     throw new Error("Expected at least one renderable runtime font record for Phase 2A proof.");
@@ -340,7 +339,7 @@ const main = async (): Promise<void> => {
 
   const proofLookup = resolveRuntimeFontById(proofRecord.fontId, registry);
   if (!proofLookup.selectedFont) {
-    throw new Error(`Failed to resolve proof runtime font ${proofRecord.fontId}.`);
+    throw new Error(`Failed to resolve runtime font ${proofRecord.fontId} without a hidden proof default.`);
   }
 
   const manifestBridgePalette = getManifestBackedPaletteForFamilyName("Aesthetic")
@@ -409,6 +408,12 @@ const main = async (): Promise<void> => {
 
   const selectorSeesManifestCandidate = selectorResult.fontCandidateId.startsWith("manifest-")
     && selectorResult.palette.displayFamily.includes("__prometheus_font_");
+  const debugOverrideLookup = DEBUG_RUNTIME_FONT_ID
+    ? await ensureSelectedRuntimeFontLoaded({debugSelectedFontId: DEBUG_RUNTIME_FONT_ID})
+    : null;
+  if (DEBUG_RUNTIME_FONT_ID && !debugOverrideLookup?.selectedFont) {
+    throw new Error(`Explicit debugSelectedFontId override failed for ${DEBUG_RUNTIME_FONT_ID}.`);
+  }
 
   const proofCss = buildRuntimeFontFaceCssForFamily(proofLookup.selectedFont.records);
   const browserProof = await runBrowserProofIfAvailable({
@@ -437,6 +442,9 @@ const main = async (): Promise<void> => {
         selectorSawManifestCandidate: selectorSeesManifestCandidate,
         selectorFontCandidateId: selectorResult.fontCandidateId,
         selectorFontPaletteId: selectorResult.fontPaletteId,
+        hiddenProofDefaultRequired: false,
+        debugOverrideFontId: DEBUG_RUNTIME_FONT_ID,
+        debugOverrideResolved: Boolean(debugOverrideLookup?.selectedFont),
         oldFallbackStillWorks: fallbackPaletteId === "fraunces-editorial",
         usesPublicUrl: proofCss.includes(proofRecord.publicUrl),
         sampleCss: buildRuntimeFontFaceCss(proofRecord),

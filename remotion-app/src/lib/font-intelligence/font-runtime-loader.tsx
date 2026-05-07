@@ -1,7 +1,6 @@
 import React, {useEffect} from "react";
 
 import {
-  PHASE_2A_PROOF_RUNTIME_FONT_ID,
   RUNTIME_FONT_MANIFEST_PUBLIC_URL,
   buildRuntimeFontFaceCssForFamily,
   createRuntimeFontRegistry,
@@ -17,6 +16,7 @@ import {
   type RuntimeFontRegistry,
   type SelectedRuntimeFont
 } from "./font-runtime-registry";
+import {getManifestBackedPalettes} from "./runtime-font-bridge";
 
 type RuntimeFontLoadResult = RuntimeFontLookupResult & {
   loaded: boolean;
@@ -163,6 +163,48 @@ const toLookupError = (error: unknown): RuntimeFontLoadResult => {
   };
 };
 
+const ensureManifestBridgeSubsetLoaded = async (): Promise<RuntimeFontLoadResult> => {
+  const manifestBackedPalettes = getManifestBackedPalettes();
+  if (manifestBackedPalettes.length === 0) {
+    return {
+      selectedFont: null,
+      diagnostics: [{
+        code: "selection-empty",
+        message: "No manifest-backed bridge palettes were available for automatic runtime font bootstrap.",
+        requestedValue: null
+      }],
+      loaded: false
+    };
+  }
+
+  const registry = await fetchRuntimeFontRegistry();
+  const selectedFonts = manifestBackedPalettes
+    .map((palette) => resolveRuntimeFontFamilyById(palette.familyId, registry).selectedFont)
+    .filter((selectedFont): selectedFont is SelectedRuntimeFont => selectedFont !== null);
+
+  if (selectedFonts.length === 0) {
+    return {
+      selectedFont: null,
+      diagnostics: [{
+        code: "family-id-not-found",
+        message: "Manifest-backed bridge palettes exist, but none could be resolved from the runtime registry.",
+        requestedValue: null
+      }],
+      loaded: false
+    };
+  }
+
+  if (typeof document !== "undefined") {
+    await Promise.all(selectedFonts.map((selectedFont) => ensureRuntimeFontFamilyLoaded(selectedFont)));
+  }
+
+  return {
+    selectedFont: selectedFonts[0],
+    diagnostics: [],
+    loaded: typeof document !== "undefined"
+  };
+};
+
 export const ensureRuntimeFontLoadedById = async (fontId: string): Promise<RuntimeFontLoadResult> => {
   try {
     const registry = await fetchRuntimeFontRegistry();
@@ -182,47 +224,82 @@ export const ensureRuntimeFontFamilyLoadedById = async (familyId: string): Promi
 };
 
 export const ensureSelectedRuntimeFontLoaded = async (request: {
+  debugSelectedFontId?: string | null;
+  debugSelectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
   selectedFontId?: string | null;
   selectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
 }): Promise<RuntimeFontLoadResult> => {
   try {
+    if (
+      !request.debugSelectedFontId &&
+      !request.debugSelectedFont &&
+      !request.selectedFontId &&
+      !request.selectedFont
+    ) {
+      return ensureManifestBridgeSubsetLoaded();
+    }
+
     const registry = await fetchRuntimeFontRegistry();
-    return toLoadResult(resolveSelectedRuntimeFont(request, registry));
+    return toLoadResult(resolveSelectedRuntimeFont({
+      selectedFontId: request.debugSelectedFontId ?? request.selectedFontId,
+      selectedFont: request.debugSelectedFont ?? request.selectedFont
+    }, registry));
   } catch (error) {
     return toLookupError(error);
   }
 };
 
 export const primeRuntimeFontBootstrap = async ({
-  selectedFontId = PHASE_2A_PROOF_RUNTIME_FONT_ID,
+  debugSelectedFontId = null,
+  debugSelectedFont = null,
+  selectedFontId = null,
   selectedFont = null
 }: {
+  debugSelectedFontId?: string | null;
+  debugSelectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
   selectedFontId?: string | null;
   selectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
 } = {}): Promise<RuntimeFontLoadResult> => {
   return ensureSelectedRuntimeFontLoaded({
+    debugSelectedFontId,
+    debugSelectedFont,
     selectedFontId,
     selectedFont
   });
 };
 
 export const RuntimeFontBootstrap: React.FC<{
+  debugSelectedFontId?: string | null;
+  debugSelectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
   selectedFontId?: string | null;
   selectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
 }> = ({
-  selectedFontId = PHASE_2A_PROOF_RUNTIME_FONT_ID,
+  debugSelectedFontId = null,
+  debugSelectedFont = null,
+  selectedFontId = null,
   selectedFont = null
 }) => {
   useEffect(() => {
     void primeRuntimeFontBootstrap({
+      debugSelectedFontId,
+      debugSelectedFont,
       selectedFontId,
       selectedFont
     }).then((result) => {
-      if (!result.loaded && result.diagnostics.length > 0) {
+      if (result.diagnostics.length > 0) {
         console.warn("[runtime-font-bootstrap]", result.diagnostics);
       }
     });
-  }, [selectedFont?.familyId, selectedFont?.familyName, selectedFont?.fontId, selectedFontId]);
+  }, [
+    debugSelectedFont?.familyId,
+    debugSelectedFont?.familyName,
+    debugSelectedFont?.fontId,
+    debugSelectedFontId,
+    selectedFont?.familyId,
+    selectedFont?.familyName,
+    selectedFont?.fontId,
+    selectedFontId
+  ]);
 
   return null;
 };

@@ -379,9 +379,9 @@ export const resolveSelectedRuntimeFont = (
   return buildLookupMiss("selection-empty", "No selected runtime font request was provided.");
 };
 
-const phase2aProofRuntimeFontRecord = defaultRuntimeFontRegistry.records[0] ?? null;
+const debugRuntimeFontRecord = defaultRuntimeFontRegistry.records[0] ?? null;
 
-// Phase 2A only: this is a temporary manual proof hook until vector-backed runtime selection lands.
-export const PHASE_2A_PROOF_RUNTIME_FONT_ID = phase2aProofRuntimeFontRecord?.fontId ?? null;
+// Debug/test only: explicit manual override target for local proofing. Never use this as an implicit runtime default.
+export const DEBUG_RUNTIME_FONT_ID = debugRuntimeFontRecord?.fontId ?? null;
 
-export const PHASE_2A_PROOF_RUNTIME_FONT_FAMILY_ID = phase2aProofRuntimeFontRecord?.familyId ?? null;
+export const DEBUG_RUNTIME_FONT_FAMILY_ID = debugRuntimeFontRecord?.familyId ?? null;

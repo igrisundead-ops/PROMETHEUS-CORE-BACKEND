@@ -75,6 +75,8 @@ export type CaptionEditorialContext = {
   sequencePlan?: SequenceDirectorPlan | null;
   isSilenced?: boolean;
   pauseDurationMs?: number;
+  debugSelectedFontId?: string | null;
+  debugSelectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
   selectedFontId?: string | null;
   selectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
 };
@@ -535,12 +537,21 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     }
     : typography;
 
-  const runtimeFontLookup = context.selectedFontId || context.selectedFont
+  const debugRuntimeFontRequest = context.debugSelectedFontId || context.debugSelectedFont
+    ? {
+      selectedFontId: context.debugSelectedFontId,
+      selectedFont: context.debugSelectedFont
+    }
+    : null;
+  const selectedRuntimeFontRequest = context.selectedFontId || context.selectedFont
     ? resolveSelectedRuntimeFont({
       selectedFontId: context.selectedFontId,
       selectedFont: context.selectedFont
     })
     : null;
+  const runtimeFontLookup = debugRuntimeFontRequest
+    ? resolveSelectedRuntimeFont(debugRuntimeFontRequest)
+    : selectedRuntimeFontRequest;
   const selectedRuntimeFont = runtimeFontLookup?.selectedFont ?? null;
 
   const typeface = resolveCaptionEditorialTypeface({
@@ -628,6 +639,8 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     combatNeedsEscalation ? "combat-needs-escalation" : null,
     `typography-role=${finalTypography.role}`,
     `typography-pattern=${finalTypography.pattern.id}`,
+    debugRuntimeFontRequest ? "runtime-font-source=debug-override" : null,
+    !debugRuntimeFontRequest && selectedRuntimeFontRequest ? "runtime-font-source=selected-font-payload" : null,
     selectedRuntimeFont ? `runtime-font-id=${selectedRuntimeFont.primaryRecord.fontId}` : null,
     selectedRuntimeFont ? `runtime-font-family=${selectedRuntimeFont.cssFamily}` : null,
     ...((runtimeFontLookup?.diagnostics ?? []).map((diagnostic) => `runtime-font-diagnostic=${diagnostic.code}`)),

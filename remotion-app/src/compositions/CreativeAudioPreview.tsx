@@ -110,6 +110,8 @@ export type CreativeAudioPreviewProps = {
   readonly showDebugOverlay?: boolean;
   readonly renderJobActive?: boolean;
   readonly videoLoaded?: boolean;
+  readonly debugSelectedFontId?: string | null;
+  readonly debugSelectedFont?: ManualSelectedRuntimeFont | null;
   readonly selectedFontId?: string | null;
   readonly selectedFont?: ManualSelectedRuntimeFont | null;
 };
@@ -365,6 +367,8 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
   showDebugOverlay = false,
   renderJobActive = false,
   videoLoaded = false,
+  debugSelectedFontId,
+  debugSelectedFont,
   selectedFontId,
   selectedFont
 }) => {
@@ -428,9 +432,13 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
     captionBias: motionModel.captionBias,
     motionTier: motionModel.tier,
     compositionCombatPlan: motionModel.compositionCombatPlan,
+    debugSelectedFontId,
+    debugSelectedFont,
     selectedFontId,
     selectedFont
   }), [
+    debugSelectedFont,
+    debugSelectedFontId,
     motionModel.backgroundOverlayPlan,
     motionModel.captionBias,
     motionModel.compositionCombatPlan,

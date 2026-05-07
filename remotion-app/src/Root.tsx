@@ -12,8 +12,7 @@ import {
   LONGFORM_DRAFT_VIDEO_ASSET
 } from "./lib/draft-preview";
 import {HouseFontBootstrap} from "./lib/cinematic-typography/house-font-loader";
-import {RuntimeFontBootstrap, primeRuntimeFontBootstrap} from "./lib/font-intelligence/font-runtime-loader";
-import {PHASE_2A_PROOF_RUNTIME_FONT_ID} from "./lib/font-intelligence/font-runtime-registry";
+import {RuntimeFontBootstrap} from "./lib/font-intelligence/font-runtime-loader";
 import {getPresentationPreset} from "./lib/presentation-presets";
 import {normalizeCaptionStyleProfileId} from "./lib/stylebooks/caption-style-profiles";
 
@@ -21,8 +20,6 @@ const envCaptionProfileId = typeof process !== "undefined" ? process.env.CAPTION
 const defaultCaptionProfileId = envCaptionProfileId?.trim()
   ? normalizeCaptionStyleProfileId(envCaptionProfileId)
   : undefined;
-// Phase 2A only: manual proof font until runtime/vector selection is wired end-to-end.
-const phase2aManualProofFontId = PHASE_2A_PROOF_RUNTIME_FONT_ID ?? undefined;
 const reelPreset = getPresentationPreset("reel");
 const longFormPreset = getPresentationPreset("long-form");
 const longFormDraftVideoMetadata = getLongformDraftVideoMetadata(longFormPreset.videoMetadata);
@@ -48,15 +45,11 @@ const cinematicPiPShowcaseVideoMetadata = {
   durationInFrames: longFormPreset.videoMetadata.fps * 12
 };
 
-void primeRuntimeFontBootstrap({
-  selectedFontId: phase2aManualProofFontId
-});
-
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <HouseFontBootstrap />
-      <RuntimeFontBootstrap selectedFontId={phase2aManualProofFontId} />
+      <RuntimeFontBootstrap />
       <Composition
         id="FemaleCoachDeanGraziosi"
         component={FemaleCoachDeanGraziosi}
@@ -73,8 +66,7 @@ export const RemotionRoot: React.FC = () => {
           transitionPresetId: "auto",
           matteMode: "auto",
           captionBias: "auto",
-          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId,
-          selectedFontId: phase2aManualProofFontId
+          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId
         }}
       />
       <Composition
@@ -94,7 +86,6 @@ export const RemotionRoot: React.FC = () => {
           matteMode: "auto",
           captionBias: "auto",
           captionProfileId: defaultCaptionProfileId ?? longFormPreset.captionProfileId,
-          selectedFontId: phase2aManualProofFontId,
           motion3DMode: "editorial",
           stabilizePreviewTimeline: true,
           previewPerformanceMode: "balanced"
@@ -120,8 +111,7 @@ export const RemotionRoot: React.FC = () => {
           captionProfileId: defaultCaptionProfileId ?? longFormPreset.captionProfileId,
           captionBias: "auto",
           hideCaptionOverlays: false,
-          previewPerformanceMode: "balanced",
-          selectedFontId: phase2aManualProofFontId
+          previewPerformanceMode: "balanced"
         }}
       />
       <Composition
@@ -142,8 +132,7 @@ export const RemotionRoot: React.FC = () => {
           motion3DMode: "showcase",
           matteMode: "auto",
           captionBias: "auto",
-          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId,
-          selectedFontId: phase2aManualProofFontId
+          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId
         }}
       />
       <Composition
@@ -166,8 +155,7 @@ export const RemotionRoot: React.FC = () => {
           matteMode: "off",
           captionBias: "middle",
           hideCaptionOverlays: true,
-          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId,
-          selectedFontId: phase2aManualProofFontId
+          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId
         }}
       />
       <Composition
