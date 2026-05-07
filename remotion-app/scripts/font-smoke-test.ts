@@ -15,6 +15,16 @@ import {
   resolveRuntimeFontById,
   type RuntimeFontAssetRecord
 } from "../src/lib/font-intelligence/font-runtime-registry";
+import {
+  getManifestBackedPaletteForCandidate,
+  getManifestBackedPaletteForFamilyName,
+  resolveRenderableTypographyFont
+} from "../src/lib/font-intelligence/runtime-font-bridge";
+import {
+  getEditorialFontPalette,
+  getRuntimePaletteIdForTypographyCandidate
+} from "../src/lib/cinematic-typography/font-runtime-registry";
+import {selectRuntimeFontSelection} from "../src/lib/cinematic-typography/runtime-font-selector";
 
 type BrowserProofResult = {
   browserLoadAttempted: boolean;
@@ -40,6 +50,8 @@ const MIME_TYPES: Record<string, string> = {
   ".woff": "font/woff",
   ".woff2": "font/woff2"
 };
+
+const PLACEHOLDER_FONT_NAME_PATTERN = /\b(Anton|Oswald|Jugendreisen|Louize|Sokoli|Canela|Satoshi)\b/i;
 
 const require = createRequire(import.meta.url);
 
@@ -331,6 +343,73 @@ const main = async (): Promise<void> => {
     throw new Error(`Failed to resolve proof runtime font ${proofRecord.fontId}.`);
   }
 
+  const manifestBridgePalette = getManifestBackedPaletteForFamilyName("Aesthetic")
+    ?? getManifestBackedPaletteForCandidate("manifest-aesthetic");
+  if (!manifestBridgePalette) {
+    throw new Error("Manifest bridge failed to resolve the Phase 2B proof candidate for Aesthetic.");
+  }
+  if (!manifestBridgePalette.renderable) {
+    throw new Error(`Manifest bridge returned a non-renderable palette for ${manifestBridgePalette.familyName}.`);
+  }
+  if (manifestBridgePalette.cssFamily !== getRuntimeFontCssFamily(manifestBridgePalette.records[0]!)) {
+    throw new Error(`Manifest bridge palette for ${manifestBridgePalette.familyName} did not use the deterministic CSS alias.`);
+  }
+  if (manifestBridgePalette.publicUrls.some((publicUrl) => !publicUrl.startsWith("/fonts/library/"))) {
+    throw new Error(`Manifest bridge palette for ${manifestBridgePalette.familyName} exposed an invalid publicUrl.`);
+  }
+  if (PLACEHOLDER_FONT_NAME_PATTERN.test(manifestBridgePalette.displayFamily)) {
+    throw new Error(`Manifest bridge palette for ${manifestBridgePalette.familyName} leaked an old placeholder font name.`);
+  }
+
+  const bridgeResolution = resolveRenderableTypographyFont({
+    candidateId: manifestBridgePalette.candidateId,
+    requestedWeight: 700,
+    requestedStyle: "italic"
+  });
+  if (!bridgeResolution) {
+    throw new Error(`Manifest bridge failed to resolve renderable typography font for candidate ${manifestBridgePalette.candidateId}.`);
+  }
+  if (bridgeResolution.palette.id !== manifestBridgePalette.id) {
+    throw new Error(`Manifest bridge resolved the wrong palette for candidate ${manifestBridgePalette.candidateId}.`);
+  }
+
+  const bridgedPaletteId = getRuntimePaletteIdForTypographyCandidate(manifestBridgePalette.candidateId);
+  if (bridgedPaletteId !== manifestBridgePalette.id) {
+    throw new Error(`Old runtime registry did not prefer the manifest-backed palette for candidate ${manifestBridgePalette.candidateId}.`);
+  }
+
+  const bridgedPaletteFromRegistry = getEditorialFontPalette(bridgedPaletteId);
+  if (bridgedPaletteFromRegistry.displayFamily !== manifestBridgePalette.displayFamily) {
+    throw new Error(`Old runtime registry did not return the manifest-backed palette for ${manifestBridgePalette.candidateId}.`);
+  }
+  if (bridgedPaletteFromRegistry.displayFamily.includes(manifestBridgePalette.familyName) && !bridgedPaletteFromRegistry.displayFamily.includes(manifestBridgePalette.cssFamily)) {
+    throw new Error(`Manifest-backed registry path used raw family name instead of deterministic alias for ${manifestBridgePalette.familyName}.`);
+  }
+
+  const fallbackPaletteId = getRuntimePaletteIdForTypographyCandidate("fraunces");
+  if (fallbackPaletteId !== "fraunces-editorial") {
+    throw new Error(`Old fallback runtime registry behavior changed unexpectedly for 'fraunces'. Received '${fallbackPaletteId ?? "null"}'.`);
+  }
+
+  const selectorResult = selectRuntimeFontSelection({
+    typographyRole: "headline",
+    contentEnergy: "high",
+    patternMood: "luxury",
+    targetMoods: ["luxury", "editorial"],
+    patternUnit: "word",
+    wordCount: 2,
+    emphasisCount: 1,
+    mode: "keyword-only",
+    surfaceTone: "dark",
+    motionTier: "hero",
+    semanticIntent: "name-callout",
+    presentationMode: "reel",
+    treatmentFontProfileBucket: "editorial_authority"
+  });
+
+  const selectorSeesManifestCandidate = selectorResult.fontCandidateId.startsWith("manifest-")
+    && selectorResult.palette.displayFamily.includes("__prometheus_font_");
+
   const proofCss = buildRuntimeFontFaceCssForFamily(proofLookup.selectedFont.records);
   const browserProof = await runBrowserProofIfAvailable({
     publicRoot,
@@ -348,6 +427,17 @@ const main = async (): Promise<void> => {
         proofFontId: proofRecord.fontId,
         proofFamilyId: proofRecord.familyId,
         proofCssFamily: proofLookup.selectedFont.cssFamily,
+        manifestBridgeCandidateId: manifestBridgePalette.candidateId,
+        manifestBridgeFamilyName: manifestBridgePalette.familyName,
+        manifestBridgePaletteId: manifestBridgePalette.id,
+        manifestBridgeCssFamily: manifestBridgePalette.cssFamily,
+        manifestBridgeUsesPublicUrl: manifestBridgePalette.publicUrls.includes(manifestBridgePalette.records[0]!.publicUrl),
+        manifestBridgeFauxBoldRisk: bridgeResolution.fauxBoldRisk,
+        manifestBridgeFauxItalicRisk: bridgeResolution.fauxItalicRisk,
+        selectorSawManifestCandidate: selectorSeesManifestCandidate,
+        selectorFontCandidateId: selectorResult.fontCandidateId,
+        selectorFontPaletteId: selectorResult.fontPaletteId,
+        oldFallbackStillWorks: fallbackPaletteId === "fraunces-editorial",
         usesPublicUrl: proofCss.includes(proofRecord.publicUrl),
         sampleCss: buildRuntimeFontFaceCss(proofRecord),
         ...browserProof

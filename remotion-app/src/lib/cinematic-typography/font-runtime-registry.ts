@@ -1,11 +1,19 @@
 import type {TypographyRoleSlotId} from "./typography-doctrine";
 import {
+  getManifestBackedPaletteById,
+  getManifestBackedPaletteForCandidate,
+  getManifestBackedPalettes,
+  type ManifestBackedEditorialFontPalette,
+  type ManifestBackedPaletteId
+} from "../font-intelligence/runtime-font-bridge";
+import {
   getActiveHouseFontDefinitions,
   type HouseFontPaletteId
 } from "./house-font-registry";
 
 export type EditorialFontPaletteId =
   | HouseFontPaletteId
+  | ManifestBackedPaletteId
   | "fraunces-editorial"
   | "playfair-contrast"
   | "cormorant-salon"
@@ -27,7 +35,7 @@ export type EditorialFontPalette = {
   doctrineRoleIds: TypographyRoleSlotId[];
 };
 
-export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
+const STATIC_EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
   {
     id: "jugendreisen-house",
     displayFamily: "\"Jugendreisen\", \"Times New Roman\", serif",
@@ -162,6 +170,11 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
   }
 ];
 
+export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
+  ...STATIC_EDITORIAL_FONT_PALETTES,
+  ...getManifestBackedPalettes()
+];
+
 const fontPaletteMap = new Map(EDITORIAL_FONT_PALETTES.map((palette) => [palette.id, palette]));
 
 export const TYPOGRAPHY_RUNTIME_CANDIDATE_TO_PALETTE: Partial<Record<string, EditorialFontPaletteId>> = {
@@ -177,6 +190,11 @@ export const TYPOGRAPHY_RUNTIME_CANDIDATE_TO_PALETTE: Partial<Record<string, Edi
 export const getEditorialFontPalette = (
   paletteId: EditorialFontPaletteId | null | undefined
 ): EditorialFontPalette => {
+  const manifestBackedPalette = getManifestBackedPaletteById(paletteId ?? null);
+  if (manifestBackedPalette) {
+    return manifestBackedPalette;
+  }
+
   return fontPaletteMap.get(paletteId ?? "fraunces-editorial") ?? EDITORIAL_FONT_PALETTES[0];
 };
 
@@ -189,6 +207,11 @@ export const getEditorialFontPalettesForRole = (
 export const getRuntimePaletteIdForTypographyCandidate = (
   candidateId: string
 ): EditorialFontPaletteId | null => {
+  const manifestBackedPalette = getManifestBackedPaletteForCandidate(candidateId);
+  if (manifestBackedPalette) {
+    return manifestBackedPalette.id;
+  }
+
   const activeHouseFont = getActiveHouseFontDefinitions().find((definition) => definition.candidateId === candidateId);
   if (activeHouseFont) {
     return activeHouseFont.paletteId;
@@ -201,5 +224,8 @@ export const isRuntimeSelectableTypographyCandidate = (candidateId: string): boo
 };
 
 export const getRuntimeSelectableTypographyCandidateIds = (): string[] => {
-  return Object.keys(TYPOGRAPHY_RUNTIME_CANDIDATE_TO_PALETTE);
+  return [...new Set([
+    ...getManifestBackedPalettes().map((palette) => palette.candidateId),
+    ...Object.keys(TYPOGRAPHY_RUNTIME_CANDIDATE_TO_PALETTE)
+  ])];
 };
