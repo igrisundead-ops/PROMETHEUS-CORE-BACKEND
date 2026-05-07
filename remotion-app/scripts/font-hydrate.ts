@@ -118,6 +118,8 @@ const MATCH_PRIORITY: Record<MatchedBy, number> = {
 
 const normalizeSlash = (value: string): string => value.replace(/\\/g, "/");
 
+const toRemotionRelativePath = (...segments: string[]): string => normalizeSlash(path.posix.join(...segments));
+
 const normalizeEntryName = (value: string): string => normalizeSlash(value).replace(/^\/+/, "");
 
 const toFormat = (extension: SupportedFontExtension): FontFormat => extension.slice(1) as FontFormat;
@@ -540,6 +542,9 @@ const main = async (): Promise<void> => {
   const libraryDir = path.join(process.cwd(), "public", "fonts", "library");
   const runtimeManifestPath = path.join(libraryDir, "font-manifest-urls.json");
   const hydrationReportPath = path.join(libraryDir, "font-hydration-report.json");
+  const relativeLibraryDir = toRemotionRelativePath("public", "fonts", "library");
+  const relativeRuntimeManifestPath = toRemotionRelativePath(relativeLibraryDir, "font-manifest-urls.json");
+  const relativeHydrationReportPath = toRemotionRelativePath(relativeLibraryDir, "font-hydration-report.json");
 
   const sourceDirStats = await stat(sourceZipDir).catch(() => null);
   if (!sourceDirStats?.isDirectory()) {
@@ -601,11 +606,12 @@ const main = async (): Promise<void> => {
     const originalStem = path.basename(originalFileName ?? entry.record.observed.filename, extension);
     const safeStem = slugify(originalStem) || slugify(entry.record.fontId);
     const targetFileName = `${safeStem}-${entry.record.fontId.slice(-12)}${extension}`;
-    const localPublicPath = path.join(libraryDir, familyFolder, targetFileName);
+    const localPublicPath = toRemotionRelativePath(relativeLibraryDir, familyFolder, targetFileName);
+    const absoluteLocalPublicPath = path.join(process.cwd(), localPublicPath);
     const publicUrl = `/fonts/library/${familyFolder}/${targetFileName}`;
 
-    await mkdir(path.dirname(localPublicPath), {recursive: true});
-    await writeFile(localPublicPath, bytes);
+    await mkdir(path.dirname(absoluteLocalPublicPath), {recursive: true});
+    await writeFile(absoluteLocalPublicPath, bytes);
 
     matchedByCounts[entry.match.matchedBy] += 1;
     hydratedFormats[publicFormat] = (hydratedFormats[publicFormat] ?? 0) + 1;
@@ -664,9 +670,9 @@ const main = async (): Promise<void> => {
     hydratedFormats,
     warnings,
     outputPaths: {
-      libraryDir,
-      manifestPath: runtimeManifestPath,
-      reportPath: hydrationReportPath
+      libraryDir: relativeLibraryDir,
+      manifestPath: relativeRuntimeManifestPath,
+      reportPath: relativeHydrationReportPath
     }
   };
 
@@ -689,8 +695,8 @@ const main = async (): Promise<void> => {
         renderableManifestEntries: report.renderableManifestEntries,
         skippedForLicenseReview: report.skippedForLicenseReview,
         missing: report.missing,
-        runtimeManifestPath,
-        hydrationReportPath
+        runtimeManifestPath: relativeRuntimeManifestPath,
+        hydrationReportPath: relativeHydrationReportPath
       },
       null,
       2

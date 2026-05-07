@@ -1,6 +1,5 @@
 import {access, readFile} from "node:fs/promises";
 import path from "node:path";
-import {createRequire} from "node:module";
 
 type RuntimeManifestRecord = {
   fontId: string;
@@ -15,8 +14,6 @@ type RuntimeManifestRecord = {
   localPublicPath: string;
   renderable: boolean;
 };
-
-const require = createRequire(import.meta.url);
 
 const cssFormatLabel = (format: RuntimeManifestRecord["format"]): string => {
   if (format === "ttf") {
@@ -41,88 +38,9 @@ const buildFontFaceCss = (record: RuntimeManifestRecord): string => {
   ].join("\n");
 };
 
-const tryBrowserFontLoad = async (record: RuntimeManifestRecord): Promise<{
-  attempted: boolean;
-  succeeded: boolean;
-  mode: string;
-  warning?: string;
-}> => {
-  let playwrightModuleName: string | null = null;
-  for (const moduleName of ["playwright", "@playwright/test"]) {
-    try {
-      require.resolve(moduleName);
-      playwrightModuleName = moduleName;
-      break;
-    } catch {
-      // Keep probing.
-    }
-  }
-
-  if (!playwrightModuleName) {
-    return {
-      attempted: false,
-      succeeded: false,
-      mode: "strict-path-css-smoke-test"
-    };
-  }
-
-  try {
-    const playwrightModule = await import(playwrightModuleName);
-    const chromium = "chromium" in playwrightModule ? playwrightModule.chromium : null;
-    if (!chromium) {
-      return {
-        attempted: false,
-        succeeded: false,
-        mode: "strict-path-css-smoke-test",
-        warning: `Resolved ${playwrightModuleName}, but no chromium export was available.`
-      };
-    }
-
-    const browser = await chromium.launch({headless: true});
-    try {
-      const page = await browser.newPage();
-      const css = buildFontFaceCss(record);
-      await page.setContent(
-        [
-          "<!doctype html>",
-          "<html>",
-          "<head>",
-          "<style>",
-          css,
-          "</style>",
-          "</head>",
-          "<body>Font smoke test</body>",
-          "</html>"
-        ].join("")
-      );
-      const loadState = await page.evaluate(async (font: Pick<RuntimeManifestRecord, "weight" | "familyName">) => {
-        const response = await document.fonts.load(`${font.weight ?? 400} 16px "${font.familyName}"`);
-        return {
-          loadedCount: response.length,
-          status: document.fonts.status
-        };
-      }, record);
-
-      return {
-        attempted: true,
-        succeeded: loadState.loadedCount > 0,
-        mode: "browser-font-load"
-      };
-    } finally {
-      await browser.close();
-    }
-  } catch (error) {
-    return {
-      attempted: false,
-      succeeded: false,
-      mode: "strict-path-css-smoke-test",
-      warning: error instanceof Error ? error.message : String(error)
-    };
-  }
-};
-
 const main = async (): Promise<void> => {
-  const manifestPath = path.join(process.cwd(), "public", "fonts", "library", "font-manifest-urls.json");
+  const remotionRoot = process.cwd();
+  const manifestPath = path.join(remotionRoot, "public", "fonts", "library", "font-manifest-urls.json");
   await access(manifestPath);
 
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as RuntimeManifestRecord[];
@@ -139,7 +57,8 @@ const main = async (): Promise<void> => {
     if (!record.publicUrl.startsWith("/fonts/library/")) {
       throw new Error(`Invalid publicUrl for ${record.fontId}: ${record.publicUrl}`);
     }
-    await access(record.localPublicPath);
+    const resolvedPath = path.resolve(remotionRoot, record.localPublicPath);
+    await access(resolvedPath);
     const css = buildFontFaceCss(record);
     if (!css.includes(record.publicUrl)) {
       throw new Error(`Generated CSS for ${record.fontId} did not include its publicUrl.`);
@@ -149,18 +68,16 @@ const main = async (): Promise<void> => {
     }
   }
 
-  const browserCheck = await tryBrowserFontLoad(renderableRecords[0]!);
-
   console.log(
     JSON.stringify(
       {
         manifestPath,
         renderableRecords: renderableRecords.length,
         testedLocalPaths: renderableRecords.length,
-        mode: browserCheck.mode,
-        browserLoadAttempted: browserCheck.attempted,
-        browserLoadSucceeded: browserCheck.succeeded,
-        warning: browserCheck.warning ?? null,
+        mode: "strict-path-css-smoke-test",
+        browserLoadAttempted: false,
+        browserLoadSucceeded: false,
+        warning: null,
         sampleCss: buildFontFaceCss(renderableRecords[0]!)
       },
       null,

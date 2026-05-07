@@ -9,7 +9,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/aesthetic/aesthetic-regular-b3500383bd34.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\aesthetic\\aesthetic-regular-b3500383bd34.woff2",
+    "localPublicPath": "public/fonts/library/aesthetic/aesthetic-regular-b3500383bd34.woff2",
     "license": {
       "licenseTexts": [
         "(c) 2022 Nirmana Visual",
@@ -39,7 +39,7 @@
     "style": "normal",
     "format": "ttf",
     "publicUrl": "/fonts/library/aesthico-demo/aesthico-demo-regular-efbe4604facd.ttf",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\aesthico-demo\\aesthico-demo-regular-efbe4604facd.ttf",
+    "localPublicPath": "public/fonts/library/aesthico-demo/aesthico-demo-regular-efbe4604facd.ttf",
     "license": {
       "licenseTexts": [
         "Aesthico © (Heinzel Std). 2022. All Rights Reserved",
@@ -68,7 +68,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/almera/almera-baa51ed42a1d.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\almera\\almera-baa51ed42a1d.woff2",
+    "localPublicPath": "public/fonts/library/almera/almera-baa51ed42a1d.woff2",
     "license": {
       "licenseTexts": [
         "Typeface © SlideShoot 2022. All Rights Reserved",
@@ -97,7 +97,7 @@
     "style": "normal",
     "format": "ttf",
     "publicUrl": "/fonts/library/amerika/amerika-134a789cf9d0.ttf",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\amerika\\amerika-134a789cf9d0.ttf",
+    "localPublicPath": "public/fonts/library/amerika/amerika-134a789cf9d0.ttf",
     "license": {
       "licenseTexts": [
         "© 2001, Apostrophic Labs. All rights reserved. Visit www.apostrophiclab.com or email info@apostrophiclab.com for more information.",
@@ -126,7 +126,7 @@
     "style": "normal",
     "format": "ttf",
     "publicUrl": "/fonts/library/amerika-alternates/amerikaa-26bc8e73b088.ttf",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\amerika-alternates\\amerikaa-26bc8e73b088.ttf",
+    "localPublicPath": "public/fonts/library/amerika-alternates/amerikaa-26bc8e73b088.ttf",
     "license": {
       "licenseTexts": [
         "© 2001, Apostrophic Labs. All rights reserved. Visit www.apostrophiclab.com or email info@apostrophiclab.com for more information.",
@@ -155,7 +155,7 @@
     "style": "normal",
     "format": "ttf",
     "publicUrl": "/fonts/library/antenna/antenna-a14c59300f3b.ttf",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\antenna\\antenna-a14c59300f3b.ttf",
+    "localPublicPath": "public/fonts/library/antenna/antenna-a14c59300f3b.ttf",
     "license": {
       "licenseTexts": [
         "ANTENNA © khoir. All Rights Reserved",
@@ -184,7 +184,7 @@
     "style": "normal",
     "format": "ttf",
     "publicUrl": "/fonts/library/aulion-demo/auliondemoregular-e016efd7fcb7.ttf",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\aulion-demo\\auliondemoregular-e016efd7fcb7.ttf",
+    "localPublicPath": "public/fonts/library/aulion-demo/auliondemoregular-e016efd7fcb7.ttf",
     "license": {
       "licenseTexts": [
         "©CalligraphyFonts.net",
@@ -215,7 +215,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/baguile-free-trial/baguile-free-trial-cc85058e7468.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\baguile-free-trial\\baguile-free-trial-cc85058e7468.woff2",
+    "localPublicPath": "public/fonts/library/baguile-free-trial/baguile-free-trial-cc85058e7468.woff2",
     "license": {
       "licenseTexts": [
         "©typefactory",
@@ -246,7 +246,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/balona/balona-regular-2836d0eb8081.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\balona\\balona-regular-2836d0eb8081.woff2",
+    "localPublicPath": "public/fonts/library/balona/balona-regular-2836d0eb8081.woff2",
     "license": {
       "licenseTexts": [
         "Version 1.000;October 7, 2022;FontCreator 14.0.0.2877 64-bit"
@@ -274,7 +274,7 @@
     "style": "normal",
     "format": "woff",
     "publicUrl": "/fonts/library/berlleigh/berlleigh-0dc004cf245a.woff",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\berlleigh\\berlleigh-0dc004cf245a.woff",
+    "localPublicPath": "public/fonts/library/berlleigh/berlleigh-0dc004cf245a.woff",
     "license": {
       "licenseTexts": [
         "Version 1.001;Fontself Maker 3.5.7"
@@ -302,7 +302,7 @@
     "style": "normal",
     "format": "woff",
     "publicUrl": "/fonts/library/brushelva-personal-used/brushelva-personal-used-77ea8f79fb4a.woff",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\brushelva-personal-used\\brushelva-personal-used-77ea8f79fb4a.woff",
+    "localPublicPath": "public/fonts/library/brushelva-personal-used/brushelva-personal-used-77ea8f79fb4a.woff",
     "license": {
       "licenseTexts": [
         "Lettercorner Studio",
@@ -333,7 +333,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/cavergiz/cavergiz-761b0f36a3cc.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\cavergiz\\cavergiz-761b0f36a3cc.woff2",
+    "localPublicPath": "public/fonts/library/cavergiz/cavergiz-761b0f36a3cc.woff2",
     "license": {
       "licenseTexts": [
         "2022 © rvandtype foundry",
@@ -363,7 +363,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/leviathan/leviathan-c291e2b0aec8.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\leviathan\\leviathan-c291e2b0aec8.woff2",
+    "localPublicPath": "public/fonts/library/leviathan/leviathan-c291e2b0aec8.woff2",
     "license": {
       "licenseTexts": [
         "Typeface © (Kong Font). 2020. All Rights Reserved (kongvector@gmail.com).",
@@ -392,7 +392,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/leviathan-italic/leviathan-italic-ac864336242c.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\leviathan-italic\\leviathan-italic-ac864336242c.woff2",
+    "localPublicPath": "public/fonts/library/leviathan-italic/leviathan-italic-ac864336242c.woff2",
     "license": {
       "licenseTexts": [
         "Typeface © (Kong Font). 2020. All Rights Reserved (kongvector@gmail.com).",
@@ -421,7 +421,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/leviathan-oblique/leviathan-oblique-ea2cc92ea65b.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\leviathan-oblique\\leviathan-oblique-ea2cc92ea65b.woff2",
+    "localPublicPath": "public/fonts/library/leviathan-oblique/leviathan-oblique-ea2cc92ea65b.woff2",
     "license": {
       "licenseTexts": [
         "Typeface © (Kong Font). 2020. All Rights Reserved (kongvector@gmail.com).",
@@ -450,7 +450,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/mangko/mangkoregular-2349699ef89f.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\mangko\\mangkoregular-2349699ef89f.woff2",
+    "localPublicPath": "public/fonts/library/mangko/mangkoregular-2349699ef89f.woff2",
     "license": {
       "licenseTexts": [
         "Typeface © 2024 by  Toni Studio. All Rights Reserved",
@@ -479,7 +479,7 @@
     "style": "normal",
     "format": "woff",
     "publicUrl": "/fonts/library/marlong/marlong-ad829d01d275.woff",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\marlong\\marlong-ad829d01d275.woff",
+    "localPublicPath": "public/fonts/library/marlong/marlong-ad829d01d275.woff",
     "license": {
       "licenseTexts": [
         "Your name font © Typeline Studio 2022. All Rights Reserved",
@@ -508,7 +508,7 @@
     "style": "normal",
     "format": "woff",
     "publicUrl": "/fonts/library/ragara/ragara-32225374711b.woff",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\ragara\\ragara-32225374711b.woff",
+    "localPublicPath": "public/fonts/library/ragara/ragara-32225374711b.woff",
     "license": {
       "licenseTexts": [
         "Ragara © Penatic Studio 2022. All Rights Reserved",
@@ -537,7 +537,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/reglarik/reglarik-15fb0be89377.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\reglarik\\reglarik-15fb0be89377.woff2",
+    "localPublicPath": "public/fonts/library/reglarik/reglarik-15fb0be89377.woff2",
     "license": {
       "licenseTexts": [
         "©Denustudios 2022.  All Rights Reserved",
@@ -568,7 +568,7 @@
     "style": "normal",
     "format": "woff2",
     "publicUrl": "/fonts/library/the-glamoure/the-glamoure-953defaf2136.woff2",
-    "localPublicPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\the-glamoure\\the-glamoure-953defaf2136.woff2",
+    "localPublicPath": "public/fonts/library/the-glamoure/the-glamoure-953defaf2136.woff2",
     "license": {
       "licenseTexts": [
         "Typeface © SlideShoot 2022. All Rights Reserved",

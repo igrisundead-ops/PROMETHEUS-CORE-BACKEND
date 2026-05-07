@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-07T04:12:39.489Z",
+  "generatedAt": "2026-05-07T06:14:57.844Z",
   "totalMetadataRecordsRead": 577,
   "sourceFilesFoundInFontsDir": 319,
   "sourceZipCount": 319,
@@ -31,8 +31,8 @@
   },
   "warnings": [],
   "outputPaths": {
-    "libraryDir": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library",
-    "manifestPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\font-manifest-urls.json",
-    "reportPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\font-hydration-report.json"
+    "libraryDir": "public/fonts/library",
+    "manifestPath": "public/fonts/library/font-manifest-urls.json",
+    "reportPath": "public/fonts/library/font-hydration-report.json"
   }
 }
