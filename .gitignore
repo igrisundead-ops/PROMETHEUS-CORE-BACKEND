@@ -68,6 +68,9 @@ SVG animations/
 TEXT SVG ANIMATIONS/
 TRANSITION/
 FONTS/
+!remotion-app/public/fonts/
+!remotion-app/public/fonts/library/
+!remotion-app/public/fonts/library/**
 font-intelligence/extracted-fonts/
 font-intelligence/raw-zips/
 font-intelligence/specimens/

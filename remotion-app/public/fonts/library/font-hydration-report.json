@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-05-07T04:12:39.489Z",
+  "totalMetadataRecordsRead": 577,
+  "sourceFilesFoundInFontsDir": 319,
+  "sourceZipCount": 319,
+  "sourceDirectFontFileCount": 0,
+  "matchedMetadataRecords": 577,
+  "fontsHydrated": 20,
+  "renderableManifestEntries": 20,
+  "skippedForLicenseReview": 342,
+  "missing": 0,
+  "notSelectedDueToLimit": 215,
+  "includeLicenseReview": false,
+  "limit": 20,
+  "ghostFontsSummary": {
+    "unmatchedRecordCount": 0,
+    "sampleFontIds": [],
+    "sampleFamilies": []
+  },
+  "matchedBy": {
+    "hash": 20,
+    "relative-path": 0,
+    "zip-entry": 0,
+    "filename": 0,
+    "unknown": 0
+  },
+  "hydratedFormats": {
+    "woff2": 11,
+    "woff": 4,
+    "ttf": 5
+  },
+  "warnings": [],
+  "outputPaths": {
+    "libraryDir": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library",
+    "manifestPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\font-manifest-urls.json",
+    "reportPath": "C:\\Users\\HomePC\\Downloads\\HELP, VIDEO MATTING\\remotion-app\\public\\fonts\\library\\font-hydration-report.json"
+  }
+}
