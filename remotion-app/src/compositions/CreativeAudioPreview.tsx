@@ -32,6 +32,7 @@ import {CinematicCaptionOverlay} from "../components/CinematicCaptionOverlay";
 import {SvgCaptionOverlay, isSvgCaptionChunk} from "../components/SvgCaptionOverlay";
 import {MotionShowcaseOverlay} from "../components/MotionShowcaseOverlay";
 import {loadEditorialCaptionFonts} from "../lib/cinematic-typography/editorial-fonts";
+import type {ManualSelectedRuntimeFont} from "../lib/font-intelligence/font-runtime-registry";
 import {buildPreviewCaptionChunks} from "../lib/preview-caption-data";
 import {
   getDefaultCaptionProfileIdForPresentationMode,
@@ -109,6 +110,8 @@ export type CreativeAudioPreviewProps = {
   readonly showDebugOverlay?: boolean;
   readonly renderJobActive?: boolean;
   readonly videoLoaded?: boolean;
+  readonly selectedFontId?: string | null;
+  readonly selectedFont?: ManualSelectedRuntimeFont | null;
 };
 
 const treatmentTone = (finalTreatment: string): string => {
@@ -361,7 +364,9 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
   audioErrorMessage = null,
   showDebugOverlay = false,
   renderJobActive = false,
-  videoLoaded = false
+  videoLoaded = false,
+  selectedFontId,
+  selectedFont
 }) => {
   const resolvedVideoMetadata = videoMetadata ?? getDefaultVideoMetadataForPresentationMode("long-form");
   const resolvedPresentationMode = resolvePresentationMode(resolvedVideoMetadata, presentationMode);
@@ -422,13 +427,17 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
     backgroundOverlayPlan: motionModel.backgroundOverlayPlan,
     captionBias: motionModel.captionBias,
     motionTier: motionModel.tier,
-    compositionCombatPlan: motionModel.compositionCombatPlan
+    compositionCombatPlan: motionModel.compositionCombatPlan,
+    selectedFontId,
+    selectedFont
   }), [
     motionModel.backgroundOverlayPlan,
     motionModel.captionBias,
     motionModel.compositionCombatPlan,
     motionModel.gradeProfile,
-    motionModel.tier
+    motionModel.tier,
+    selectedFont,
+    selectedFontId
   ]);
   const showBackgroundOverlay = previewPerformanceMode !== "turbo";
   const showMotionAssetOverlay = previewPerformanceMode !== "turbo";

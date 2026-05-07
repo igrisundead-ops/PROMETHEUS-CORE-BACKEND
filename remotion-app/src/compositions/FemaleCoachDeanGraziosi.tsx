@@ -36,6 +36,7 @@ import {MotionShowcaseOverlay} from "../components/MotionShowcaseOverlay";
 import {SvgCaptionOverlay, isSvgCaptionChunk} from "../components/SvgCaptionOverlay";
 import reelVideoMetadata from "../data/video.metadata.json" with {type: "json"};
 import {loadEditorialCaptionFonts} from "../lib/cinematic-typography/editorial-fonts";
+import type {ManualSelectedRuntimeFont} from "../lib/font-intelligence/font-runtime-registry";
 import {buildPreviewCaptionChunks} from "../lib/preview-caption-data";
 import {LONGFORM_SAFE_MOTION_ASSET_FAMILIES} from "../lib/motion-platform/asset-manifests";
 import {
@@ -109,6 +110,8 @@ export type FemaleCoachDeanGraziosiProps = {
   readonly previewPerformanceMode?: PreviewPerformanceMode;
   readonly respectPreviewPerformanceModeDuringRender?: boolean;
   readonly motionModelOverride?: MotionCompositionModel | null;
+  readonly selectedFontId?: string | null;
+  readonly selectedFont?: ManualSelectedRuntimeFont | null;
 };
 
 export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = ({
@@ -134,7 +137,9 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
   previewTimelineResetVersion = 0,
   previewPerformanceMode = "full",
   respectPreviewPerformanceModeDuringRender = false,
-  motionModelOverride = null
+  motionModelOverride = null,
+  selectedFontId,
+  selectedFont
 }) => {
   const remotionEnvironment = useRemotionEnvironment();
   const useRealtimePreviewPath = stabilizePreviewTimeline && !remotionEnvironment.isRendering;
@@ -206,13 +211,17 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     backgroundOverlayPlan: motionModel.backgroundOverlayPlan,
     captionBias: motionModel.captionBias,
     motionTier: motionModel.tier,
-    compositionCombatPlan: motionModel.compositionCombatPlan
+    compositionCombatPlan: motionModel.compositionCombatPlan,
+    selectedFontId,
+    selectedFont
   }), [
     motionModel.backgroundOverlayPlan,
     motionModel.captionBias,
     motionModel.compositionCombatPlan,
     motionModel.gradeProfile,
-    motionModel.tier
+    motionModel.tier,
+    selectedFont,
+    selectedFontId
   ]);
   const showBackgroundOverlay = resolvedPreviewPerformanceMode !== "turbo" && !showPiPShowcase;
   const showMotionAssetOverlay = resolvedPreviewPerformanceMode !== "turbo" && !showPiPShowcase;

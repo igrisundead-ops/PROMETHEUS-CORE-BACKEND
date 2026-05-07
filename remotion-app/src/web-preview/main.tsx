@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import {loadHouseTypographyFonts} from "../lib/cinematic-typography/house-font-loader";
+import {primeRuntimeFontBootstrap} from "../lib/font-intelligence/font-runtime-loader";
+import {PHASE_2A_PROOF_RUNTIME_FONT_ID} from "../lib/font-intelligence/font-runtime-registry";
 import {PreviewApp} from "./PreviewApp";
 import "./preview.css";
 
@@ -81,10 +83,23 @@ class RootErrorBoundary extends React.Component<{
   }
 }
 
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <RootErrorBoundary>
-      <PreviewApp />
-    </RootErrorBoundary>
-  </React.StrictMode>
-);
+const renderPreviewApp = (): void => {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <RootErrorBoundary>
+        <PreviewApp />
+      </RootErrorBoundary>
+    </React.StrictMode>
+  );
+};
+
+void primeRuntimeFontBootstrap({
+  // Phase 2A only: bootstrap one manual hydrated font until vector-driven runtime selection is wired.
+  selectedFontId: PHASE_2A_PROOF_RUNTIME_FONT_ID
+})
+  .catch((error) => {
+    console.warn("[runtime-font-bootstrap] Preview bootstrap failed", error);
+  })
+  .finally(() => {
+    renderPreviewApp();
+  });

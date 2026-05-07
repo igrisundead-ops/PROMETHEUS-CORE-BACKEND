@@ -1,72 +1,342 @@
-import {access, readFile} from "node:fs/promises";
+import {createReadStream} from "node:fs";
+import {access, readFile, stat} from "node:fs/promises";
+import {createServer, type IncomingMessage, type ServerResponse} from "node:http";
+import {createRequire} from "node:module";
+import type {AddressInfo} from "node:net";
 import path from "node:path";
 
-type RuntimeManifestRecord = {
-  fontId: string;
-  familyId: string;
-  familyName: string;
-  fileName: string;
-  originalFileName: string | null;
-  weight: number | null;
-  style: string;
-  format: "ttf" | "otf" | "woff" | "woff2";
-  publicUrl: string;
-  localPublicPath: string;
-  renderable: boolean;
+import {
+  PHASE_2A_PROOF_RUNTIME_FONT_ID,
+  buildRuntimeFontFaceCss,
+  buildRuntimeFontFaceCssForFamily,
+  createRuntimeFontRegistry,
+  getRuntimeFontCssFamily,
+  getRuntimeFontFormatLabel,
+  resolveRuntimeFontById,
+  type RuntimeFontAssetRecord
+} from "../src/lib/font-intelligence/font-runtime-registry";
+
+type BrowserProofResult = {
+  browserLoadAttempted: boolean;
+  browserLoadSucceeded: boolean;
+  warning: string | null;
+  details: {
+    manifestFetched: boolean;
+    publicUrlFetched: boolean;
+    styleInjected: boolean;
+    fontsLoadSucceeded: boolean;
+    fontsCheckSucceeded: boolean;
+  } | null;
 };
 
-const cssFormatLabel = (format: RuntimeManifestRecord["format"]): string => {
-  if (format === "ttf") {
-    return "truetype";
-  }
-  if (format === "otf") {
-    return "opentype";
-  }
-  return format;
+const MIME_TYPES: Record<string, string> = {
+  ".css": "text/css; charset=utf-8",
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".otf": "font/otf",
+  ".ttf": "font/ttf",
+  ".txt": "text/plain; charset=utf-8",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2"
 };
 
-const buildFontFaceCss = (record: RuntimeManifestRecord): string => {
-  const escapedFamily = record.familyName.replace(/(["\\])/g, "\\$1");
-  return [
-    "@font-face {",
-    `  font-family: "${escapedFamily}";`,
-    `  src: url("${record.publicUrl}") format("${cssFormatLabel(record.format)}");`,
-    `  font-style: ${record.style};`,
-    `  font-weight: ${record.weight ?? 400};`,
-    "  font-display: swap;",
-    "}"
-  ].join("\n");
+const require = createRequire(import.meta.url);
+
+const escapeForInlineScript = (value: string): string => {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/`/g, "\\`")
+    .replace(/\$\{/g, "\\${");
+};
+
+const buildBrowserProofHtml = ({
+  proofFont,
+  proofCss
+}: {
+  proofFont: RuntimeFontAssetRecord;
+  proofCss: string;
+}): string => {
+  const proofFamily = getRuntimeFontCssFamily(proofFont);
+  const fontWeight = proofFont.weight ?? 400;
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Runtime font smoke test</title>
+  </head>
+  <body>
+    <div id="font-proof" style="font-family: '${escapeForInlineScript(proofFamily)}', sans-serif;">Phase 2A runtime font proof</div>
+    <script>
+      window.__fontSmokeResult = null;
+      (async () => {
+        try {
+          const manifestResponse = await fetch('/fonts/library/font-manifest-urls.json', {cache: 'no-store'});
+          const manifestFetched = manifestResponse.ok;
+          const manifest = manifestFetched ? await manifestResponse.json() : [];
+          const record = manifest.find((entry) => entry.fontId === '${escapeForInlineScript(proofFont.fontId)}') ?? null;
+          const fontResponse = record ? await fetch(record.publicUrl, {cache: 'no-store'}) : null;
+          const publicUrlFetched = Boolean(fontResponse && fontResponse.ok);
+          const style = document.createElement('style');
+          style.id = 'runtime-font-proof-style';
+          style.textContent = \`${escapeForInlineScript(proofCss)}\`;
+          document.head.appendChild(style);
+          const styleInjected = Boolean(document.getElementById('runtime-font-proof-style'));
+          let fontsLoadSucceeded = false;
+          let fontsCheckSucceeded = false;
+          if (document.fonts && typeof document.fonts.load === 'function') {
+            await document.fonts.load('${fontWeight} 1em "${escapeForInlineScript(proofFamily)}"');
+            fontsLoadSucceeded = true;
+            fontsCheckSucceeded = document.fonts.check('${fontWeight} 1em "${escapeForInlineScript(proofFamily)}"');
+          }
+          window.__fontSmokeResult = {
+            manifestFetched,
+            publicUrlFetched,
+            styleInjected,
+            fontsLoadSucceeded,
+            fontsCheckSucceeded
+          };
+        } catch (error) {
+          window.__fontSmokeResult = {
+            manifestFetched: false,
+            publicUrlFetched: false,
+            styleInjected: false,
+            fontsLoadSucceeded: false,
+            fontsCheckSucceeded: false,
+            error: error instanceof Error ? error.message : String(error)
+          };
+        }
+      })();
+    </script>
+  </body>
+</html>`;
+};
+
+const servePublicDirectory = async ({
+  publicRoot,
+  proofFont,
+  proofCss
+}: {
+  publicRoot: string;
+  proofFont: RuntimeFontAssetRecord;
+  proofCss: string;
+}): Promise<{
+  close: () => Promise<void>;
+  origin: string;
+}> => {
+  const server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
+    const requestPath = request.url ? new URL(request.url, "http://127.0.0.1").pathname : "/";
+    if (requestPath === "/" || requestPath === "/index.html") {
+      response.writeHead(200, {"Content-Type": MIME_TYPES[".html"]});
+      response.end(buildBrowserProofHtml({proofFont, proofCss}));
+      return;
+    }
+
+    const normalizedPath = path.normalize(requestPath).replace(/^(\.\.[/\\])+/, "");
+    const absolutePath = path.join(publicRoot, normalizedPath);
+    if (!absolutePath.startsWith(publicRoot)) {
+      response.writeHead(403);
+      response.end("Forbidden");
+      return;
+    }
+
+    try {
+      const fileStats = await stat(absolutePath);
+      if (!fileStats.isFile()) {
+        response.writeHead(404);
+        response.end("Not Found");
+        return;
+      }
+
+      response.writeHead(200, {
+        "Content-Type": MIME_TYPES[path.extname(absolutePath).toLowerCase()] ?? "application/octet-stream",
+        "Cache-Control": "no-store"
+      });
+      createReadStream(absolutePath).pipe(response);
+    } catch {
+      response.writeHead(404);
+      response.end("Not Found");
+    }
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => resolve());
+  });
+
+  const address = server.address() as AddressInfo;
+  return {
+    origin: `http://127.0.0.1:${address.port}`,
+    close: async () => {
+      await new Promise<void>((resolve, reject) => {
+        server.close((error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve();
+        });
+      });
+    }
+  };
+};
+
+const resolvePlaywrightChromium = async (): Promise<{
+  chromium: {launch: (options?: Record<string, unknown>) => Promise<any>};
+  packageName: string;
+} | null> => {
+  for (const packageName of ["playwright", "@playwright/test"]) {
+    try {
+      require.resolve(packageName);
+      const mod = await import(packageName);
+      const chromium = (mod as {chromium?: {launch: (options?: Record<string, unknown>) => Promise<any>}}).chromium;
+      if (chromium) {
+        return {chromium, packageName};
+      }
+    } catch {
+      // Keep looking for an already-installed browser tool.
+    }
+  }
+
+  return null;
+};
+
+const runBrowserProofIfAvailable = async ({
+  publicRoot,
+  proofFont,
+  proofCss
+}: {
+  publicRoot: string;
+  proofFont: RuntimeFontAssetRecord;
+  proofCss: string;
+}): Promise<BrowserProofResult> => {
+  const playwright = await resolvePlaywrightChromium();
+  if (!playwright) {
+    return {
+      browserLoadAttempted: false,
+      browserLoadSucceeded: false,
+      warning: "Playwright was not available in this repo, so browser proof was skipped.",
+      details: null
+    };
+  }
+
+  const server = await servePublicDirectory({
+    publicRoot,
+    proofFont,
+    proofCss
+  });
+
+  try {
+    const browser = await playwright.chromium.launch({headless: true});
+    try {
+      const page = await browser.newPage();
+      await page.goto(server.origin, {waitUntil: "networkidle"});
+      await page.waitForFunction(() => Boolean((window as Window & {__fontSmokeResult?: unknown}).__fontSmokeResult), {
+        timeout: 10_000
+      });
+      const details = await page.evaluate(() => {
+        return (window as Window & {
+          __fontSmokeResult?: BrowserProofResult["details"] & {error?: string};
+        }).__fontSmokeResult ?? null;
+      });
+
+      const browserLoadSucceeded = Boolean(
+        details?.manifestFetched &&
+        details?.publicUrlFetched &&
+        details?.styleInjected &&
+        details?.fontsLoadSucceeded &&
+        details?.fontsCheckSucceeded
+      );
+
+      return {
+        browserLoadAttempted: true,
+        browserLoadSucceeded,
+        warning: browserLoadSucceeded ? null : `Browser proof failed while using ${playwright.packageName}.`,
+        details: details
+          ? {
+            manifestFetched: Boolean(details.manifestFetched),
+            publicUrlFetched: Boolean(details.publicUrlFetched),
+            styleInjected: Boolean(details.styleInjected),
+            fontsLoadSucceeded: Boolean(details.fontsLoadSucceeded),
+            fontsCheckSucceeded: Boolean(details.fontsCheckSucceeded)
+          }
+          : null
+      };
+    } finally {
+      await browser.close();
+    }
+  } finally {
+    await server.close();
+  }
 };
 
 const main = async (): Promise<void> => {
   const remotionRoot = process.cwd();
   const manifestPath = path.join(remotionRoot, "public", "fonts", "library", "font-manifest-urls.json");
+  const publicRoot = path.join(remotionRoot, "public");
   await access(manifestPath);
 
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as RuntimeManifestRecord[];
-  if (!Array.isArray(manifest)) {
-    throw new Error(`Expected an array in ${manifestPath}.`);
-  }
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as unknown;
+  const registry = createRuntimeFontRegistry(manifest);
+  const renderableRecords = registry.records;
+  const proofRecord = PHASE_2A_PROOF_RUNTIME_FONT_ID
+    ? resolveRuntimeFontById(PHASE_2A_PROOF_RUNTIME_FONT_ID, registry).selectedFont?.primaryRecord ?? renderableRecords[0]!
+    : renderableRecords[0]!;
 
-  const renderableRecords = manifest.filter((record) => record.renderable === true);
-  if (renderableRecords.length === 0) {
-    throw new Error("Expected at least one renderable font record in the runtime manifest.");
+  if (!proofRecord) {
+    throw new Error("Expected at least one renderable runtime font record for Phase 2A proof.");
   }
 
   for (const record of renderableRecords) {
     if (!record.publicUrl.startsWith("/fonts/library/")) {
       throw new Error(`Invalid publicUrl for ${record.fontId}: ${record.publicUrl}`);
     }
+
+    if (path.isAbsolute(record.localPublicPath)) {
+      throw new Error(`Expected localPublicPath to stay relative for ${record.fontId}, received ${record.localPublicPath}`);
+    }
+
     const resolvedPath = path.resolve(remotionRoot, record.localPublicPath);
     await access(resolvedPath);
-    const css = buildFontFaceCss(record);
+
+    const cssFamily = getRuntimeFontCssFamily(record);
+    const css = buildRuntimeFontFaceCss(record);
+    const lookup = resolveRuntimeFontById(record.fontId, registry);
+    const familyCss = buildRuntimeFontFaceCssForFamily(lookup.selectedFont?.records ?? [record]);
+
+    if (!css.includes(cssFamily)) {
+      throw new Error(`Generated CSS for ${record.fontId} did not include deterministic CSS family alias ${cssFamily}.`);
+    }
     if (!css.includes(record.publicUrl)) {
       throw new Error(`Generated CSS for ${record.fontId} did not include its publicUrl.`);
     }
-    if (!css.includes("@font-face")) {
-      throw new Error(`Generated CSS for ${record.fontId} was missing an @font-face block.`);
+    if (!css.includes(`format("${getRuntimeFontFormatLabel(record.format)}")`)) {
+      throw new Error(`Generated CSS for ${record.fontId} did not include the correct format label.`);
+    }
+    if (!css.includes("font-display: swap;")) {
+      throw new Error(`Generated CSS for ${record.fontId} did not set font-display: swap.`);
+    }
+    if (!familyCss.includes("@font-face")) {
+      throw new Error(`Generated family CSS for ${record.fontId} was missing an @font-face block.`);
+    }
+    if (lookup.selectedFont?.cssFamily !== cssFamily) {
+      throw new Error(`Lookup alias mismatch for ${record.fontId}. Expected ${cssFamily}, received ${lookup.selectedFont?.cssFamily ?? "null"}.`);
     }
   }
+
+  const proofLookup = resolveRuntimeFontById(proofRecord.fontId, registry);
+  if (!proofLookup.selectedFont) {
+    throw new Error(`Failed to resolve proof runtime font ${proofRecord.fontId}.`);
+  }
+
+  const proofCss = buildRuntimeFontFaceCssForFamily(proofLookup.selectedFont.records);
+  const browserProof = await runBrowserProofIfAvailable({
+    publicRoot,
+    proofFont: proofRecord,
+    proofCss
+  });
 
   console.log(
     JSON.stringify(
@@ -74,11 +344,13 @@ const main = async (): Promise<void> => {
         manifestPath,
         renderableRecords: renderableRecords.length,
         testedLocalPaths: renderableRecords.length,
-        mode: "strict-path-css-smoke-test",
-        browserLoadAttempted: false,
-        browserLoadSucceeded: false,
-        warning: null,
-        sampleCss: buildFontFaceCss(renderableRecords[0]!)
+        mode: browserProof.browserLoadAttempted ? "strict-path-css-browser-smoke-test" : "strict-path-css-smoke-test",
+        proofFontId: proofRecord.fontId,
+        proofFamilyId: proofRecord.familyId,
+        proofCssFamily: proofLookup.selectedFont.cssFamily,
+        usesPublicUrl: proofCss.includes(proofRecord.publicUrl),
+        sampleCss: buildRuntimeFontFaceCss(proofRecord),
+        ...browserProof
       },
       null,
       2

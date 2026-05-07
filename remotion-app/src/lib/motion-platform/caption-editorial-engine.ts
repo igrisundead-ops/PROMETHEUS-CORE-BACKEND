@@ -12,6 +12,13 @@ import {
   type TypographySelection,
   type TypographyTextRole
 } from "../typography-intelligence";
+import {
+  resolveSelectedRuntimeFont,
+  type ManualSelectedRuntimeFont,
+  type RuntimeFontLookupDiagnostic,
+  type RuntimeFontAssetRecord,
+  type SelectedRuntimeFont
+} from "../font-intelligence/font-runtime-registry";
 import {getEditorialFontPalette, type EditorialFontPaletteId} from "../cinematic-typography/editorial-fonts";
 import {
   selectRuntimeFontSelection,
@@ -68,6 +75,8 @@ export type CaptionEditorialContext = {
   sequencePlan?: SequenceDirectorPlan | null;
   isSilenced?: boolean;
   pauseDurationMs?: number;
+  selectedFontId?: string | null;
+  selectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
 };
 
 export type CaptionEditorialLineStyle = {
@@ -119,7 +128,19 @@ export type CaptionEditorialDecision = {
     fauxBoldRisk?: boolean;
     graphUsageScore?: number;
     genericFallbackRisk?: boolean;
+    runtimeFontId?: string;
+    runtimeFamilyId?: string;
+    runtimeCssFamily?: string;
+    runtimeDiagnostics?: RuntimeFontLookupDiagnostic[];
   };
+  runtimeFont?: {
+    source: SelectedRuntimeFont["source"];
+    fontId: string;
+    familyId: string;
+    familyName: string;
+    cssFamily: string;
+    diagnostics: RuntimeFontLookupDiagnostic[];
+  } | null;
   qualityGate?: {
     fontLoadScore: number;
     fauxBoldRisk: boolean;
@@ -292,12 +313,14 @@ const resolveCaptionEditorialTypeface = ({
   mode,
   typography,
   uppercaseBias,
-  fontSelection
+  fontSelection,
+  selectedRuntimeFont
 }: {
   mode: CaptionEditorialMode;
   typography: TypographySelection;
   uppercaseBias: boolean;
   fontSelection: RuntimeFontSelection;
+  selectedRuntimeFont?: SelectedRuntimeFont | null;
 }): {
   fontFamily: string;
   fontWeight: number | string;
@@ -339,6 +362,20 @@ const resolveCaptionEditorialTypeface = ({
       letterSpacing = uppercaseBias ? "-0.016em" : "-0.016em";
       break;
   }
+
+  if (selectedRuntimeFont) {
+    const requestedWeight = typeof fontSelection.resolvedWeight === "number" ? fontSelection.resolvedWeight : Number(fontWeight);
+    const selectedRuntimeRecord = [...selectedRuntimeFont.records].sort((left, right) => {
+      return Math.abs((left.weight ?? 400) - requestedWeight) - Math.abs((right.weight ?? 400) - requestedWeight);
+    })[0] ?? selectedRuntimeFont.primaryRecord;
+
+    return {
+      fontFamily: selectedRuntimeFont.cssFamily,
+      fontWeight: selectedRuntimeRecord.weight ?? fontSelection.resolvedWeight ?? fontWeight,
+      letterSpacing
+    };
+  }
+
   return {
     fontFamily: palette.displayFamily,
     fontWeight: fontSelection.resolvedWeight ?? fontWeight,
@@ -498,11 +535,20 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     }
     : typography;
 
+  const runtimeFontLookup = context.selectedFontId || context.selectedFont
+    ? resolveSelectedRuntimeFont({
+      selectedFontId: context.selectedFontId,
+      selectedFont: context.selectedFont
+    })
+    : null;
+  const selectedRuntimeFont = runtimeFontLookup?.selectedFont ?? null;
+
   const typeface = resolveCaptionEditorialTypeface({
     mode,
     typography: finalTypography,
     uppercaseBias,
-    fontSelection: finalFontSelection
+    fontSelection: finalFontSelection,
+    selectedRuntimeFont
   });
 
   const keywordAnimation: CaptionKeywordAnimation = mode === "keyword-only" || finalTypography.pattern.unit === "letter"
@@ -582,6 +628,9 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     combatNeedsEscalation ? "combat-needs-escalation" : null,
     `typography-role=${finalTypography.role}`,
     `typography-pattern=${finalTypography.pattern.id}`,
+    selectedRuntimeFont ? `runtime-font-id=${selectedRuntimeFont.primaryRecord.fontId}` : null,
+    selectedRuntimeFont ? `runtime-font-family=${selectedRuntimeFont.cssFamily}` : null,
+    ...((runtimeFontLookup?.diagnostics ?? []).map((diagnostic) => `runtime-font-diagnostic=${diagnostic.code}`)),
     ...finalFontSelection.rationale,
     ...visualOrchestration.restraintPlan.reasons.map(r => `ORCHESTRATION: ${r}`),
     ...stylePhysics.rationale,
@@ -631,7 +680,23 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     visualOrchestration,
     stylePhysics,
     timelineRhythm,
-    fontSelection: finalFontSelection,
+    fontSelection: {
+      ...finalFontSelection,
+      runtimeFontId: selectedRuntimeFont?.primaryRecord.fontId,
+      runtimeFamilyId: selectedRuntimeFont?.familyId,
+      runtimeCssFamily: selectedRuntimeFont?.cssFamily,
+      runtimeDiagnostics: runtimeFontLookup?.diagnostics ?? []
+    },
+    runtimeFont: selectedRuntimeFont
+      ? {
+        source: selectedRuntimeFont.source,
+        fontId: selectedRuntimeFont.primaryRecord.fontId,
+        familyId: selectedRuntimeFont.familyId,
+        familyName: selectedRuntimeFont.familyName,
+        cssFamily: selectedRuntimeFont.cssFamily,
+        diagnostics: runtimeFontLookup?.diagnostics ?? []
+      }
+      : null,
     qualityGate
   };
 };
