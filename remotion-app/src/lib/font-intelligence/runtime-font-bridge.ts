@@ -2,15 +2,19 @@ import {
   buildRuntimeFontFaceCssForFamily,
   getBundledRuntimeFontRegistry,
   getRuntimeFontCssFamily,
-  resolveRuntimeFontFamilyById,
-  resolveRuntimeFontFamilyByName,
   type RuntimeFontAssetRecord,
-  type RuntimeFontLookupDiagnostic,
-  type SelectedRuntimeFont
+  type RuntimeFontLookupDiagnostic
 } from "./font-runtime-registry";
-import type {TypographyRoleSlotId} from "../cinematic-typography/typography-doctrine";
+import type {
+  TypographyFontCandidate,
+  TypographyRoleSlotId
+} from "../cinematic-typography/typography-doctrine";
 
-export type ManifestBackedPaletteId = `manifest-${string}`;
+export type ManifestBackedPaletteId = `manifest-family_${string}`;
+
+export type ManifestRoleMappingConfidence = "low" | "medium";
+export type ManifestBridgeSourceMarker = "manifest-bridge";
+export type ManifestFontKind = "serif" | "sans" | "script" | "decorative";
 
 export type ManifestBackedEditorialFontPalette = {
   id: ManifestBackedPaletteId;
@@ -20,18 +24,29 @@ export type ManifestBackedEditorialFontPalette = {
   displayWeight: number;
   supportWeight: number;
   availableWeights: number[];
+  availableStyles: string[];
   moodTags: string[];
   doctrineRoleIds: TypographyRoleSlotId[];
-  candidateId: string;
+  candidateId: ManifestBackedPaletteId;
   familyId: string;
   familyName: string;
   cssFamily: string;
   renderable: true;
   publicUrls: string[];
   fontFaceCss: string;
-  availableStyles: string[];
   records: RuntimeFontAssetRecord[];
   diagnostics: RuntimeFontLookupDiagnostic[];
+  sourceMarker: ManifestBridgeSourceMarker;
+  roleMappingConfidence: ManifestRoleMappingConfidence;
+  fontKind: ManifestFontKind;
+};
+
+export type DynamicManifestTypographyCandidate = TypographyFontCandidate & {
+  id: ManifestBackedPaletteId;
+  paletteId: ManifestBackedPaletteId;
+  familyId: string;
+  roleMappingConfidence: ManifestRoleMappingConfidence;
+  sourceMarker: ManifestBridgeSourceMarker;
 };
 
 export type ResolveRenderableTypographyFontInput = {
@@ -43,7 +58,7 @@ export type ResolveRenderableTypographyFontInput = {
 };
 
 export type ResolvedRenderableTypographyFont = {
-  candidateId: string;
+  candidateId: ManifestBackedPaletteId;
   palette: ManifestBackedEditorialFontPalette;
   requestedWeight: number;
   requestedStyle: string;
@@ -55,45 +70,22 @@ export type ResolvedRenderableTypographyFont = {
   diagnostics: RuntimeFontLookupDiagnostic[];
 };
 
-type ManifestBridgeProofDefinition = {
-  candidateId: string;
-  preferredFamilyName: string;
+type ManifestBridgeFamilyInference = {
+  fontKind: ManifestFontKind;
+  genericFamily: "serif" | "sans-serif" | "cursive";
   doctrineRoleIds: TypographyRoleSlotId[];
+  category: TypographyFontCandidate["categories"][number];
   moodTags: string[];
-  genericFamily: "serif" | "sans-serif";
-  preferredDisplayWeight: number;
-  preferredSupportWeight: number;
+  motionTolerance: TypographyFontCandidate["motionTolerance"];
+  intensityFit: TypographyFontCandidate["intensityFit"];
+  premiumSignal: number;
+  restraintSignal: number;
+  roleMappingConfidence: ManifestRoleMappingConfidence;
 };
 
-const PHASE_2B_MANIFEST_BRIDGE_PROOF_DEFINITIONS: ManifestBridgeProofDefinition[] = [
-  {
-    candidateId: "manifest-aesthetic",
-    preferredFamilyName: "Aesthetic",
-    doctrineRoleIds: ["hero_serif_alternate", "editorial_serif_support"],
-    moodTags: ["luxury", "editorial", "cinematic"],
-    genericFamily: "serif",
-    preferredDisplayWeight: 400,
-    preferredSupportWeight: 400
-  },
-  {
-    candidateId: "manifest-amerika",
-    preferredFamilyName: "Amerika",
-    doctrineRoleIds: ["editorial_serif_support", "display_sans_pressure_release"],
-    moodTags: ["statement", "dramatic", "editorial"],
-    genericFamily: "serif",
-    preferredDisplayWeight: 400,
-    preferredSupportWeight: 400
-  },
-  {
-    candidateId: "manifest-antenna",
-    preferredFamilyName: "ANTENNA",
-    doctrineRoleIds: ["neutral_sans_core"],
-    moodTags: ["modern", "precision", "directive"],
-    genericFamily: "sans-serif",
-    preferredDisplayWeight: 400,
-    preferredSupportWeight: 400
-  }
-];
+const containsAny = (value: string, patterns: RegExp[]): boolean => {
+  return patterns.some((pattern) => pattern.test(value));
+};
 
 const uniqueNumbers = (values: number[]): number[] => {
   return [...new Set(values)].sort((left, right) => left - right);
@@ -101,6 +93,24 @@ const uniqueNumbers = (values: number[]): number[] => {
 
 const uniqueStrings = (values: string[]): string[] => {
   return [...new Set(values)];
+};
+
+const normalizeStyle = (value: string | null | undefined): string => {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "italic" || normalized === "oblique" ? normalized : "normal";
+};
+
+const sanitizeManifestToken = (value: string): string => {
+  const normalized = value.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "");
+  return normalized || "unknown";
+};
+
+export const buildManifestFamilyCandidateId = (familyId: string): ManifestBackedPaletteId => {
+  const normalizedFamilyId = sanitizeManifestToken(familyId);
+  const suffix = normalizedFamilyId.startsWith("family_")
+    ? normalizedFamilyId.slice("family_".length)
+    : normalizedFamilyId;
+  return `manifest-family_${suffix}`;
 };
 
 const findNearestWeight = (requestedWeight: number, availableWeights: number[]): number => {
@@ -118,115 +128,292 @@ const findNearestWeight = (requestedWeight: number, availableWeights: number[]):
   })[0]!;
 };
 
-const normalizeStyle = (value: string | null | undefined): string => {
-  const normalized = value?.trim().toLowerCase();
-  return normalized === "italic" || normalized === "oblique" ? normalized : "normal";
+const buildFamilyCorpus = (records: RuntimeFontAssetRecord[]): string => {
+  return records
+    .flatMap((record) => [
+      record.familyName,
+      record.fileName,
+      record.originalFileName ?? "",
+      record.style
+    ])
+    .join(" ")
+    .toLowerCase();
 };
 
-const resolveRenderableFontSelection = (selectedFont: SelectedRuntimeFont): ManifestBridgeProofDefinition | null => {
-  return PHASE_2B_MANIFEST_BRIDGE_PROOF_DEFINITIONS.find((definition) => {
-    return definition.preferredFamilyName.toLowerCase() === selectedFont.familyName.toLowerCase();
-  }) ?? null;
-};
+const inferManifestBridgeFamily = (records: RuntimeFontAssetRecord[]): ManifestBridgeFamilyInference => {
+  const familyCorpus = buildFamilyCorpus(records);
+  const familyName = records[0]?.familyName ?? "";
+  const isUppercaseFamily = familyName.trim().length > 0 && familyName === familyName.toUpperCase();
 
-const resolvePreferredWeight = (preferredWeight: number, availableWeights: number[]): number => {
-  if (availableWeights.length === 0) {
-    return preferredWeight;
+  const scriptPatterns = [
+    /\bscript\b/,
+    /\bbrush\b/,
+    /\bcallig/,
+    /\bhand/,
+    /\bsignature\b/,
+    /\bcursive\b/,
+    /\bvibes\b/,
+    /\baulion\b/,
+    /\bbrushelva\b/,
+    /\bragara\b/,
+    /\bberlleigh\b/
+  ];
+  const sansPatterns = [
+    /\bsans\b/,
+    /\bgothic\b/,
+    /\bgrotesk\b/,
+    /\bneo\b/,
+    /\bcondensed\b/,
+    /\bdisplay sans\b/,
+    /\bantenna\b/,
+    /\bamerika\b/
+  ];
+  const serifPatterns = [
+    /\bserif\b/,
+    /\bgaramond\b/,
+    /\bbodoni\b/,
+    /\broman\b/,
+    /\bdidot\b/,
+    /\bdisplay\b/,
+    /\beditorial\b/,
+    /\baesthetic\b/,
+    /\balmera\b/,
+    /\bbaguile\b/,
+    /\bbalona\b/,
+    /\bcavergiz\b/,
+    /\bleviathan\b/,
+    /\bmangko\b/,
+    /\breglarik\b/,
+    /\bglamoure\b/
+  ];
+  const decorativePatterns = [
+    /\bdemo\b/,
+    /\bfree\b/,
+    /\btrial\b/,
+    /\bpersonal\b/,
+    /\balternates?\b/,
+    /\boblique\b/,
+    /\bitalic\b/
+  ];
+
+  if (containsAny(familyCorpus, scriptPatterns)) {
+    return {
+      fontKind: "script",
+      genericFamily: "cursive",
+      doctrineRoleIds: ["script_accent_rare"],
+      category: "script",
+      moodTags: ["accent", "luxury", "manifest-bridge"],
+      motionTolerance: "low",
+      intensityFit: ["low", "medium"],
+      premiumSignal: 0.58,
+      restraintSignal: 0.62,
+      roleMappingConfidence: "medium"
+    };
   }
 
-  return findNearestWeight(preferredWeight, availableWeights);
-};
+  if (containsAny(familyCorpus, sansPatterns) || isUppercaseFamily) {
+    return {
+      fontKind: "sans",
+      genericFamily: "sans-serif",
+      doctrineRoleIds: ["neutral_sans_core", "display_sans_pressure_release"],
+      category: "neutral-sans",
+      moodTags: ["precision", "directive", "manifest-bridge"],
+      motionTolerance: "high",
+      intensityFit: ["medium", "high"],
+      premiumSignal: 0.57,
+      restraintSignal: 0.71,
+      roleMappingConfidence: containsAny(familyCorpus, sansPatterns) ? "medium" : "low"
+    };
+  }
 
-const buildPaletteFamilyDescriptor = (cssFamily: string, genericFamily: ManifestBridgeProofDefinition["genericFamily"]): string => {
-  return `"${cssFamily}", ${genericFamily}`;
-};
+  if (containsAny(familyCorpus, serifPatterns)) {
+    return {
+      fontKind: "serif",
+      genericFamily: "serif",
+      doctrineRoleIds: ["hero_serif_alternate", "editorial_serif_support"],
+      category: "display-serif",
+      moodTags: ["editorial", "cinematic", "manifest-bridge"],
+      motionTolerance: "medium",
+      intensityFit: ["low", "medium", "high"],
+      premiumSignal: 0.61,
+      restraintSignal: 0.72,
+      roleMappingConfidence: "medium"
+    };
+  }
 
-const toManifestPaletteId = (familyId: string): ManifestBackedPaletteId => {
-  return `manifest-${familyId}`;
-};
-
-const buildManifestBackedPalette = (
-  definition: ManifestBridgeProofDefinition,
-  selectedFont: SelectedRuntimeFont
-): ManifestBackedEditorialFontPalette => {
-  const availableWeights = uniqueNumbers(selectedFont.records.map((record) => record.weight ?? 400));
-  const availableStyles = uniqueStrings(selectedFont.records.map((record) => normalizeStyle(record.style)));
-  const cssFamily = getRuntimeFontCssFamily(selectedFont.primaryRecord);
-  const familyDescriptor = buildPaletteFamilyDescriptor(cssFamily, definition.genericFamily);
+  if (containsAny(familyCorpus, decorativePatterns)) {
+    return {
+      fontKind: "decorative",
+      genericFamily: "sans-serif",
+      doctrineRoleIds: ["display_sans_pressure_release"],
+      category: "decorative",
+      moodTags: ["statement", "display", "manifest-bridge"],
+      motionTolerance: "medium",
+      intensityFit: ["medium", "high"],
+      premiumSignal: 0.55,
+      restraintSignal: 0.48,
+      roleMappingConfidence: "low"
+    };
+  }
 
   return {
-    id: toManifestPaletteId(selectedFont.familyId),
-    displayFamily: familyDescriptor,
-    supportFamily: familyDescriptor,
-    italicFamily: familyDescriptor,
-    displayWeight: resolvePreferredWeight(definition.preferredDisplayWeight, availableWeights),
-    supportWeight: resolvePreferredWeight(definition.preferredSupportWeight, availableWeights),
-    availableWeights,
-    moodTags: definition.moodTags,
-    doctrineRoleIds: definition.doctrineRoleIds,
-    candidateId: definition.candidateId,
-    familyId: selectedFont.familyId,
-    familyName: selectedFont.familyName,
-    cssFamily,
-    renderable: true,
-    publicUrls: selectedFont.records.map((record) => record.publicUrl),
-    fontFaceCss: buildRuntimeFontFaceCssForFamily(selectedFont.records),
-    availableStyles,
-    records: selectedFont.records,
-    diagnostics: selectedFont.diagnostics
+    fontKind: "serif",
+    genericFamily: "serif",
+    doctrineRoleIds: ["editorial_serif_support"],
+    category: "display-serif",
+    moodTags: ["editorial", "renderable", "manifest-bridge"],
+    motionTolerance: "medium",
+    intensityFit: ["low", "medium"],
+    premiumSignal: 0.56,
+    restraintSignal: 0.66,
+    roleMappingConfidence: "low"
   };
 };
 
-const resolveManifestBackedPaletteForSelectedFont = (
-  selectedFont: SelectedRuntimeFont | null
-): ManifestBackedEditorialFontPalette | null => {
-  if (!selectedFont) {
-    return null;
-  }
-
-  const definition = resolveRenderableFontSelection(selectedFont);
-  if (!definition) {
-    return null;
-  }
-
-  return buildManifestBackedPalette(definition, selectedFont);
+const buildPaletteFamilyDescriptor = (cssFamily: string, genericFamily: "serif" | "sans-serif" | "cursive"): string => {
+  return `"${cssFamily}", ${genericFamily}`;
 };
 
-export const getManifestBackedPalettes = (): ManifestBackedEditorialFontPalette[] => {
-  return PHASE_2B_MANIFEST_BRIDGE_PROOF_DEFINITIONS
-    .map((definition) => {
-      const lookup = resolveRuntimeFontFamilyByName(definition.preferredFamilyName, getBundledRuntimeFontRegistry());
-      return resolveManifestBackedPaletteForSelectedFont(lookup.selectedFont);
-    })
+const buildFamilyDiagnostics = ({
+  familyId,
+  familyName,
+  roleMappingConfidence
+}: {
+  familyId: string;
+  familyName: string;
+  roleMappingConfidence: ManifestRoleMappingConfidence;
+}): RuntimeFontLookupDiagnostic[] => {
+  if (roleMappingConfidence !== "low") {
+    return [];
+  }
+
+  return [{
+    code: "family-name-fallback",
+    message: `Manifest bridge assigned a provisional low-confidence role mapping to '${familyName}' (${familyId}).`,
+    requestedValue: familyId
+  }];
+};
+
+const buildManifestBackedPalette = (records: RuntimeFontAssetRecord[]): ManifestBackedEditorialFontPalette | null => {
+  const primaryRecord = records[0];
+  if (!primaryRecord) {
+    return null;
+  }
+
+  if (
+    !primaryRecord.fontId.trim() ||
+    !primaryRecord.familyId.trim() ||
+    !primaryRecord.familyName.trim() ||
+    !records.every((record) => record.publicUrl.startsWith("/"))
+  ) {
+    return null;
+  }
+
+  const inference = inferManifestBridgeFamily(records);
+  const availableWeights = uniqueNumbers(records.map((record) => record.weight ?? 400));
+  const availableStyles = uniqueStrings(records.map((record) => normalizeStyle(record.style)));
+  const cssFamily = getRuntimeFontCssFamily(primaryRecord);
+  const familyDescriptor = buildPaletteFamilyDescriptor(cssFamily, inference.genericFamily);
+  const candidateId = buildManifestFamilyCandidateId(primaryRecord.familyId);
+
+  return {
+    id: candidateId,
+    displayFamily: familyDescriptor,
+    supportFamily: familyDescriptor,
+    italicFamily: familyDescriptor,
+    displayWeight: findNearestWeight(700, availableWeights),
+    supportWeight: findNearestWeight(400, availableWeights),
+    availableWeights,
+    availableStyles,
+    moodTags: inference.moodTags,
+    doctrineRoleIds: inference.doctrineRoleIds,
+    candidateId,
+    familyId: primaryRecord.familyId,
+    familyName: primaryRecord.familyName,
+    cssFamily,
+    renderable: true,
+    publicUrls: records.map((record) => record.publicUrl),
+    fontFaceCss: buildRuntimeFontFaceCssForFamily(records),
+    records,
+    diagnostics: buildFamilyDiagnostics({
+      familyId: primaryRecord.familyId,
+      familyName: primaryRecord.familyName,
+      roleMappingConfidence: inference.roleMappingConfidence
+    }),
+    sourceMarker: "manifest-bridge",
+    roleMappingConfidence: inference.roleMappingConfidence,
+    fontKind: inference.fontKind
+  };
+};
+
+const buildDynamicManifestTypographyCandidate = (
+  palette: ManifestBackedEditorialFontPalette
+): DynamicManifestTypographyCandidate => {
+  const inference = inferManifestBridgeFamily(palette.records);
+  return {
+    id: palette.candidateId,
+    name: palette.familyName,
+    source: "reference-pool",
+    stage: "candidate",
+    categories: [inference.category],
+    eligibleRoles: palette.doctrineRoleIds,
+    motionTolerance: inference.motionTolerance,
+    premiumSignal: inference.premiumSignal,
+    restraintSignal: inference.restraintSignal,
+    intensityFit: inference.intensityFit,
+    notes: [
+      `Phase 2B-2A dynamic manifest bridge candidate.`,
+      `Source marker: ${palette.sourceMarker}.`,
+      `Role mapping confidence: ${palette.roleMappingConfidence}.`,
+      `Renderable family ${palette.familyId} exposes ${palette.records.length} verified runtime source(s).`
+    ],
+    paletteId: palette.id,
+    familyId: palette.familyId,
+    roleMappingConfidence: palette.roleMappingConfidence,
+    sourceMarker: palette.sourceMarker
+  };
+};
+
+const buildManifestBackedPalettes = (): ManifestBackedEditorialFontPalette[] => {
+  const registry = getBundledRuntimeFontRegistry();
+  return [...registry.byFamilyId.entries()]
+    .sort(([leftFamilyId], [rightFamilyId]) => leftFamilyId.localeCompare(rightFamilyId))
+    .map(([, records]) => buildManifestBackedPalette(records))
     .filter((palette): palette is ManifestBackedEditorialFontPalette => palette !== null);
 };
 
-const manifestBackedPalettes = getManifestBackedPalettes();
+const manifestBackedPalettes = buildManifestBackedPalettes();
+const dynamicManifestTypographyCandidates = manifestBackedPalettes.map((palette) => buildDynamicManifestTypographyCandidate(palette));
 
 const manifestBackedPaletteByCandidateId = new Map(
   manifestBackedPalettes.map((palette) => [palette.candidateId, palette] as const)
 );
-
 const manifestBackedPaletteByFamilyId = new Map(
   manifestBackedPalettes.map((palette) => [palette.familyId, palette] as const)
 );
-
 const manifestBackedPaletteByFamilyName = new Map(
   manifestBackedPalettes.map((palette) => [palette.familyName.toLowerCase(), palette] as const)
 );
-
 const manifestBackedPaletteById = new Map(
   manifestBackedPalettes.map((palette) => [palette.id, palette] as const)
 );
 
+export const getManifestBackedPalettes = (): ManifestBackedEditorialFontPalette[] => {
+  return manifestBackedPalettes;
+};
+
+export const getDynamicManifestTypographyCandidates = (): DynamicManifestTypographyCandidate[] => {
+  return dynamicManifestTypographyCandidates;
+};
+
 export const getManifestBackedPaletteForCandidate = (
   candidateId: string | null | undefined
 ): ManifestBackedEditorialFontPalette | null => {
-  if (!candidateId) {
+  if (!candidateId?.trim()) {
     return null;
   }
 
-  return manifestBackedPaletteByCandidateId.get(candidateId) ?? null;
+  return manifestBackedPaletteByCandidateId.get(candidateId as ManifestBackedPaletteId) ?? null;
 };
 
 export const getManifestBackedPaletteForFamilyName = (
@@ -236,13 +423,7 @@ export const getManifestBackedPaletteForFamilyName = (
     return null;
   }
 
-  const directPalette = manifestBackedPaletteByFamilyName.get(familyName.trim().toLowerCase());
-  if (directPalette) {
-    return directPalette;
-  }
-
-  const lookup = resolveRuntimeFontFamilyByName(familyName, getBundledRuntimeFontRegistry());
-  return resolveManifestBackedPaletteForSelectedFont(lookup.selectedFont);
+  return manifestBackedPaletteByFamilyName.get(familyName.trim().toLowerCase()) ?? null;
 };
 
 export const getManifestBackedPaletteForFamilyId = (
@@ -252,13 +433,7 @@ export const getManifestBackedPaletteForFamilyId = (
     return null;
   }
 
-  const directPalette = manifestBackedPaletteByFamilyId.get(familyId.trim());
-  if (directPalette) {
-    return directPalette;
-  }
-
-  const lookup = resolveRuntimeFontFamilyById(familyId, getBundledRuntimeFontRegistry());
-  return resolveManifestBackedPaletteForSelectedFont(lookup.selectedFont);
+  return manifestBackedPaletteByFamilyId.get(familyId.trim()) ?? null;
 };
 
 export const getManifestBackedPaletteById = (
@@ -298,9 +473,7 @@ export const resolveRenderableTypographyFont = (
     requestedWeight,
     uniqueNumbers(weightPool.map((record) => record.weight ?? 400))
   );
-  const resolvedRecord = weightPool.find((record) => {
-    return (record.weight ?? 400) === resolvedWeight;
-  }) ?? weightPool[0] ?? palette.records[0]!;
+  const resolvedRecord = weightPool.find((record) => (record.weight ?? 400) === resolvedWeight) ?? weightPool[0] ?? palette.records[0]!;
   const resolvedStyle = normalizeStyle(resolvedRecord.style);
   const fauxBoldRisk = resolvedWeight !== requestedWeight;
   const fauxItalicRisk = resolvedStyle !== requestedStyle;

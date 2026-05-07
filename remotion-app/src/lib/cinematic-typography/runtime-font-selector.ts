@@ -4,6 +4,7 @@ import type {
   TypographyMood,
   TypographyTextRole
 } from "../typography-intelligence";
+import {getDynamicManifestTypographyCandidates} from "../font-intelligence/runtime-font-bridge";
 import type {MotionTier, PresentationMode} from "../types";
 import {
   getEditorialFontPalette,
@@ -54,7 +55,10 @@ export type RuntimeFontSelection = {
 };
 
 const candidateById = new Map(
-  TYPOGRAPHY_DOCTRINE_V1.candidates.map((candidate) => [candidate.id, candidate] as const)
+  [
+    ...TYPOGRAPHY_DOCTRINE_V1.candidates,
+    ...getDynamicManifestTypographyCandidates()
+  ].map((candidate) => [candidate.id, candidate] as const)
 );
 
 const toNumericBand = (value: RuntimeFontMotionDemand | TypographyIntensityBand | TypographyFontCandidate["motionTolerance"]): number => {
@@ -183,7 +187,7 @@ const inferMotionDemand = (input: RuntimeFontSelectionInput): RuntimeFontMotionD
 };
 
 const getRuntimeCandidatesForRole = (roleId: TypographyRoleSlotId): TypographyFontCandidate[] => {
-  return rankTypographyCandidatesForRole(roleId)
+  const rankedStaticCandidates = rankTypographyCandidatesForRole(roleId)
     .map((node) => candidateById.get(node.id) ?? null)
     .filter((candidate): candidate is TypographyFontCandidate => {
       return Boolean(
@@ -193,6 +197,26 @@ const getRuntimeCandidatesForRole = (roleId: TypographyRoleSlotId): TypographyFo
           getRuntimePaletteIdForTypographyCandidate(candidate.id)
       );
     });
+
+  const rankedStaticCandidateIds = new Set(rankedStaticCandidates.map((candidate) => candidate.id));
+  const dynamicCandidates = getDynamicManifestTypographyCandidates()
+    .filter((candidate) => {
+      return candidate.eligibleRoles.includes(roleId) &&
+        !rankedStaticCandidateIds.has(candidate.id) &&
+        candidate.stage !== "legacy" &&
+        candidate.stage !== "rejected" &&
+        getRuntimePaletteIdForTypographyCandidate(candidate.id);
+    })
+    .sort((left, right) => {
+      const scoreDelta = (right.premiumSignal + right.restraintSignal) - (left.premiumSignal + left.restraintSignal);
+      if (scoreDelta !== 0) {
+        return scoreDelta;
+      }
+
+      return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
+    });
+
+  return [...rankedStaticCandidates, ...dynamicCandidates];
 };
 
 export const TYPOGRAPHY_ROLE_FALLBACK_ORDER: Record<TypographyRoleSlotId, TypographyRoleSlotId[]> = {

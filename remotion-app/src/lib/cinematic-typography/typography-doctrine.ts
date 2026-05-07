@@ -145,54 +145,6 @@ export const TYPOGRAPHY_DOCTRINE_V1: TypographyDoctrine = {
   roleSlots: TYPOGRAPHY_ROLE_SLOTS,
   candidates: [
     {
-      id: "manifest-aesthetic",
-      name: "Aesthetic",
-      source: "reference-pool",
-      stage: "candidate",
-      categories: ["display-serif"],
-      eligibleRoles: ["hero_serif_alternate", "editorial_serif_support"],
-      motionTolerance: "medium",
-      premiumSignal: 0.93,
-      restraintSignal: 0.83,
-      intensityFit: ["low", "medium", "high"],
-      notes: [
-        "Phase 2B proof subset: hydrated manifest-backed runtime bridge candidate.",
-        "Exposed narrowly so the existing selector can see at least one real manifest-backed hero/editorial option."
-      ]
-    },
-    {
-      id: "manifest-amerika",
-      name: "Amerika",
-      source: "reference-pool",
-      stage: "candidate",
-      categories: ["display-serif"],
-      eligibleRoles: ["editorial_serif_support", "display_sans_pressure_release"],
-      motionTolerance: "medium",
-      premiumSignal: 0.81,
-      restraintSignal: 0.68,
-      intensityFit: ["medium", "high"],
-      notes: [
-        "Phase 2B proof subset: hydrated manifest-backed runtime bridge candidate.",
-        "Included as a narrow proof that manifest-backed renderable families can join selector ranking without a doctrine rewrite."
-      ]
-    },
-    {
-      id: "manifest-antenna",
-      name: "ANTENNA",
-      source: "reference-pool",
-      stage: "candidate",
-      categories: ["neutral-sans"],
-      eligibleRoles: ["neutral_sans_core"],
-      motionTolerance: "high",
-      premiumSignal: 0.66,
-      restraintSignal: 0.82,
-      intensityFit: ["low", "medium", "high"],
-      notes: [
-        "Phase 2B proof subset: hydrated manifest-backed runtime bridge candidate.",
-        "Gives the selector a narrow manifest-backed neutral lane without changing the stable DM Sans fallback."
-      ]
-    },
-    {
       id: "jugendreisen",
       name: "Jugendreisen",
       source: "reference-pool",

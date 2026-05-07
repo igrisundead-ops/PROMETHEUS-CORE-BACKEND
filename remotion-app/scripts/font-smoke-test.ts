@@ -17,6 +17,8 @@ import {
 } from "../src/lib/font-intelligence/font-runtime-registry";
 import {ensureSelectedRuntimeFontLoaded} from "../src/lib/font-intelligence/font-runtime-loader";
 import {
+  getDynamicManifestTypographyCandidates,
+  getManifestBackedPalettes,
   getManifestBackedPaletteForCandidate,
   getManifestBackedPaletteForFamilyName,
   resolveRenderableTypographyFont
@@ -25,7 +27,10 @@ import {
   getEditorialFontPalette,
   getRuntimePaletteIdForTypographyCandidate
 } from "../src/lib/cinematic-typography/font-runtime-registry";
-import {selectRuntimeFontSelection} from "../src/lib/cinematic-typography/runtime-font-selector";
+import {
+  selectRuntimeFontSelection,
+  type RuntimeFontSelectionInput
+} from "../src/lib/cinematic-typography/runtime-font-selector";
 
 type BrowserProofResult = {
   browserLoadAttempted: boolean;
@@ -297,7 +302,7 @@ const main = async (): Promise<void> => {
   const proofRecord = renderableRecords[0]!;
 
   if (!proofRecord) {
-    throw new Error("Expected at least one renderable runtime font record for Phase 2A proof.");
+    throw new Error("Expected at least one renderable runtime font record.");
   }
 
   for (const record of renderableRecords) {
@@ -342,13 +347,25 @@ const main = async (): Promise<void> => {
     throw new Error(`Failed to resolve runtime font ${proofRecord.fontId} without a hidden proof default.`);
   }
 
-  const manifestBridgePalette = getManifestBackedPaletteForFamilyName("Aesthetic")
-    ?? getManifestBackedPaletteForCandidate("manifest-aesthetic");
+  const manifestBackedPalettes = getManifestBackedPalettes();
+  const dynamicManifestCandidates = getDynamicManifestTypographyCandidates();
+  const manifestFamilyCandidateCount = registry.byFamilyId.size;
+  if (manifestBackedPalettes.length !== manifestFamilyCandidateCount) {
+    throw new Error(`Dynamic manifest bridge exposed ${manifestBackedPalettes.length} family candidates, expected ${manifestFamilyCandidateCount}.`);
+  }
+  if (dynamicManifestCandidates.length !== manifestFamilyCandidateCount) {
+    throw new Error(`Dynamic manifest typography candidate count ${dynamicManifestCandidates.length} did not match manifest family candidate count ${manifestFamilyCandidateCount}.`);
+  }
+
+  const manifestBridgePalette = getManifestBackedPaletteForFamilyName("Aesthetic");
   if (!manifestBridgePalette) {
-    throw new Error("Manifest bridge failed to resolve the Phase 2B proof candidate for Aesthetic.");
+    throw new Error("Dynamic manifest bridge failed to resolve Aesthetic.");
   }
   if (!manifestBridgePalette.renderable) {
     throw new Error(`Manifest bridge returned a non-renderable palette for ${manifestBridgePalette.familyName}.`);
+  }
+  if (!manifestBridgePalette.candidateId.startsWith("manifest-family_")) {
+    throw new Error(`Dynamic manifest candidate ID did not use the expected scheme: ${manifestBridgePalette.candidateId}`);
   }
   if (manifestBridgePalette.cssFamily !== getRuntimeFontCssFamily(manifestBridgePalette.records[0]!)) {
     throw new Error(`Manifest bridge palette for ${manifestBridgePalette.familyName} did not use the deterministic CSS alias.`);
@@ -372,6 +389,21 @@ const main = async (): Promise<void> => {
     throw new Error(`Manifest bridge resolved the wrong palette for candidate ${manifestBridgePalette.candidateId}.`);
   }
 
+  const nonProofDynamicPalette = manifestBackedPalettes.find((palette) => {
+    return !["aesthetic", "amerika", "antenna"].includes(palette.familyName.trim().toLowerCase());
+  }) ?? null;
+  if (!nonProofDynamicPalette) {
+    throw new Error("Dynamic manifest bridge did not expose any non-proof family candidate beyond the old Phase 2B subset.");
+  }
+  const nonProofResolution = resolveRenderableTypographyFont({
+    familyId: nonProofDynamicPalette.familyId,
+    requestedWeight: 400,
+    requestedStyle: "normal"
+  });
+  if (!nonProofResolution) {
+    throw new Error(`Dynamic manifest bridge failed to resolve non-proof family ${nonProofDynamicPalette.familyName}.`);
+  }
+
   const bridgedPaletteId = getRuntimePaletteIdForTypographyCandidate(manifestBridgePalette.candidateId);
   if (bridgedPaletteId !== manifestBridgePalette.id) {
     throw new Error(`Old runtime registry did not prefer the manifest-backed palette for candidate ${manifestBridgePalette.candidateId}.`);
@@ -390,24 +422,91 @@ const main = async (): Promise<void> => {
     throw new Error(`Old fallback runtime registry behavior changed unexpectedly for 'fraunces'. Received '${fallbackPaletteId ?? "null"}'.`);
   }
 
-  const selectorResult = selectRuntimeFontSelection({
-    typographyRole: "headline",
-    contentEnergy: "high",
-    patternMood: "luxury",
-    targetMoods: ["luxury", "editorial"],
-    patternUnit: "word",
-    wordCount: 2,
-    emphasisCount: 1,
-    mode: "keyword-only",
-    surfaceTone: "dark",
-    motionTier: "hero",
-    semanticIntent: "name-callout",
-    presentationMode: "reel",
-    treatmentFontProfileBucket: "editorial_authority"
-  });
+  const selectorProbeConfigs: Array<{
+    label: string;
+    input: RuntimeFontSelectionInput;
+  }> = [
+    {
+      label: "hero-hint",
+      input: {
+        typographyRole: "headline" as const,
+        contentEnergy: "high" as const,
+        patternMood: "luxury" as const,
+        targetMoods: ["luxury", "editorial"],
+        patternUnit: "word" as const,
+        wordCount: 2,
+        emphasisCount: 1,
+        mode: "keyword-only" as const,
+        surfaceTone: "dark" as const,
+        motionTier: "hero" as const,
+        semanticIntent: "name-callout",
+        presentationMode: "reel" as const,
+        treatmentFontProfileBucket: "editorial_authority" as const
+      }
+    },
+    {
+      label: "neutral-hint",
+      input: {
+        typographyRole: "subtitle" as const,
+        contentEnergy: "medium" as const,
+        patternMood: "editorial" as const,
+        targetMoods: ["editorial", "tech"],
+        patternUnit: "word" as const,
+        wordCount: 6,
+        emphasisCount: 0,
+        mode: "normal" as const,
+        surfaceTone: "dark" as const,
+        motionTier: "premium" as const,
+        semanticIntent: null,
+        presentationMode: "reel" as const,
+        treatmentFontProfileBucket: "neutral_reading" as const
+      }
+    },
+    {
+      label: "display-hint",
+      input: {
+        typographyRole: "keyword" as const,
+        contentEnergy: "high" as const,
+        patternMood: "aggressive" as const,
+        targetMoods: ["aggressive", "dramatic"],
+        patternUnit: "word" as const,
+        wordCount: 1,
+        emphasisCount: 1,
+        mode: "keyword-only" as const,
+        surfaceTone: "dark" as const,
+        motionTier: "hero" as const,
+        semanticIntent: "punch-emphasis",
+        presentationMode: "reel" as const,
+        treatmentFontProfileBucket: "kinetic_display" as const
+      }
+    }
+  ];
 
-  const selectorSeesManifestCandidate = selectorResult.fontCandidateId.startsWith("manifest-")
-    && selectorResult.palette.displayFamily.includes("__prometheus_font_");
+  const selectorDynamicMatch = manifestBackedPalettes.flatMap((palette) => {
+    return selectorProbeConfigs.map((probe) => {
+      const result = selectRuntimeFontSelection({
+        ...probe.input,
+        treatmentFontProfileHint: palette.id,
+        treatmentFallbackFontProfileHint: palette.id
+      });
+      return {
+        familyName: palette.familyName,
+        probeLabel: probe.label,
+        result
+      };
+    });
+  }).find((entry) => {
+    return entry.result.fontCandidateId === entry.result.fontPaletteId &&
+      entry.result.fontCandidateId.startsWith("manifest-family_") &&
+      entry.result.palette.displayFamily.includes("__prometheus_font_");
+  }) ?? null;
+
+  if (!selectorDynamicMatch) {
+    throw new Error("Automatic selector could not select any dynamic manifest-backed candidate during the runtime bridge probe.");
+  }
+
+  const selectorResult = selectorDynamicMatch.result;
+  const selectorSeesManifestCandidate = true;
   const debugOverrideLookup = DEBUG_RUNTIME_FONT_ID
     ? await ensureSelectedRuntimeFontLoaded({debugSelectedFontId: DEBUG_RUNTIME_FONT_ID})
     : null;
@@ -427,6 +526,8 @@ const main = async (): Promise<void> => {
       {
         manifestPath,
         renderableRecords: renderableRecords.length,
+        manifestFamilyCandidates: manifestFamilyCandidateCount,
+        dynamicManifestCandidates: dynamicManifestCandidates.length,
         testedLocalPaths: renderableRecords.length,
         mode: browserProof.browserLoadAttempted ? "strict-path-css-browser-smoke-test" : "strict-path-css-smoke-test",
         proofFontId: proofRecord.fontId,
@@ -439,7 +540,11 @@ const main = async (): Promise<void> => {
         manifestBridgeUsesPublicUrl: manifestBridgePalette.publicUrls.includes(manifestBridgePalette.records[0]!.publicUrl),
         manifestBridgeFauxBoldRisk: bridgeResolution.fauxBoldRisk,
         manifestBridgeFauxItalicRisk: bridgeResolution.fauxItalicRisk,
+        nonProofDynamicFamilyName: nonProofDynamicPalette.familyName,
+        nonProofDynamicCandidateId: nonProofDynamicPalette.candidateId,
         selectorSawManifestCandidate: selectorSeesManifestCandidate,
+        selectorProbeFamilyName: selectorDynamicMatch.familyName,
+        selectorProbeLabel: selectorDynamicMatch.probeLabel,
         selectorFontCandidateId: selectorResult.fontCandidateId,
         selectorFontPaletteId: selectorResult.fontPaletteId,
         hiddenProofDefaultRequired: false,
