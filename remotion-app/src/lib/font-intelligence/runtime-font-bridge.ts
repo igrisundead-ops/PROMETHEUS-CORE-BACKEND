@@ -508,3 +508,46 @@ export const resolveRenderableTypographyFont = (
     diagnostics
   };
 };
+
+export const resolveRenderableTypographyFontForRole = ({
+  roleId,
+  requestedWeight,
+  requestedStyle
+}: {
+  roleId?: TypographyRoleSlotId | null;
+  requestedWeight?: number | null;
+  requestedStyle?: string | null;
+}): ResolvedRenderableTypographyFont | null => {
+  if (!roleId) {
+    return null;
+  }
+
+  const rankedCandidates = dynamicManifestTypographyCandidates
+    .filter((candidate) => candidate.eligibleRoles.includes(roleId))
+    .sort((left, right) => {
+      const confidenceDelta = (left.roleMappingConfidence === "medium" ? 1 : 0) - (right.roleMappingConfidence === "medium" ? 1 : 0);
+      if (confidenceDelta !== 0) {
+        return -confidenceDelta;
+      }
+
+      const signalDelta = (right.premiumSignal + right.restraintSignal) - (left.premiumSignal + left.restraintSignal);
+      if (signalDelta !== 0) {
+        return signalDelta;
+      }
+
+      return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
+    });
+
+  for (const candidate of rankedCandidates) {
+    const resolved = resolveRenderableTypographyFont({
+      candidateId: candidate.id,
+      requestedWeight,
+      requestedStyle
+    });
+    if (resolved) {
+      return resolved;
+    }
+  }
+
+  return null;
+};

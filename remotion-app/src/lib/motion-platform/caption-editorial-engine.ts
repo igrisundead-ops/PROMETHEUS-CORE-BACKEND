@@ -24,6 +24,11 @@ import {
   selectRuntimeFontSelection,
   type RuntimeFontSelection
 } from "../cinematic-typography/runtime-font-selector";
+import {
+  resolveRenderableTypographyFontForRole,
+  resolveRenderableTypographyFont,
+  type ResolvedRenderableTypographyFont
+} from "../font-intelligence/runtime-font-bridge";
 import {selectActiveMotionBackgroundOverlayCueAtTime} from "./background-overlay-planner";
 import type {
   CaptionChunk,
@@ -79,6 +84,7 @@ export type CaptionEditorialContext = {
   debugSelectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
   selectedFontId?: string | null;
   selectedFont?: ManualSelectedRuntimeFont | RuntimeFontAssetRecord | null;
+  allowAutomaticManifestRuntimeFont?: boolean;
 };
 
 export type CaptionEditorialLineStyle = {
@@ -128,11 +134,13 @@ export type CaptionEditorialDecision = {
     resolvedWeight?: number;
     availableWeights?: number[];
     fauxBoldRisk?: boolean;
+    fauxItalicRisk?: boolean;
     graphUsageScore?: number;
     genericFallbackRisk?: boolean;
     runtimeFontId?: string;
     runtimeFamilyId?: string;
     runtimeCssFamily?: string;
+    manifestBacked?: boolean;
     runtimeDiagnostics?: RuntimeFontLookupDiagnostic[];
   };
   runtimeFont?: {
@@ -316,13 +324,15 @@ const resolveCaptionEditorialTypeface = ({
   typography,
   uppercaseBias,
   fontSelection,
-  selectedRuntimeFont
+  selectedRuntimeFont,
+  manifestRuntimeFont
 }: {
   mode: CaptionEditorialMode;
   typography: TypographySelection;
   uppercaseBias: boolean;
   fontSelection: RuntimeFontSelection;
   selectedRuntimeFont?: SelectedRuntimeFont | null;
+  manifestRuntimeFont?: ResolvedRenderableTypographyFont | null;
 }): {
   fontFamily: string;
   fontWeight: number | string;
@@ -374,6 +384,14 @@ const resolveCaptionEditorialTypeface = ({
     return {
       fontFamily: selectedRuntimeFont.cssFamily,
       fontWeight: selectedRuntimeRecord.weight ?? fontSelection.resolvedWeight ?? fontWeight,
+      letterSpacing
+    };
+  }
+
+  if (manifestRuntimeFont) {
+    return {
+      fontFamily: manifestRuntimeFont.palette.displayFamily,
+      fontWeight: manifestRuntimeFont.resolvedWeight,
       letterSpacing
     };
   }
@@ -553,13 +571,29 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     ? resolveSelectedRuntimeFont(debugRuntimeFontRequest)
     : selectedRuntimeFontRequest;
   const selectedRuntimeFont = runtimeFontLookup?.selectedFont ?? null;
+  const manifestRuntimeFont = !selectedRuntimeFont && context.allowAutomaticManifestRuntimeFont
+    ? resolveRenderableTypographyFont({
+      candidateId: finalFontSelection.fontCandidateId,
+      requestedWeight: finalFontSelection.resolvedWeight ?? finalFontSelection.requestedWeight,
+      requestedStyle: "normal"
+    }) ?? resolveRenderableTypographyFontForRole({
+      roleId: finalFontSelection.selectedRoleId,
+      requestedWeight: finalFontSelection.resolvedWeight ?? finalFontSelection.requestedWeight,
+      requestedStyle: "normal"
+    })
+    : null;
+  const runtimeFontDiagnostics = [
+    ...(runtimeFontLookup?.diagnostics ?? []),
+    ...(manifestRuntimeFont?.diagnostics ?? [])
+  ];
 
   const typeface = resolveCaptionEditorialTypeface({
     mode,
     typography: finalTypography,
     uppercaseBias,
     fontSelection: finalFontSelection,
-    selectedRuntimeFont
+    selectedRuntimeFont,
+    manifestRuntimeFont
   });
 
   const keywordAnimation: CaptionKeywordAnimation = mode === "keyword-only" || finalTypography.pattern.unit === "letter"
@@ -641,9 +675,12 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     `typography-pattern=${finalTypography.pattern.id}`,
     debugRuntimeFontRequest ? "runtime-font-source=debug-override" : null,
     !debugRuntimeFontRequest && selectedRuntimeFontRequest ? "runtime-font-source=selected-font-payload" : null,
+    !debugRuntimeFontRequest && !selectedRuntimeFontRequest && manifestRuntimeFont ? "runtime-font-source=manifest-bridge-auto" : null,
     selectedRuntimeFont ? `runtime-font-id=${selectedRuntimeFont.primaryRecord.fontId}` : null,
     selectedRuntimeFont ? `runtime-font-family=${selectedRuntimeFont.cssFamily}` : null,
-    ...((runtimeFontLookup?.diagnostics ?? []).map((diagnostic) => `runtime-font-diagnostic=${diagnostic.code}`)),
+    manifestRuntimeFont ? `runtime-font-id=${manifestRuntimeFont.resolvedRecord.fontId}` : null,
+    manifestRuntimeFont ? `runtime-font-family=${manifestRuntimeFont.palette.cssFamily}` : null,
+    ...(runtimeFontDiagnostics.map((diagnostic) => `runtime-font-diagnostic=${diagnostic.code}`)),
     ...finalFontSelection.rationale,
     ...visualOrchestration.restraintPlan.reasons.map(r => `ORCHESTRATION: ${r}`),
     ...stylePhysics.rationale,
@@ -695,10 +732,12 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
     timelineRhythm,
     fontSelection: {
       ...finalFontSelection,
-      runtimeFontId: selectedRuntimeFont?.primaryRecord.fontId,
-      runtimeFamilyId: selectedRuntimeFont?.familyId,
-      runtimeCssFamily: selectedRuntimeFont?.cssFamily,
-      runtimeDiagnostics: runtimeFontLookup?.diagnostics ?? []
+      runtimeFontId: selectedRuntimeFont?.primaryRecord.fontId ?? manifestRuntimeFont?.resolvedRecord.fontId,
+      runtimeFamilyId: selectedRuntimeFont?.familyId ?? manifestRuntimeFont?.palette.familyId,
+      runtimeCssFamily: selectedRuntimeFont?.cssFamily ?? manifestRuntimeFont?.palette.cssFamily,
+      fauxItalicRisk: manifestRuntimeFont?.fauxItalicRisk ?? false,
+      manifestBacked: Boolean(manifestRuntimeFont),
+      runtimeDiagnostics: runtimeFontDiagnostics
     },
     runtimeFont: selectedRuntimeFont
       ? {
@@ -707,8 +746,17 @@ export const resolveCaptionEditorialDecision = (context: CaptionEditorialContext
         familyId: selectedRuntimeFont.familyId,
         familyName: selectedRuntimeFont.familyName,
         cssFamily: selectedRuntimeFont.cssFamily,
-        diagnostics: runtimeFontLookup?.diagnostics ?? []
+        diagnostics: runtimeFontDiagnostics
       }
+      : manifestRuntimeFont
+        ? {
+          source: "familyId",
+          fontId: manifestRuntimeFont.resolvedRecord.fontId,
+          familyId: manifestRuntimeFont.palette.familyId,
+          familyName: manifestRuntimeFont.palette.familyName,
+          cssFamily: manifestRuntimeFont.palette.cssFamily,
+          diagnostics: runtimeFontDiagnostics
+        }
       : null,
     qualityGate
   };

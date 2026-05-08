@@ -72,6 +72,44 @@ const fontLoadOptions = {
   ignoreTooManyRequestsWarning: true
 };
 
+export const resolvePreviewVisualFeatureFlags = ({
+  focusedStudioMode,
+  previewPerformanceMode,
+  showPiPShowcase
+}: {
+  focusedStudioMode: boolean;
+  previewPerformanceMode: PreviewPerformanceMode;
+  showPiPShowcase: boolean;
+}) => {
+  return {
+    showBackgroundOverlay: !focusedStudioMode && previewPerformanceMode !== "turbo" && !showPiPShowcase,
+    showMotionAssetOverlay: !focusedStudioMode && previewPerformanceMode !== "turbo" && !showPiPShowcase,
+    showMatteForeground: !focusedStudioMode && previewPerformanceMode === "full" && !showPiPShowcase,
+    showShowcaseOverlay: !focusedStudioMode && previewPerformanceMode !== "turbo" && !showPiPShowcase,
+    showSoundDesign: !focusedStudioMode && previewPerformanceMode === "full",
+    showTypographyBiasOverlay: !focusedStudioMode && !showPiPShowcase,
+    showTransitionOverlay: !focusedStudioMode && !showPiPShowcase
+  };
+};
+
+export const resolveFocusedStudioCaptionCompositor = ({
+  focusedStudioMode,
+  presentationMode,
+  hideCaptionOverlays
+}: {
+  focusedStudioMode: boolean;
+  presentationMode: PresentationModeSetting;
+  hideCaptionOverlays: boolean;
+}): "longform-word-by-word" | null => {
+  if (hideCaptionOverlays) {
+    return null;
+  }
+
+  return focusedStudioMode && presentationMode === "long-form"
+    ? "longform-word-by-word"
+    : null;
+};
+
 loadAllura("normal", fontLoadOptions);
 loadAnton("normal", fontLoadOptions);
 loadBebasNeue("normal", fontLoadOptions);
@@ -92,6 +130,7 @@ export type FemaleCoachDeanGraziosiProps = {
   readonly videoMetadata?: Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames">;
   readonly presentationMode?: PresentationModeSetting;
   readonly captionChunksOverride?: CaptionChunk[];
+  readonly captionMediaSourceKey?: string | null;
   readonly motionTier?: MotionTier | "auto";
   readonly gradeProfileId?: MotionGradeProfileId | "auto";
   readonly transitionPresetId?: string;
@@ -110,6 +149,7 @@ export type FemaleCoachDeanGraziosiProps = {
   readonly previewTimelineResetVersion?: number;
   readonly previewPerformanceMode?: PreviewPerformanceMode;
   readonly respectPreviewPerformanceModeDuringRender?: boolean;
+  readonly focusedStudioMode?: boolean;
   readonly motionModelOverride?: MotionCompositionModel | null;
   readonly disablePreviewProxyForVideoSrc?: boolean;
   readonly devFixtureExpectedPublicAssetName?: string | null;
@@ -124,6 +164,7 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
   videoMetadata = reelVideoMetadata,
   presentationMode = "auto",
   captionChunksOverride,
+  captionMediaSourceKey = null,
   motionTier = "auto",
   gradeProfileId,
   transitionPresetId = "auto",
@@ -142,6 +183,7 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
   previewTimelineResetVersion = 0,
   previewPerformanceMode = "full",
   respectPreviewPerformanceModeDuringRender = false,
+  focusedStudioMode = false,
   motionModelOverride = null,
   disablePreviewProxyForVideoSrc = false,
   devFixtureExpectedPublicAssetName = null,
@@ -157,6 +199,7 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     : previewPerformanceMode;
   const resolvedPresentationMode = resolvePresentationMode(videoMetadata, presentationMode);
   const resolvedVideoSrc = videoSrc ?? staticFile(getDefaultVideoAssetForPresentationMode(resolvedPresentationMode));
+  const isFocusedStudioMode = focusedStudioMode && !remotionEnvironment.isRendering;
   const [devFixtureMissingMessage, setDevFixtureMissingMessage] = useState<string | null>(null);
   const interactivePreviewVideoSrc = useMemo(() => {
     if (remotionEnvironment.isRendering) {
@@ -208,9 +251,18 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
       ? captionProfileId
       : getDefaultCaptionProfileIdForPresentationMode(resolvedPresentationMode)
   );
+  const previewCaptionMediaIdentity = useMemo(() => ({
+    mediaSource: captionMediaSourceKey ?? resolvedVideoSrc,
+    durationSeconds: videoMetadata.durationSeconds,
+    durationInFrames: videoMetadata.durationInFrames
+  }), [captionMediaSourceKey, resolvedVideoSrc, videoMetadata.durationInFrames, videoMetadata.durationSeconds]);
   const captionChunks = useMemo(
-    () => captionChunksOverride ?? buildPreviewCaptionChunks(resolvedCaptionProfileId, resolvedPresentationMode),
-    [captionChunksOverride, resolvedCaptionProfileId, resolvedPresentationMode]
+    () => captionChunksOverride ?? buildPreviewCaptionChunks(
+      resolvedCaptionProfileId,
+      resolvedPresentationMode,
+      previewCaptionMediaIdentity
+    ),
+    [captionChunksOverride, previewCaptionMediaIdentity, resolvedCaptionProfileId, resolvedPresentationMode]
   );
   const longformCaptionRenderMode = useMemo(
     () => getLongformCaptionRenderMode(resolvedCaptionProfileId),
@@ -250,13 +302,16 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     gradeProfile: motionModel.gradeProfile,
     backgroundOverlayPlan: motionModel.backgroundOverlayPlan,
     captionBias: motionModel.captionBias,
+    presentationMode: resolvedPresentationMode,
     motionTier: motionModel.tier,
     compositionCombatPlan: motionModel.compositionCombatPlan,
+    allowAutomaticManifestRuntimeFont: isFocusedStudioMode,
     debugSelectedFontId,
     debugSelectedFont,
     selectedFontId,
     selectedFont
   }), [
+    isFocusedStudioMode,
     debugSelectedFont,
     debugSelectedFontId,
     motionModel.backgroundOverlayPlan,
@@ -264,14 +319,29 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     motionModel.compositionCombatPlan,
     motionModel.gradeProfile,
     motionModel.tier,
+    resolvedPresentationMode,
     selectedFont,
     selectedFontId
   ]);
-  const showBackgroundOverlay = resolvedPreviewPerformanceMode !== "turbo" && !showPiPShowcase;
-  const showMotionAssetOverlay = resolvedPreviewPerformanceMode !== "turbo" && !showPiPShowcase;
-  const showMatteForeground = resolvedPreviewPerformanceMode === "full" && !showPiPShowcase;
-  const showShowcaseOverlay = resolvedPreviewPerformanceMode !== "turbo" && !showPiPShowcase;
-  const showSoundDesign = resolvedPreviewPerformanceMode === "full";
+  const focusedStudioCaptionCompositor = useMemo(() => resolveFocusedStudioCaptionCompositor({
+    focusedStudioMode: isFocusedStudioMode,
+    presentationMode: resolvedPresentationMode,
+    hideCaptionOverlays
+  }), [hideCaptionOverlays, isFocusedStudioMode, resolvedPresentationMode]);
+  const visualFeatureFlags = useMemo(() => resolvePreviewVisualFeatureFlags({
+    focusedStudioMode: isFocusedStudioMode,
+    previewPerformanceMode: resolvedPreviewPerformanceMode,
+    showPiPShowcase
+  }), [isFocusedStudioMode, resolvedPreviewPerformanceMode, showPiPShowcase]);
+  const {
+    showBackgroundOverlay,
+    showMotionAssetOverlay,
+    showMatteForeground,
+    showShowcaseOverlay,
+    showSoundDesign,
+    showTypographyBiasOverlay,
+    showTransitionOverlay
+  } = visualFeatureFlags;
 
   return (
     <AbsoluteFill className="dg-stage">
@@ -366,7 +436,7 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
           previewTimelineResetVersion={previewTimelineResetVersion}
         />
       ) : null}
-      {showPiPShowcase ? null : resolvedPresentationMode === "long-form" && longformCaptionRenderMode !== "word-by-word" ? null : (
+      {!showTypographyBiasOverlay ? null : resolvedPresentationMode === "long-form" && longformCaptionRenderMode !== "word-by-word" ? null : (
         <LongformTypographyBiasOverlay
           presentationMode={resolvedPresentationMode}
           captionBias={motionModel.captionBias}
@@ -389,14 +459,24 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
           previewTimelineResetVersion={previewTimelineResetVersion}
         />
       ) : null}
-      {showPiPShowcase ? null : (
+      {showTransitionOverlay ? (
         <MotionTransitionOverlay
           model={motionModel}
           stabilizePreviewTimeline={useRealtimePreviewPath}
           previewTimelineResetVersion={previewTimelineResetVersion}
         />
-      )}
-      {hideCaptionOverlays ? null : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "word-by-word" ? (
+      ) : null}
+      {focusedStudioCaptionCompositor === "longform-word-by-word" ? (
+        <LongformWordByWordOverlay
+          captionProfileId={resolvedCaptionProfileId}
+          chunks={captionChunks}
+          captionBias={motionModel.captionBias}
+          editorialContext={captionEditorialContext}
+          stabilizePreviewTimeline={useRealtimePreviewPath}
+          previewTimelineResetVersion={previewTimelineResetVersion}
+          premiumTypographyMode="dev-fixture-v1"
+        />
+      ) : hideCaptionOverlays ? null : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "word-by-word" ? (
         <LongformWordByWordOverlay
           captionProfileId={resolvedCaptionProfileId}
           chunks={captionChunks}
@@ -435,7 +515,7 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
           editorialContext={captionEditorialContext}
         />
       ) : null}
-      {hideCaptionOverlays ? null : resolvedPresentationMode !== "long-form" && svgCaptionChunks.length > 0 ? (
+      {focusedStudioCaptionCompositor ? null : hideCaptionOverlays ? null : resolvedPresentationMode !== "long-form" && svgCaptionChunks.length > 0 ? (
         <SvgCaptionOverlay
           chunks={svgCaptionChunks}
           captionBias={motionModel.captionBias}

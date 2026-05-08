@@ -91,6 +91,7 @@ export type CreativeAudioPreviewProps = {
   readonly videoMetadata?: Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames">;
   readonly presentationMode?: PresentationModeSetting;
   readonly captionChunksOverride?: CaptionChunk[];
+  readonly captionMediaSourceKey?: string | null;
   readonly motionTier?: MotionTier | "auto";
   readonly gradeProfileId?: MotionGradeProfileId | "auto";
   readonly transitionPresetId?: string;
@@ -348,6 +349,7 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
   videoMetadata,
   presentationMode = "auto",
   captionChunksOverride,
+  captionMediaSourceKey = null,
   motionTier = "auto",
   gradeProfileId,
   transitionPresetId = "auto",
@@ -381,8 +383,24 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
       : getDefaultCaptionProfileIdForPresentationMode(resolvedPresentationMode)
   );
   const captionChunks = useMemo(
-    () => captionChunksOverride ?? buildPreviewCaptionChunks(effectiveCaptionProfileId, resolvedPresentationMode),
-    [captionChunksOverride, effectiveCaptionProfileId, resolvedPresentationMode]
+    () => captionChunksOverride ?? buildPreviewCaptionChunks(
+      effectiveCaptionProfileId,
+      resolvedPresentationMode,
+      {
+        mediaSource: captionMediaSourceKey ?? sourceAudioSrc ?? null,
+        durationSeconds: resolvedVideoMetadata.durationSeconds,
+        durationInFrames: resolvedVideoMetadata.durationInFrames
+      }
+    ),
+    [
+      captionChunksOverride,
+      captionMediaSourceKey,
+      effectiveCaptionProfileId,
+      resolvedPresentationMode,
+      resolvedVideoMetadata.durationInFrames,
+      resolvedVideoMetadata.durationSeconds,
+      sourceAudioSrc
+    ]
   );
   const longformCaptionRenderMode = useMemo(
     () => getLongformCaptionRenderMode(effectiveCaptionProfileId),
