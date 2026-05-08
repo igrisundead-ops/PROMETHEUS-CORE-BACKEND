@@ -263,6 +263,27 @@ type LongformSemanticGraphicAssetRule = {
   matchers: RegExp[];
 };
 
+// Visual quality gate 1:
+// Keep literal semantic graphic sidecalls disabled until the asset set is editorially premium-ready.
+export const ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS = false;
+export const ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS = false;
+export const ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS = false;
+
+const UNSAFE_SEMANTIC_PREVIEW_TEXT_PATTERNS = [
+  /retrieval-assets/i,
+  /does not exist/i,
+  /[a-z]:\\/i,
+  /\/public\//i,
+  /\.html\b/i,
+  /\.tsx?\b/i,
+  /error:/i,
+  /\benoent\b/i,
+  /graphic asset/i,
+  /text capsule/i,
+  /title keyword/i,
+  /sidecall/i
+] as const;
+
 const GRAPHIC_ASSET_RULES: LongformSemanticGraphicAssetRule[] = [
   {
     asset: {
@@ -383,9 +404,32 @@ const matchesAny = (text: string, matchers: RegExp[]): boolean => {
   return matchers.some((matcher) => matcher.test(text));
 };
 
+export const sanitizeLongformSemanticPreviewText = (
+  value: string | null | undefined
+): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = cleanText(value);
+  if (!normalized) {
+    return null;
+  }
+
+  if (UNSAFE_SEMANTIC_PREVIEW_TEXT_PATTERNS.some((pattern) => pattern.test(normalized))) {
+    return null;
+  }
+
+  return normalized;
+};
+
 export const resolveLongformSemanticGraphicAsset = (
   chunk: CaptionChunk
 ): LongformSemanticGraphicAsset | null => {
+  if (!ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS) {
+    return null;
+  }
+
   const text = getCleanText(chunk).toLowerCase();
   if (!text) {
     return null;
@@ -401,6 +445,10 @@ export const resolveLongformSemanticGraphicAsset = (
 };
 
 export const hasLongformSemanticGraphicAsset = (chunk: CaptionChunk): boolean => {
+  if (!ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS) {
+    return false;
+  }
+
   return resolveLongformSemanticGraphicAsset(chunk) !== null;
 };
 

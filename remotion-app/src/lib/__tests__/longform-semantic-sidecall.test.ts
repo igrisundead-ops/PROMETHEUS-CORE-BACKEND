@@ -1,9 +1,20 @@
 import {describe, expect, it} from "vitest";
 
 import {
+  ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS,
+  ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS,
   buildLongformSemanticSidecallPresentation,
-  getLongformSemanticSidecallKeywords
+  hasLongformSemanticGraphicAsset,
+  getLongformSemanticSidecallKeywords,
+  sanitizeLongformSemanticPreviewText
 } from "../longform-semantic-sidecall";
+import {
+  ENABLE_PREVIEW_INTERNAL_DIAGNOSTIC_TEXT,
+  ENABLE_PREVIEW_RETRIEVAL_OVERLAY_ASSETS,
+  sanitizeRenderableOverlayText,
+  shouldRenderOverlayText,
+  shouldRenderPreviewOverlayAsset
+} from "../motion-platform/render-text-safety";
 import type {CaptionChunk} from "../types";
 
 const makeChunk = (partial: Partial<CaptionChunk>): CaptionChunk => ({
@@ -55,7 +66,7 @@ describe("longform semantic sidecall presentation", () => {
     expect(getLongformSemanticSidecallKeywords({chunk})[0]).toBe("Gary Vee");
   });
 
-  it("attaches graphic assets for thought and capsule cues", () => {
+  it("keeps literal semantic graphic assets gated off by default", () => {
     const thinkingChunk = makeChunk({
       text: "I need to think about the choice.",
       words: [
@@ -83,12 +94,51 @@ describe("longform semantic sidecall presentation", () => {
       ]
     });
 
-    expect(buildLongformSemanticSidecallPresentation({chunk: thinkingChunk}).graphicAsset?.assetId).toBe(
-      "thinking-concrete-choice"
-    );
-    expect(buildLongformSemanticSidecallPresentation({chunk: capsuleChunk}).graphicAsset?.assetId).toBe(
-      "send-messagea"
-    );
+    expect(ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS).toBe(false);
+    expect(hasLongformSemanticGraphicAsset(thinkingChunk)).toBe(false);
+    expect(hasLongformSemanticGraphicAsset(capsuleChunk)).toBe(false);
+    expect(buildLongformSemanticSidecallPresentation({chunk: thinkingChunk}).graphicAsset).toBeNull();
+    expect(buildLongformSemanticSidecallPresentation({chunk: capsuleChunk}).graphicAsset).toBeNull();
+  });
+
+  it("keeps semantic sidecall overlays gated off by default", () => {
+    expect(ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS).toBe(false);
+  });
+
+  it("suppresses retrieval paths and debug-card text in preview-safe overlay text", () => {
+    expect(sanitizeLongformSemanticPreviewText("retrieval-assets/missing/card.png does not exist")).toBeNull();
+    expect(sanitizeLongformSemanticPreviewText("C:\\\\repo\\\\public\\\\retrieval-assets\\\\card.tsx")).toBeNull();
+    expect(sanitizeLongformSemanticPreviewText("GRAPHIC ASSET")).toBeNull();
+    expect(sanitizeLongformSemanticPreviewText("TITLE KEYWORD")).toBeNull();
+    expect(sanitizeLongformSemanticPreviewText("Editorial keyword")).toBe("Editorial keyword");
+  });
+
+  it("keeps preview internal diagnostic text disabled by default", () => {
+    expect(ENABLE_PREVIEW_INTERNAL_DIAGNOSTIC_TEXT).toBe(false);
+    expect(ENABLE_PREVIEW_RETRIEVAL_OVERLAY_ASSETS).toBe(false);
+  });
+
+  it("suppresses internal diagnostics and preserves normal caption text at the central render boundary", () => {
+    expect(sanitizeRenderableOverlayText("C:\\\\Users\\\\HomePC\\\\retrieval-assets\\\\card.html does not exist")).toBe("");
+    expect(sanitizeRenderableOverlayText("retrieval-assets/demo/card.tsx")).toBe("");
+    expect(sanitizeRenderableOverlayText("Error: Cannot find /public/demo.ts")).toBe("");
+    expect(shouldRenderOverlayText("Normal caption text")).toBe(true);
+    expect(sanitizeRenderableOverlayText("Normal caption text")).toBe("Normal caption text");
+  });
+
+  it("suppresses retrieval-backed html overlay assets by default", () => {
+    expect(shouldRenderPreviewOverlayAsset({
+      src: "retrieval-assets/structured-animation-typewriter/typewriter.html",
+      renderMode: "iframe",
+      sourceKind: "authoring-batch",
+      sourceHtml: "C:\\\\Users\\\\HomePC\\\\Downloads\\\\typewriter.html"
+    })).toBe(false);
+
+    expect(shouldRenderPreviewOverlayAsset({
+      src: "showcase-assets/imports/prometheus-concrete/thinking.png",
+      renderMode: "image",
+      sourceKind: "local-public"
+    })).toBe(true);
   });
 
   it("builds a step sequence layout when the transcript mentions ordered steps", () => {

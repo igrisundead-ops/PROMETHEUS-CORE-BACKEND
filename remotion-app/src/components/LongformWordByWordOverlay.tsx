@@ -10,11 +10,16 @@ import {
 } from "./LongformWordEmphasisAdornment";
 import type {LongformWordEmphasisPrimitiveId} from "./LongformWordEmphasisAdornment";
 import {LongformSemanticSidecallOverlay} from "./LongformSemanticSidecallOverlay";
+import {ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS} from "../lib/longform-semantic-sidecall";
 import {
   resolveCaptionEditorialDecision,
   type CaptionEditorialContext,
   type CaptionEditorialDecision
 } from "../lib/motion-platform/caption-editorial-engine";
+import {
+  sanitizeRenderableOverlayText,
+  shouldRenderOverlayText
+} from "../lib/motion-platform/render-text-safety";
 import {getCaptionContainerStyle, longformCaptionSafeZone} from "../lib/caption-layout";
 import {getLongformCaptionSizing} from "../lib/longform-caption-scale";
 import {resolveActiveLongformNumericTreatment} from "../lib/longform-numeric-treatment";
@@ -207,8 +212,11 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
 
     return getLongformWordByWordFallbackModeForProfile(captionProfileId, activeChunk, editorialContext);
   }, [activeChunk, captionProfileId, editorialContext]);
+  const effectiveFallbackMode = fallbackMode === "semantic-sidecall" && !ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS
+    ? null
+    : fallbackMode;
   const emphasisBudgetMap = useMemo(() => {
-    if (fallbackMode) {
+    if (effectiveFallbackMode) {
       return new Map<string, LongformWordEmphasisPrimitiveId>();
     }
 
@@ -216,9 +224,9 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
       chunks,
       currentTimeMs
     });
-  }, [chunks, currentTimeMs, fallbackMode]);
+  }, [chunks, currentTimeMs, effectiveFallbackMode]);
   const preparedChunks = useMemo(() => {
-    if (fallbackMode) {
+    if (effectiveFallbackMode) {
       return new Map<string, PreparedLongformChunk>();
     }
 
@@ -244,7 +252,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
         return [chunk.id, {lines, wordMetaByKey}];
       })
     );
-  }, [chunks, fallbackMode]);
+  }, [chunks, effectiveFallbackMode]);
   const activeChunkPresentation = activeChunk ? preparedChunks.get(activeChunk.id) ?? null : null;
   const lines = activeChunkPresentation?.lines ?? [];
   const captionSizing = useMemo(() => getLongformCaptionSizing({
@@ -254,7 +262,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
     lineCount: lines.length
   }), [height, lines, width]);
   const activeNumericTreatment = useMemo(() => {
-    if (fallbackMode) {
+    if (effectiveFallbackMode) {
       return null;
     }
 
@@ -263,13 +271,17 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
       activeChunk,
       currentTimeMs
     });
-  }, [activeChunk, chunks, currentTimeMs, fallbackMode]);
+  }, [activeChunk, chunks, currentTimeMs, effectiveFallbackMode]);
 
   if (!activeChunk || activeChunk.words.length === 0) {
     return null;
   }
 
-  if (editorialDecision.mode !== "normal") {
+  if (!shouldRenderOverlayText(activeChunk.text)) {
+    return null;
+  }
+
+  if (editorialDecision.mode !== "normal" && ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS) {
     return (
       <LongformSemanticSidecallOverlay
         chunks={chunks}
@@ -280,7 +292,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
     );
   }
 
-  if (fallbackMode === "semantic-sidecall") {
+  if (effectiveFallbackMode === "semantic-sidecall") {
     return (
       <LongformSemanticSidecallOverlay
         chunks={chunks}
@@ -291,7 +303,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
     );
   }
 
-  if (fallbackMode === "docked-inverse") {
+  if (effectiveFallbackMode === "docked-inverse") {
     return (
       <LongformDockedInverseOverlay
         chunks={chunks}
@@ -368,6 +380,15 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
           }}
         >
           {lines.map((line, lineIndex) => {
+            const safeLineWords = line.words
+              .map((word) => ({
+                word,
+                safeText: sanitizeRenderableOverlayText(word.text)
+              }))
+              .filter((entry) => entry.safeText.length > 0);
+            if (safeLineWords.length === 0) {
+              return null;
+            }
             const lineStyle = usesTwoLineHandoff
               ? getTwoLineStyle({lineIndex, handoffProgress})
               : getSingleLineStyle();
@@ -384,7 +405,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
                   whiteSpace: "nowrap"
                 }}
               >
-                {line.words.map((word, wordIndex) => {
+                {safeLineWords.map(({word, safeText}, wordIndex) => {
                   const wordKey = getLongformWordEmphasisWordKey(word);
                   const wordMeta = activeChunkPresentation?.wordMetaByKey.get(wordKey);
                   const chunkWordIndex = wordMeta?.chunkWordIndex ?? wordIndex;
@@ -424,7 +445,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
                         currentTimeMs={currentTimeMs}
                         resolvedPrimitiveId={resolvedPrimitiveId}
                       />
-                      {word.text}
+                      {safeText}
                     </span>
                   );
                 })}

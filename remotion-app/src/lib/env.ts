@@ -1,5 +1,3 @@
-import {config as loadDotenv} from "dotenv";
-import path from "node:path";
 import {z} from "zod";
 
 import type {AppEnv} from "./types";
@@ -44,6 +42,14 @@ export const loadEnv = (): AppEnv => {
   if (cachedEnv) {
     return cachedEnv;
   }
+
+  const nodeRequire = (0, eval)("require") as (specifier: string) => unknown;
+  const {config: loadDotenv} = nodeRequire("dotenv") as {
+    config: (options?: {path?: string; override?: boolean}) => void;
+  };
+  const path = nodeRequire("node:path") as {
+    resolve: (...segments: string[]) => string;
+  };
 
   loadDotenv();
   loadDotenv({

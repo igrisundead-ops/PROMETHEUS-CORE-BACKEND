@@ -1,5 +1,5 @@
-import React, {useMemo} from "react";
-import {AbsoluteFill, staticFile, useRemotionEnvironment} from "remotion";
+import React, {useEffect, useMemo, useState} from "react";
+import {AbsoluteFill, getStaticFiles, staticFile, useRemotionEnvironment, watchStaticFile} from "remotion";
 import {loadFont as loadAllura} from "@remotion/google-fonts/Allura";
 import {loadFont as loadAnton} from "@remotion/google-fonts/Anton";
 import {loadFont as loadBebasNeue} from "@remotion/google-fonts/BebasNeue";
@@ -37,6 +37,7 @@ import {SvgCaptionOverlay, isSvgCaptionChunk} from "../components/SvgCaptionOver
 import reelVideoMetadata from "../data/video.metadata.json" with {type: "json"};
 import {loadEditorialCaptionFonts} from "../lib/cinematic-typography/editorial-fonts";
 import type {ManualSelectedRuntimeFont} from "../lib/font-intelligence/font-runtime-registry";
+import {ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS} from "../lib/longform-semantic-sidecall";
 import {buildPreviewCaptionChunks} from "../lib/preview-caption-data";
 import {LONGFORM_SAFE_MOTION_ASSET_FAMILIES} from "../lib/motion-platform/asset-manifests";
 import {
@@ -110,6 +111,8 @@ export type FemaleCoachDeanGraziosiProps = {
   readonly previewPerformanceMode?: PreviewPerformanceMode;
   readonly respectPreviewPerformanceModeDuringRender?: boolean;
   readonly motionModelOverride?: MotionCompositionModel | null;
+  readonly disablePreviewProxyForVideoSrc?: boolean;
+  readonly devFixtureExpectedPublicAssetName?: string | null;
   readonly debugSelectedFontId?: string | null;
   readonly debugSelectedFont?: ManualSelectedRuntimeFont | null;
   readonly selectedFontId?: string | null;
@@ -140,6 +143,8 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
   previewPerformanceMode = "full",
   respectPreviewPerformanceModeDuringRender = false,
   motionModelOverride = null,
+  disablePreviewProxyForVideoSrc = false,
+  devFixtureExpectedPublicAssetName = null,
   debugSelectedFontId,
   debugSelectedFont,
   selectedFontId,
@@ -152,8 +157,13 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     : previewPerformanceMode;
   const resolvedPresentationMode = resolvePresentationMode(videoMetadata, presentationMode);
   const resolvedVideoSrc = videoSrc ?? staticFile(getDefaultVideoAssetForPresentationMode(resolvedPresentationMode));
+  const [devFixtureMissingMessage, setDevFixtureMissingMessage] = useState<string | null>(null);
   const interactivePreviewVideoSrc = useMemo(() => {
     if (remotionEnvironment.isRendering) {
+      return resolvedVideoSrc;
+    }
+
+    if (disablePreviewProxyForVideoSrc) {
       return resolvedVideoSrc;
     }
 
@@ -166,7 +176,33 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
     }
 
     return resolvedVideoSrc.replace(/\.mp4$/i, ".preview.mp4");
-  }, [remotionEnvironment.isRendering, resolvedPreviewPerformanceMode, resolvedVideoSrc]);
+  }, [disablePreviewProxyForVideoSrc, remotionEnvironment.isRendering, resolvedPreviewPerformanceMode, resolvedVideoSrc]);
+  useEffect(() => {
+    if (
+      remotionEnvironment.isRendering ||
+      !devFixtureExpectedPublicAssetName ||
+      typeof window === "undefined"
+    ) {
+      setDevFixtureMissingMessage(null);
+      return;
+    }
+
+    const missingFixtureMessage = "Missing Studio dev fixture video. Place test-video.mp4 at remotion-app/public/dev-fixtures/test-video.mp4.";
+    const syncFixturePresence = (isPresent: boolean) => {
+      setDevFixtureMissingMessage(isPresent ? null : missingFixtureMessage);
+    };
+
+    const matchingFile = getStaticFiles().find((file) => file.name === devFixtureExpectedPublicAssetName);
+    syncFixturePresence(Boolean(matchingFile));
+
+    const watcher = watchStaticFile(devFixtureExpectedPublicAssetName, (file) => {
+      syncFixturePresence(Boolean(file));
+    });
+
+    return () => {
+      watcher.cancel();
+    };
+  }, [devFixtureExpectedPublicAssetName, remotionEnvironment.isRendering]);
   const resolvedCaptionProfileId = normalizeCaptionStyleProfileId(
     captionProfileId && captionProfileId !== "auto"
       ? captionProfileId
@@ -239,6 +275,35 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
 
   return (
     <AbsoluteFill className="dg-stage">
+      {devFixtureMissingMessage ? (
+        <AbsoluteFill
+          style={{
+            zIndex: 1000,
+            pointerEvents: "none",
+            display: "grid",
+            placeItems: "start center",
+            paddingTop: 24
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 960,
+              margin: "0 24px",
+              padding: "14px 18px",
+              borderRadius: 14,
+              background: "rgba(12, 16, 28, 0.92)",
+              color: "#F8FAFC",
+              border: "1px solid rgba(248, 113, 113, 0.35)",
+              boxShadow: "0 18px 44px rgba(0, 0, 0, 0.28)",
+              fontFamily: "ui-sans-serif, system-ui, sans-serif",
+              fontSize: 14,
+              lineHeight: 1.5
+            }}
+          >
+            {devFixtureMissingMessage}
+          </div>
+        </AbsoluteFill>
+      ) : null}
       <MotionVideoBackdrop
         model={motionModel}
         videoSrc={interactivePreviewVideoSrc}
@@ -347,9 +412,18 @@ export const FemaleCoachDeanGraziosi: React.FC<FemaleCoachDeanGraziosiProps> = (
           stabilizePreviewTimeline={useRealtimePreviewPath}
           previewTimelineResetVersion={previewTimelineResetVersion}
         />
-      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" ? (
+      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" && ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS ? (
         <LongformSemanticSidecallOverlay
           chunks={captionChunks}
+          editorialContext={captionEditorialContext}
+          stabilizePreviewTimeline={useRealtimePreviewPath}
+          previewTimelineResetVersion={previewTimelineResetVersion}
+        />
+      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" ? (
+        <LongformWordByWordOverlay
+          captionProfileId={resolvedCaptionProfileId}
+          chunks={captionChunks}
+          captionBias={motionModel.captionBias}
           editorialContext={captionEditorialContext}
           stabilizePreviewTimeline={useRealtimePreviewPath}
           previewTimelineResetVersion={previewTimelineResetVersion}

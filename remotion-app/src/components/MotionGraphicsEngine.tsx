@@ -14,6 +14,7 @@ import {
   resolveGradeProfile
 } from "../lib/motion-platform/grade-profiles";
 import {resolveControlledBackgroundScale} from "../lib/motion-platform/caption-editorial-engine";
+import {shouldRenderPreviewOverlayAsset} from "../lib/motion-platform/render-text-safety";
 import {useStablePreviewFrame} from "../lib/preview-runtime-stability";
 import {
   buildMotionCompositionModel,
@@ -267,6 +268,10 @@ const MotionAssetItem: React.FC<{
   fps: number;
   choreographyTransform?: MotionTransformValue | null;
 }> = ({asset, scene, currentTimeMs, fps, choreographyTransform}) => {
+  if (!shouldRenderPreviewOverlayAsset(asset)) {
+    return null;
+  }
+
   const {entryProgress, exitProgress} = getSceneTransitionState({scene, currentTimeMs, fps});
   const entryRules = scene.transitionInPreset.entryRules;
   const exitRules = scene.transitionOutPreset.exitRules;
@@ -344,6 +349,9 @@ const MotionGraphicsDecisionItem: React.FC<{
   }
 
   const asset = selectedAsset.asset;
+  if (!shouldRenderPreviewOverlayAsset(asset)) {
+    return null;
+  }
   const placement = resolveMotionDecisionAssetPlacement({
     selectedAsset,
     decision

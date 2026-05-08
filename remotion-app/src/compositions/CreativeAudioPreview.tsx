@@ -33,6 +33,7 @@ import {SvgCaptionOverlay, isSvgCaptionChunk} from "../components/SvgCaptionOver
 import {MotionShowcaseOverlay} from "../components/MotionShowcaseOverlay";
 import {loadEditorialCaptionFonts} from "../lib/cinematic-typography/editorial-fonts";
 import type {ManualSelectedRuntimeFont} from "../lib/font-intelligence/font-runtime-registry";
+import {ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS} from "../lib/longform-semantic-sidecall";
 import {buildPreviewCaptionChunks} from "../lib/preview-caption-data";
 import {
   getDefaultCaptionProfileIdForPresentationMode,
@@ -554,9 +555,18 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
           stabilizePreviewTimeline={false}
           previewTimelineResetVersion={previewTimelineResetVersion}
         />
-      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" ? (
+      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" && ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS ? (
         <LongformSemanticSidecallOverlay
           chunks={captionChunks}
+          editorialContext={captionEditorialContext}
+          stabilizePreviewTimeline={false}
+          previewTimelineResetVersion={previewTimelineResetVersion}
+        />
+      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" ? (
+        <LongformWordByWordOverlay
+          captionProfileId={effectiveCaptionProfileId}
+          chunks={captionChunks}
+          captionBias={motionModel.captionBias}
           editorialContext={captionEditorialContext}
           stabilizePreviewTimeline={false}
           previewTimelineResetVersion={previewTimelineResetVersion}

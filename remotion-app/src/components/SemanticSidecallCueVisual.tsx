@@ -1,6 +1,11 @@
 import React, {type CSSProperties} from "react";
 
 import {AzureGAnimatedCounter} from "./AzureGAnimatedCounter";
+import {
+  ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS,
+  ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS,
+  sanitizeLongformSemanticPreviewText
+} from "../lib/longform-semantic-sidecall";
 import type {MotionShowcaseCue, TemplateGraphicCategory} from "../lib/types";
 
 type SemanticSidecallCueVisualProps = {
@@ -128,13 +133,14 @@ const extractMetricText = (value: string): string | null => {
 };
 
 const getDisplayPhrase = (cue: MotionShowcaseCue): string => {
+  const safeMatchedText = sanitizeLongformSemanticPreviewText(cue.matchedText);
   if (cue.cueSource === "typography-only") {
-    return truncateWords(cue.matchedText, 4);
+    return truncateWords(safeMatchedText ?? cue.canonicalLabel, 4);
   }
   if (cue.templateGraphicCategory === "number-counter-kpi") {
-    return extractMetricText(cue.matchedText) ?? truncateWords(cue.matchedText, 3);
+    return extractMetricText(safeMatchedText ?? "") ?? truncateWords(safeMatchedText ?? cue.canonicalLabel, 3);
   }
-  return truncateWords(cue.matchedText, 5);
+  return truncateWords(safeMatchedText ?? cue.canonicalLabel, 5);
 };
 
 const getDescriptor = (cue: MotionShowcaseCue): string => {
@@ -251,6 +257,14 @@ const buildTagStyle = (cue: MotionShowcaseCue): CSSProperties => {
 };
 
 const GraphicHeader: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
+  if (!ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS) {
+    return (
+      <div style={{display: "flex", marginBottom: 12}}>
+        <div style={headerBarStyle(cue)} />
+      </div>
+    );
+  }
+
   return (
     <div style={headerStyle(cue)}>
       <span>{getDescriptor(cue)}</span>
@@ -285,10 +299,12 @@ const TypographyPlate: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
         >
           {toTitleLike(phrase)}
         </div>
-        <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
-          <span style={buildTagStyle(cue)}>{cue.canonicalLabel}</span>
-          <span style={buildTagStyle(cue)}>{cue.governorAction === "text-only-accent" ? "Typography" : "Sidecall"}</span>
-        </div>
+        {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+          <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
+            <span style={buildTagStyle(cue)}>{cue.canonicalLabel}</span>
+            <span style={buildTagStyle(cue)}>{cue.governorAction === "text-only-accent" ? "Typography" : "Sidecall"}</span>
+          </div>
+        ) : null}
       </div>
       <div
         style={{
@@ -314,17 +330,19 @@ const PersonCalloutGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
           padding: "4px 0 2px"
         }}
       >
-        <div
-          style={{
-            color: "rgba(241, 246, 255, 0.84)",
-            fontFamily: "\"Great Vibes\", \"Allura\", cursive",
-            fontSize: "clamp(1.2rem, 2vw, 1.6rem)",
-            lineHeight: 1,
-            letterSpacing: "0.02em"
-          }}
-        >
-          Reference person
-        </div>
+        {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+          <div
+            style={{
+              color: "rgba(241, 246, 255, 0.84)",
+              fontFamily: "\"Great Vibes\", \"Allura\", cursive",
+              fontSize: "clamp(1.2rem, 2vw, 1.6rem)",
+              lineHeight: 1,
+              letterSpacing: "0.02em"
+            }}
+          >
+            Reference person
+          </div>
+        ) : null}
         <div
           style={{
             color: accent.text,
@@ -338,11 +356,13 @@ const PersonCalloutGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
         >
           {personPhrase}
         </div>
-        <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
-          <span style={buildTagStyle(cue)}>Named cue</span>
-          <span style={buildTagStyle(cue)}>Person</span>
-          <span style={buildTagStyle(cue)}>{cue.governorAction === "text-only-accent" ? "Typography" : "Showcase"}</span>
-        </div>
+        {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+          <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
+            <span style={buildTagStyle(cue)}>Named cue</span>
+            <span style={buildTagStyle(cue)}>Person</span>
+            <span style={buildTagStyle(cue)}>{cue.governorAction === "text-only-accent" ? "Typography" : "Showcase"}</span>
+          </div>
+        ) : null}
       </div>
       <div
         style={{
@@ -390,10 +410,12 @@ const GraphChartGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
           >
             {toTitleLike(phrase)}
           </div>
-          <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
-            <span style={buildTagStyle(cue)}>Graph</span>
-            <span style={buildTagStyle(cue)}>Momentum</span>
-          </div>
+          {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+            <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
+              <span style={buildTagStyle(cue)}>Graph</span>
+              <span style={buildTagStyle(cue)}>Momentum</span>
+            </div>
+          ) : null}
         </div>
         <div
           style={{
@@ -458,10 +480,12 @@ const NumberCounterGraphic: React.FC<{cue: MotionShowcaseCue; visibility: number
       <GraphicHeader cue={cue} />
       <div style={{display: "grid", gap: 10, padding: "2px 0 4px"}}>
         <AzureGAnimatedCounter cue={cue} visibility={visibility} accent={accent} />
-        <div style={{display: "flex", gap: 8}}>
-          <span style={buildTagStyle(cue)}>KPI</span>
-          <span style={buildTagStyle(cue)}>{cue.canonicalLabel}</span>
-        </div>
+        {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+          <div style={{display: "flex", gap: 8}}>
+            <span style={buildTagStyle(cue)}>KPI</span>
+            <span style={buildTagStyle(cue)}>{cue.canonicalLabel}</span>
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -530,17 +554,19 @@ const TimelineGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
             >
               {item}
             </div>
-            <div
-              style={{
-                color: "rgba(205,214,234,0.72)",
-                fontFamily: "\"DM Sans\", sans-serif",
-                fontSize: "0.7rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase"
-              }}
-            >
-              {index === 1 ? "Current marker" : "Sequence"}
-            </div>
+            {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+              <div
+                style={{
+                  color: "rgba(205,214,234,0.72)",
+                  fontFamily: "\"DM Sans\", sans-serif",
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase"
+                }}
+              >
+                {index === 1 ? "Current marker" : "Sequence"}
+              </div>
+            ) : null}
           </div>
         ))}
       </div>
@@ -607,18 +633,20 @@ const BlueprintGraphic: React.FC<{cue: MotionShowcaseCue}> = ({cue}) => {
             >
               {node.label}
             </div>
-            <div
-              style={{
-                color: accent.primary,
-                fontFamily: "\"DM Sans\", sans-serif",
-                fontSize: "0.66rem",
-                fontWeight: 800,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase"
-              }}
-            >
-              {index === 1 ? "Active trace" : "Node"}
-            </div>
+            {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+              <div
+                style={{
+                  color: accent.primary,
+                  fontFamily: "\"DM Sans\", sans-serif",
+                  fontSize: "0.66rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase"
+                }}
+              >
+                {index === 1 ? "Active trace" : "Node"}
+              </div>
+            ) : null}
           </div>
         ))}
       </div>
@@ -644,14 +672,29 @@ const TemplateGraphic: React.FC<{
 };
 
 export const SemanticSidecallCueVisual: React.FC<SemanticSidecallCueVisualProps> = (props) => {
+  if (!ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS) {
+    return null;
+  }
+
   const {cue} = props;
+  const safeCanonicalLabel = sanitizeLongformSemanticPreviewText(cue.canonicalLabel);
+  const safeMatchedText = sanitizeLongformSemanticPreviewText(cue.matchedText);
+  if (!safeCanonicalLabel && !safeMatchedText) {
+    return null;
+  }
+
   const overlayOpacity = 0.3 + clamp01(props.visibility) * 0.5;
   const accent = getCueAccent(cue);
-  const usePersonCallout = cue.cueSource === "typography-only" && looksLikePersonReference(cue);
+  const sanitizedCue: MotionShowcaseCue = {
+    ...cue,
+    canonicalLabel: safeCanonicalLabel ?? cue.canonicalLabel,
+    matchedText: safeMatchedText ?? cue.canonicalLabel
+  };
+  const usePersonCallout = sanitizedCue.cueSource === "typography-only" && looksLikePersonReference(sanitizedCue);
 
   return (
     <div
-      style={cardShellStyle(props)}
+      style={cardShellStyle({...props, cue: sanitizedCue})}
       data-animation-registry-ref="host:semantic-sidecall-cue-visual"
       data-animation-tags="semantic-sidecall template-graphic svg focus-target"
     >
@@ -677,11 +720,11 @@ export const SemanticSidecallCueVisual: React.FC<SemanticSidecallCueVisualProps>
         }}
       />
       <div style={{position: "relative", zIndex: 1}}>
-        {cue.cueSource === "template-graphic" && cue.templateGraphicCategory
-          ? <TemplateGraphic cue={cue} category={cue.templateGraphicCategory} visibility={props.visibility} />
+        {sanitizedCue.cueSource === "template-graphic" && sanitizedCue.templateGraphicCategory
+          ? <TemplateGraphic cue={sanitizedCue} category={sanitizedCue.templateGraphicCategory} visibility={props.visibility} />
           : usePersonCallout
-            ? <PersonCalloutGraphic cue={cue} />
-            : <TypographyPlate cue={cue} />}
+            ? <PersonCalloutGraphic cue={sanitizedCue} />
+            : <TypographyPlate cue={sanitizedCue} />}
       </div>
     </div>
   );

@@ -20,6 +20,18 @@ const envCaptionProfileId = typeof process !== "undefined" ? process.env.CAPTION
 const defaultCaptionProfileId = envCaptionProfileId?.trim()
   ? normalizeCaptionStyleProfileId(envCaptionProfileId)
   : undefined;
+const DEV_FIXTURE_LONGFORM_VIDEO_ASSET = "dev-fixtures/test-video.mp4";
+const DEV_FIXTURE_LONGFORM_COMPOSITION_ID = "MaleHeadVideoLongFormDevFixture";
+const KNOWN_STUDIO_COMPOSITION_IDS = new Set([
+  "FemaleCoachDeanGraziosi",
+  "MaleHeadVideoLongForm",
+  DEV_FIXTURE_LONGFORM_COMPOSITION_ID,
+  LONGFORM_DRAFT_COMPOSITION_ID,
+  "Cinematic3DDemo",
+  "CinematicChoreographyProof",
+  "TargetFocusZoomShowcase",
+  "CinematicPiPShowcase"
+]);
 const reelPreset = getPresentationPreset("reel");
 const longFormPreset = getPresentationPreset("long-form");
 const longFormDraftVideoMetadata = getLongformDraftVideoMetadata(longFormPreset.videoMetadata);
@@ -46,6 +58,14 @@ const cinematicPiPShowcaseVideoMetadata = {
 };
 
 export const RemotionRoot: React.FC = () => {
+  if (typeof window !== "undefined" && window.remotion_isReadOnlyStudio) {
+    const pathname = window.location.pathname.replace(/^\/+/, "");
+    if (pathname && !window.location.search && KNOWN_STUDIO_COMPOSITION_IDS.has(pathname)) {
+      // Read-only Studio expects routes in ?/CompositionId form, not /CompositionId.
+      window.history.replaceState({}, "Studio", `/?/${pathname}`);
+    }
+  }
+
   return (
     <>
       <HouseFontBootstrap />
@@ -89,6 +109,31 @@ export const RemotionRoot: React.FC = () => {
           motion3DMode: "editorial",
           stabilizePreviewTimeline: true,
           previewPerformanceMode: "balanced"
+        }}
+      />
+      <Composition
+        id={DEV_FIXTURE_LONGFORM_COMPOSITION_ID}
+        component={FemaleCoachDeanGraziosi}
+        width={longFormPreset.videoMetadata.width}
+        height={longFormPreset.videoMetadata.height}
+        fps={longFormPreset.videoMetadata.fps}
+        durationInFrames={longFormPreset.videoMetadata.durationInFrames}
+        defaultProps={{
+          // Dev-only Studio fixture: drop a browser-safe test asset into public/dev-fixtures/test-video.mp4.
+          videoSrc: staticFile(DEV_FIXTURE_LONGFORM_VIDEO_ASSET),
+          videoMetadata: longFormPreset.videoMetadata,
+          presentationMode: longFormPreset.presentationMode,
+          motionTier: "auto",
+          gradeProfileId: "auto",
+          transitionPresetId: "auto",
+          matteMode: "auto",
+          captionBias: "auto",
+          captionProfileId: defaultCaptionProfileId ?? longFormPreset.captionProfileId,
+          motion3DMode: "editorial",
+          stabilizePreviewTimeline: true,
+          previewPerformanceMode: "balanced",
+          disablePreviewProxyForVideoSrc: true,
+          devFixtureExpectedPublicAssetName: DEV_FIXTURE_LONGFORM_VIDEO_ASSET
         }}
       />
       <Composition

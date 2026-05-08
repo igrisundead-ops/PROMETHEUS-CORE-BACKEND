@@ -28,6 +28,11 @@ import {
   resolveMotionDecisionZIndex
 } from "../lib/motion-graphics-agent/rendering";
 import {resolveBackgroundOverlayRenderState} from "../lib/motion-platform/background-overlay-visuals";
+import {
+  sanitizeRenderableOverlayText,
+  shouldRenderOverlayText,
+  shouldRenderPreviewOverlayAsset
+} from "../lib/motion-platform/render-text-safety";
 import {resolveSchemaStageEffectRoute} from "../lib/motion-platform/schema-mapping-resolver";
 import type {MotionGraphicsDecision, MotionGraphicsDecisionAsset} from "../lib/motion-graphics-agent/types";
 import {
@@ -1154,6 +1159,10 @@ const NativeMotionGraphicsDecisionItem: React.FC<{
     return null;
   }
 
+  if (!shouldRenderPreviewOverlayAsset(asset)) {
+    return null;
+  }
+
   const placement = resolveMotionDecisionAssetPlacement({
     selectedAsset,
     decision
@@ -1285,6 +1294,9 @@ const NativeMotionAssetOverlay: React.FC<{
         />
       ))}
       {renderLegacyAssets ? activeScene.assets.map((asset) => {
+        if (!shouldRenderPreviewOverlayAsset(asset)) {
+          return null;
+        }
         const binding = choreographyState?.scene.layerBindings.find((candidate) => candidate.sourceAssetId === asset.id);
         if (binding?.depthTreatment === "depth-worthy" && choreography3DEnabled) {
           return null;
@@ -1661,6 +1673,13 @@ const NativeShowcaseOverlay: React.FC<{
   const cueAssetSrc = activeCue.cueSource === "direct-asset"
     ? resolveCueAssetSrc(activeCue.asset.src)
     : null;
+  const safeCueLabel = sanitizeRenderableOverlayText(activeCue.canonicalLabel);
+  if (activeCue.cueSource === "direct-asset" && (!shouldRenderPreviewOverlayAsset(activeCue.asset) || !safeCueLabel)) {
+    return null;
+  }
+  if (activeCue.cueSource !== "direct-asset" && !safeCueLabel) {
+    return null;
+  }
   const canRenderAssetImage = cueAssetSrc !== null && !/\.(mp4|webm|mov)$/i.test(cueAssetSrc);
   const showcaseSchemaRoute = useMemo(() => resolveSchemaStageEffectRoute({
     text: `${activeCue.canonicalLabel} ${activeCue.reason ?? ""}`.trim()
@@ -1716,18 +1735,18 @@ const NativeShowcaseOverlay: React.FC<{
                 {canRenderAssetImage ? (
                   <StageOverlayAsset
                     src={cueAssetSrc}
-                    alt={activeCue.canonicalLabel}
+                    alt={safeCueLabel}
                     fitMode={showcaseSchemaRoute.preferAssetContain ? "contain" : "cover"}
                     filter={getCueFilter(activeCue)}
                   />
                 ) : (
                   <div className="preview-native-showcase-fallback">
-                    {activeCue.canonicalLabel}
+                    {safeCueLabel}
                   </div>
                 )}
                 {activeCue.showLabelPlate ? (
                   <div className="preview-native-showcase-label">
-                    {activeCue.canonicalLabel}
+                    {safeCueLabel}
                   </div>
                 ) : null}
               </div>
@@ -1837,6 +1856,10 @@ const NativeCaptionOverlay: React.FC<{
     return null;
   }
 
+  if (!shouldRenderOverlayText(activeChunk.text)) {
+    return null;
+  }
+
   if (captionRenderMode === "docked-inverse") {
     const activeWords = activeChunk?.words ?? [];
     const dominantWordIndex = activeWords.findIndex((word) => {
@@ -1873,6 +1896,10 @@ const NativeCaptionOverlay: React.FC<{
             <div className="preview-native-docked-caption-bar" />
             <div className="preview-native-docked-caption-words">
               {activeWords.map((word, index) => {
+                const safeText = sanitizeRenderableOverlayText(word.text);
+                if (!safeText) {
+                  return null;
+                }
                 const previousWord = index > 0 ? activeWords[index - 1] : undefined;
                 const nextWord = index < activeWords.length - 1 ? activeWords[index + 1] : undefined;
                 const motionState = getLongformWordMotionState({
@@ -1914,7 +1941,7 @@ const NativeCaptionOverlay: React.FC<{
                       willChange: "transform, opacity, filter"
                     }}
                   >
-                    {word.text}
+                    {safeText}
                   </span>
                 );
               })}
@@ -1996,6 +2023,15 @@ const NativeCaptionOverlay: React.FC<{
             }}
           >
             {lines.map((line, lineIndex) => {
+              const safeLineWords = line.words
+                .map((word) => ({
+                  word,
+                  safeText: sanitizeRenderableOverlayText(word.text)
+                }))
+                .filter((entry) => entry.safeText.length > 0);
+              if (safeLineWords.length === 0) {
+                return null;
+              }
               const lineRole = line.role ?? "context";
               const lineStyle = editorialDecision.lineStyles[lineRole] ?? {
                 fontSizeScale: 1,
@@ -2031,7 +2067,7 @@ const NativeCaptionOverlay: React.FC<{
                     letterSpacing: lineStyle.letterSpacing
                   }}
                 >
-                  {line.words.map((word, wordIndex) => {
+                  {safeLineWords.map(({word, safeText}, wordIndex) => {
                   const wordKey = getLongformWordEmphasisWordKey(word);
                   const wordMeta = activeChunkPresentation?.wordMetaByKey.get(wordKey);
                   const chunkWordIndex = Math.max(0, wordMeta?.chunkWordIndex ?? wordIndex);
@@ -2058,7 +2094,7 @@ const NativeCaptionOverlay: React.FC<{
                         overflow: "visible"
                       }}
                     >
-                      {word.text}
+                      {safeText}
                     </span>
                   );
                 })}

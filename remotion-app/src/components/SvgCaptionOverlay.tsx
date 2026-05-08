@@ -5,6 +5,7 @@ import {
   resolveCaptionEditorialDecision,
   type CaptionEditorialContext
 } from "../lib/motion-platform/caption-editorial-engine";
+import {sanitizeRenderableOverlayText, shouldRenderOverlayText} from "../lib/motion-platform/render-text-safety";
 import type {CaptionChunk, CaptionVerticalBias} from "../lib/types";
 import {
   SVG_TYPOGRAPHY_PROFILE_ID,
@@ -489,13 +490,19 @@ export const computeSvgMotionState = ({
 };
 
 const getChunkWords = (chunk: CaptionChunk): string[] => {
-  const fromWords = chunk.words.map((word) => word.text.trim()).filter(Boolean);
+  if (!shouldRenderOverlayText(chunk.text)) {
+    return [];
+  }
+
+  const fromWords = chunk.words
+    .map((word) => sanitizeRenderableOverlayText(word.text))
+    .filter(Boolean);
   if (fromWords.length > 0) {
     return fromWords;
   }
   return chunk.text
     .split(/\s+/)
-    .map((word) => word.trim())
+    .map((word) => sanitizeRenderableOverlayText(word))
     .filter(Boolean);
 };
 

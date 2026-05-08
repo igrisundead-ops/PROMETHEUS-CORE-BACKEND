@@ -2,6 +2,7 @@ import React, {useMemo} from "react";
 import {AbsoluteFill, useVideoConfig} from "remotion";
 
 import {selectActiveMotionChoreographySceneAtTime, resolveMotionChoreographySceneStateAtTime} from "../lib/motion-platform/choreography-planner";
+import {sanitizeRenderableOverlayText} from "../lib/motion-platform/render-text-safety";
 import {resolveSchemaStageEffectRoute} from "../lib/motion-platform/schema-mapping-resolver";
 import type {MotionCompositionModel} from "../lib/motion-platform/scene-engine";
 import type {MotionChoreographyScenePlan, MotionPrimitiveId} from "../lib/types";
@@ -95,6 +96,8 @@ export const MotionChoreographyStage: React.FC<{
   currentTimeMs,
   zIndex = 6
 }) => {
+  const safeHeadlineText = sanitizeRenderableOverlayText(scene.headlineText);
+  const safeSubtextText = sanitizeRenderableOverlayText(scene.subtextText);
   const sceneState = useMemo(
     () => resolveMotionChoreographySceneStateAtTime({scene, currentTimeMs}),
     [currentTimeMs, scene]
@@ -107,13 +110,13 @@ export const MotionChoreographyStage: React.FC<{
     sceneKind: scene.sceneKind
   });
   const stageEffectRoute = useMemo(() => resolveSchemaStageEffectRoute({
-    text: scene.headlineText,
-    subtext: scene.subtextText,
+    text: safeHeadlineText,
+    subtext: safeSubtextText,
     sceneKind: scene.sceneKind,
     primitiveId: headlineBinding?.primitiveId
-  }), [headlineBinding?.primitiveId, scene.headlineText, scene.sceneKind, scene.subtextText]);
+  }), [headlineBinding?.primitiveId, safeHeadlineText, safeSubtextText, scene.sceneKind]);
 
-  if (!scene.headlineText || !headlineTransform || headlineTransform.opacity <= 0.01) {
+  if (!safeHeadlineText || !headlineTransform || headlineTransform.opacity <= 0.01) {
     return null;
   }
 
@@ -155,7 +158,7 @@ export const MotionChoreographyStage: React.FC<{
               />
               <div className="preview-native-headline-copy">
                 <AnimatedHeadline
-                  text={scene.headlineText}
+                  text={safeHeadlineText}
                   reveal={headlineTransform.reveal}
                   currentTimeMs={currentTimeMs}
                   route={stageEffectRoute}
@@ -165,7 +168,7 @@ export const MotionChoreographyStage: React.FC<{
             </div>
           </div>
 
-          {scene.subtextText && subtextTransform && subtextTransform.opacity > 0.01 ? (
+          {safeSubtextText && subtextTransform && subtextTransform.opacity > 0.01 ? (
             <div
               className="preview-native-subcopy"
               style={{
@@ -179,7 +182,7 @@ export const MotionChoreographyStage: React.FC<{
             >
               <div>
                 {renderPrimitiveText({
-                  text: scene.subtextText,
+                  text: safeSubtextText,
                   primitiveId: subtextBinding?.primitiveId,
                   reveal: subtextTransform.reveal
                 })}

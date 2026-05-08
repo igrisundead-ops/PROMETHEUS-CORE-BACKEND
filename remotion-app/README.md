@@ -139,6 +139,18 @@ npm run preview:web
 
 The browser preview opens on `http://localhost:3101`.
 
+## Studio Dev Fixture
+
+Remotion Studio is a composition development tool, so it does not offer a product-style video upload flow.
+
+For a local long-form fixture in Studio:
+
+- place a test file at `public/dev-fixtures/test-video.mp4`
+- start Studio
+- open the `MaleHeadVideoLongFormDevFixture` composition
+
+That composition uses the browser-safe public URL `/dev-fixtures/test-video.mp4`.
+
 The browser sidebar now includes a `Motion Asset Brain` panel that shows:
 
 - selected showcase moments
