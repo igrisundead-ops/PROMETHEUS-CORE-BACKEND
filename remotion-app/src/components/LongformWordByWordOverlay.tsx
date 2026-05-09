@@ -53,7 +53,7 @@ type PreparedLongformChunk = {
   }>;
 };
 
-const getWordStyle = ({
+export const getWordStyle = ({
   word,
   previousWord,
   nextWord,
@@ -82,17 +82,34 @@ const getWordStyle = ({
       chunkEndMs: chunk.endMs,
       currentTimeMs
     });
+  const emphasisWordIndices = Array.isArray(chunk.emphasisWordIndices)
+    ? chunk.emphasisWordIndices
+    : [];
+  const hasEditorialHierarchy = emphasisWordIndices.length > 0;
+  const isEmphasized = hasEditorialHierarchy && emphasisWordIndices.includes(wordIndex);
+  const isHookMoment = chunk.semantic?.intent === "punch-emphasis";
+  const hierarchyScale = hasEditorialHierarchy
+    ? isEmphasized ? 1.12 : 0.93
+    : 1;
+  const hierarchyOpacity = hasEditorialHierarchy
+    ? isEmphasized ? 1 : 0.78
+    : 1;
+  const hierarchyWeight = isEmphasized && isHookMoment
+    ? typeof editorialDecision.fontWeight === "number"
+      ? Math.max(editorialDecision.fontWeight, 700)
+      : editorialDecision.fontWeight
+    : editorialDecision.fontWeight;
 
   return {
     display: "inline-block",
-    opacity,
-    transform: `translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${scale.toFixed(3)})`,
+    opacity: Math.min(1, opacity * hierarchyOpacity),
+    transform: `translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${(scale * hierarchyScale).toFixed(3)})`,
     filter: `blur(${blur.toFixed(2)}px)`,
     textShadow: editorialDecision.textShadow,
     color: editorialDecision.textColor,
     textTransform: editorialDecision.uppercaseBias ? "uppercase" : undefined,
     fontFamily: editorialDecision.fontFamily,
-    fontWeight: editorialDecision.fontWeight,
+    fontWeight: hierarchyWeight,
     letterSpacing: editorialDecision.letterSpacing,
     willChange: "transform, opacity, filter"
   };

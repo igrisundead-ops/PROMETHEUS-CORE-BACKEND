@@ -130,7 +130,36 @@ const DEFAULT_KEYWORD_STOP_WORDS = new Set([
   "your"
 ]);
 
+const SAFE_EDITORIAL_FONT_STACK = "\"Fraunces\", \"Times New Roman\", serif";
+const warnedInvalidFontFamilies = new Set<string>();
+
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+const isUsableFontStack = (value: string | null | undefined): value is string => {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return Boolean(
+    normalized &&
+    !normalized.includes("undefined") &&
+    !normalized.includes("null") &&
+    !normalized.includes("nan")
+  );
+};
+
+const warnInvalidFontFamilyOnce = (warningKey: string, invalidValue: string | null | undefined): void => {
+  if (warnedInvalidFontFamilies.has(warningKey)) {
+    return;
+  }
+
+  warnedInvalidFontFamilies.add(warningKey);
+  console.warn("[caption-editorial-engine] Invalid font family fallback applied.", {
+    warningKey,
+    invalidValue
+  });
+};
 
 const parseRgbaAlpha = (value: string | undefined | null): number => {
   if (!value) {
@@ -413,8 +442,31 @@ const resolveCaptionEditorialTypeface = ({
       break;
   }
 
+  const runtimeFontStack = palette.runtimeFontStack;
+  if (isUsableFontStack(runtimeFontStack)) {
+    return {
+      fontFamily: runtimeFontStack,
+      fontWeight,
+      letterSpacing
+    };
+  }
+
+  if (isUsableFontStack(palette.displayFamily)) {
+    if (runtimeFontStack && runtimeFontStack !== palette.displayFamily) {
+      warnInvalidFontFamilyOnce(`runtime:${palette.id}`, runtimeFontStack);
+    }
+
+    return {
+      fontFamily: palette.displayFamily,
+      fontWeight,
+      letterSpacing
+    };
+  }
+
+  warnInvalidFontFamilyOnce(`display:${palette.id}`, palette.displayFamily);
+
   return {
-    fontFamily: palette.displayFamily,
+    fontFamily: SAFE_EDITORIAL_FONT_STACK,
     fontWeight,
     letterSpacing
   };

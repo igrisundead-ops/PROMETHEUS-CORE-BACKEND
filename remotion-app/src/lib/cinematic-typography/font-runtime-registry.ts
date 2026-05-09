@@ -20,13 +20,120 @@ export type EditorialFontPalette = {
   displayFamily: string;
   supportFamily: string;
   italicFamily: string;
+  runtimeCssFamily: string;
+  runtimeFontStack: string;
+  primaryFamilyName: string;
   displayWeight: number;
   supportWeight: number;
   moodTags: string[];
   doctrineRoleIds: TypographyRoleSlotId[];
 };
 
-export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
+type RuntimeFontAliasSource = {
+  familyId?: string | null;
+  fontId?: string | null;
+};
+
+type EditorialFontPaletteSeed = Omit<
+  EditorialFontPalette,
+  "runtimeCssFamily" | "runtimeFontStack" | "primaryFamilyName"
+>;
+
+const SAFE_EDITORIAL_FONT_STACK = "\"Fraunces\", \"Times New Roman\", serif";
+
+const sanitizeAliasSegment = (value: string | null | undefined): string => {
+  if (typeof value !== "string") {
+    return "unknown";
+  }
+
+  const lowerValue = value.trim().toLowerCase();
+  if (!lowerValue || lowerValue === "undefined" || lowerValue === "null" || lowerValue === "nan") {
+    return "unknown";
+  }
+
+  const normalized = lowerValue
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return normalized || "unknown";
+};
+
+export const getRuntimeFontCssFamily = (
+  recordOrFamily: RuntimeFontAliasSource | string
+): string => {
+  if (typeof recordOrFamily === "string") {
+    return `__prometheus_font_${sanitizeAliasSegment(recordOrFamily)}`;
+  }
+
+  const familyAliasSegment = sanitizeAliasSegment(recordOrFamily.familyId);
+  if (familyAliasSegment !== "unknown") {
+    return `__prometheus_font_${familyAliasSegment}`;
+  }
+
+  const fontAliasSegment = sanitizeAliasSegment(recordOrFamily.fontId);
+  return `__prometheus_font_${fontAliasSegment === "unknown"
+    ? "unknown"
+    : `unknown_${fontAliasSegment}`}`;
+};
+
+const extractPrimaryFamilyName = (fontStack: string): string | null => {
+  const quotedMatch = fontStack.match(/^\s*"([^"]+)"/);
+  if (quotedMatch?.[1]) {
+    return quotedMatch[1].trim() || null;
+  }
+
+  const firstSegment = fontStack.split(",")[0]?.trim();
+  return firstSegment || null;
+};
+
+const isValidFontStack = (value: string | null | undefined): value is string => {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return Boolean(
+    normalized &&
+    !normalized.includes("undefined") &&
+    !normalized.includes("null") &&
+    !normalized.includes("nan")
+  );
+};
+
+const buildRuntimeFontStack = ({
+  runtimeCssFamily,
+  fallbackStack
+}: {
+  runtimeCssFamily: string;
+  fallbackStack: string;
+}): string => {
+  const safeFallbackStack = isValidFontStack(fallbackStack)
+    ? fallbackStack
+    : SAFE_EDITORIAL_FONT_STACK;
+  return `"${runtimeCssFamily}", ${safeFallbackStack}`;
+};
+
+const toEditorialFontPalette = (
+  palette: EditorialFontPaletteSeed
+): EditorialFontPalette => {
+  const primaryFamilyName = extractPrimaryFamilyName(palette.displayFamily) ?? "Fraunces";
+  const runtimeCssFamily = getRuntimeFontCssFamily({
+    familyId: primaryFamilyName,
+    fontId: palette.id
+  });
+
+  return {
+    ...palette,
+    runtimeCssFamily,
+    runtimeFontStack: buildRuntimeFontStack({
+      runtimeCssFamily,
+      fallbackStack: palette.displayFamily
+    }),
+    primaryFamilyName
+  };
+};
+
+const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
   {
     id: "jugendreisen-house",
     displayFamily: "\"Jugendreisen\", \"Times New Roman\", serif",
@@ -148,6 +255,9 @@ export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
     doctrineRoleIds: ["neutral_sans_core"]
   }
 ];
+
+export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] =
+  EDITORIAL_FONT_PALETTE_SEEDS.map(toEditorialFontPalette);
 
 const fontPaletteMap = new Map(EDITORIAL_FONT_PALETTES.map((palette) => [palette.id, palette]));
 

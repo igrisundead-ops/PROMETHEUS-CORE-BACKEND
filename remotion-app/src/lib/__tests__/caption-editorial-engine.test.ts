@@ -137,7 +137,10 @@ describe("caption editorial engine", () => {
     expect(decision.assetBias).toBe("structured");
     expect(decision.keywordPhrases.length).toBeGreaterThan(0);
     expect(decision.typography.role).toBe("hook");
+    expect(decision.fontFamily).toContain("__prometheus_font_");
     expect(decision.fontFamily).toContain("Noto Serif Display");
+    expect(decision.fontFamily.toLowerCase()).not.toContain("undefined");
+    expect(decision.fontFamily).toContain(decision.fontSelection.palette.runtimeCssFamily);
     expect(decision.fontSelection.selectedRoleId).toBe("hero_serif_alternate");
     expect(decision.rationale.join(" ")).toContain("typography-pattern=");
     expect(decision.rationale.join(" ")).toContain("font-candidate=");
