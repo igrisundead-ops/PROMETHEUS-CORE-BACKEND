@@ -1,6 +1,7 @@
-import {getLongformCaptionSizing} from "../lib/longform-caption-scale";
+import {getLongformCaptionSizing, type LongformCaptionSizing} from "../lib/longform-caption-scale";
 import type {CaptionEditorialDecision} from "../lib/motion-platform/caption-editorial-engine";
 import type {CaptionChunk, CaptionVerticalBias} from "../lib/types";
+import type {PlacementPlan} from "../lib/visual-field-engine";
 
 const clamp = (value: number, min: number, max: number): number => {
   return Math.min(max, Math.max(min, value));
@@ -28,15 +29,27 @@ export type PreviewSubtitleSafeZone = {
   backdropInsetBottomEm: number;
   backdropRadiusEm: number;
   backdropBlurPx: number;
+  justifyContent: "center" | "flex-start" | "flex-end";
+  physics: {
+    opacity: number;
+    blurPx: number;
+    scaleMultiplier: number;
+    offsetX: number;
+    offsetY: number;
+    rotation: number;
+    isSilenced: boolean;
+    impactDelayFrames: number;
+    tensionCurve: number;
+  };
 };
 
-export const PREVIEW_SUBTITLE_MAX_WIDTH_PERCENT = 72;
-export const PREVIEW_SUBTITLE_FONT_SCALE = 0.94;
-export const PREVIEW_SUBTITLE_LINE_GAP_EM = 0.16;
-export const PREVIEW_SUBTITLE_WORD_GAP_EM = 0.18;
-export const PREVIEW_SUBTITLE_GLOW_GAIN = 1.48;
-export const PREVIEW_SUBTITLE_ANIMATION_GAIN = 1.22;
-export const PREVIEW_SUBTITLE_BACKDROP_BLUR_PX = 18;
+export const PREVIEW_SUBTITLE_MAX_WIDTH_PERCENT = 65;
+export const PREVIEW_SUBTITLE_FONT_SCALE = 0.92;
+export const PREVIEW_SUBTITLE_LINE_GAP_EM = 0.14;
+export const PREVIEW_SUBTITLE_WORD_GAP_EM = 0.16;
+export const PREVIEW_SUBTITLE_GLOW_GAIN = 0.72;
+export const PREVIEW_SUBTITLE_ANIMATION_GAIN = 1.08;
+export const PREVIEW_SUBTITLE_BACKDROP_BLUR_PX = 12;
 
 const PREVIEW_SUBTITLE_SIDE_INSET_PERCENT = 9;
 const PREVIEW_SUBTITLE_BOTTOM_SAFE_PERCENT = 8.6;
@@ -111,7 +124,8 @@ export const resolvePreviewSubtitleSafeZone = ({
   lineCount,
   previewViewportScale,
   captionBias,
-  editorialDecision
+  editorialDecision,
+  placementPlan
 }: {
   width: number;
   height: number;
@@ -120,6 +134,7 @@ export const resolvePreviewSubtitleSafeZone = ({
   previewViewportScale: number;
   captionBias?: CaptionVerticalBias;
   editorialDecision?: CaptionEditorialDecision;
+  placementPlan?: PlacementPlan;
 }): PreviewSubtitleSafeZone => {
   const resolvedLineCount = Math.max(1, lineCount ?? 1);
   const sizing = getLongformCaptionSizing({
@@ -135,7 +150,6 @@ export const resolvePreviewSubtitleSafeZone = ({
   const sideInsetPercent = width >= 1600
     ? PREVIEW_SUBTITLE_SIDE_INSET_PERCENT + 1
     : PREVIEW_SUBTITLE_SIDE_INSET_PERCENT;
-  const widthPercent = Number((100 - sideInsetPercent * 2).toFixed(2));
   const maxWidthPercent = Math.round(
     clamp(
       Math.min(PREVIEW_SUBTITLE_MAX_WIDTH_PERCENT, sizing.maxWidthPercent - 6),
@@ -143,19 +157,63 @@ export const resolvePreviewSubtitleSafeZone = ({
       PREVIEW_SUBTITLE_MAX_WIDTH_PERCENT
     )
   );
-  const bottomBiasOffset = captionBias === "top"
+  let bottomBiasOffset = captionBias === "top"
     ? 2.2
     : captionBias === "middle"
       ? 1.1
       : 0;
-  const fontScale = PREVIEW_SUBTITLE_FONT_SCALE *
+      
+  const baseFontScale = PREVIEW_SUBTITLE_FONT_SCALE *
     (1 - densityPressure * 0.06 - linePressure * 0.08) *
     (editorialDecision?.fontSizeScale ?? 1);
+    
+  const fontScale = baseFontScale * (placementPlan?.breathingSpaceFactor ?? 1.0);
+
+  let leftPercent = sideInsetPercent;
+  let bottomPercent = PREVIEW_SUBTITLE_BOTTOM_SAFE_PERCENT + bottomBiasOffset;
+  let justifyContent: "center" | "flex-start" | "flex-end" = "center";
+  let widthPercent = Number((100 - sideInsetPercent * 2).toFixed(2));
+
+  if (placementPlan) {
+    if (placementPlan.strategy === "asymmetric-left") {
+      leftPercent = placementPlan.coordinates.x * 100; // e.g., 20%
+      widthPercent = Math.min(maxWidthPercent, 100 - leftPercent - sideInsetPercent);
+      justifyContent = "flex-start";
+    } else if (placementPlan.strategy === "asymmetric-right") {
+      const rightPercent = (1 - placementPlan.coordinates.x) * 100;
+      leftPercent = 100 - rightPercent - maxWidthPercent;
+      widthPercent = maxWidthPercent;
+      justifyContent = "flex-end";
+    } else if (placementPlan.strategy === "center") {
+      leftPercent = sideInsetPercent;
+      justifyContent = "center";
+    } else if (placementPlan.strategy === "lower-third") {
+      bottomPercent = (1 - placementPlan.coordinates.y) * 100;
+      justifyContent = "center";
+    } else if (placementPlan.strategy === "rule-of-thirds") {
+       leftPercent = 33;
+       widthPercent = maxWidthPercent;
+       justifyContent = "flex-start";
+    }
+  } else {
+    // Fallback if orchestration is missing
+    const isShortPunchyHook = resolvedLineCount === 1 && (maxLineUnits ?? 0) <= 14;
+    const placementStrategy = isShortPunchyHook ? "center" : (maxLineUnits ?? 0) > 18 ? "asymmetric-left" : "rule-of-thirds";
+
+    leftPercent = placementStrategy === "asymmetric-left" ? 12 : placementStrategy === "rule-of-thirds" ? 18 : sideInsetPercent;
+    widthPercent = placementStrategy === "center" ? Number((100 - sideInsetPercent * 2).toFixed(2)) : Number((100 - leftPercent - sideInsetPercent).toFixed(2));
+    justifyContent = placementStrategy === "center" ? "center" : "flex-start";
+  }
+
+  // Apply optical alignment offsets directly to the bottom percent if centered
+  if (placementPlan?.opticalAlignmentOffset.y) {
+    bottomPercent += placementPlan.opticalAlignmentOffset.y * 100;
+  }
 
   return {
-    leftPercent: sideInsetPercent,
-    widthPercent,
-    bottomPercent: Number((PREVIEW_SUBTITLE_BOTTOM_SAFE_PERCENT + bottomBiasOffset).toFixed(2)),
+    leftPercent: Number(leftPercent.toFixed(2)),
+    widthPercent: Number(widthPercent.toFixed(2)),
+    bottomPercent: Number(bottomPercent.toFixed(2)),
     maxWidthPercent,
     fontSizePx: Math.round(
       clamp(
@@ -174,6 +232,18 @@ export const resolvePreviewSubtitleSafeZone = ({
     backdropInsetTopEm: Number((0.42 + linePressure * 0.6).toFixed(3)),
     backdropInsetBottomEm: Number((0.62 + linePressure * 0.9).toFixed(3)),
     backdropRadiusEm: Number((0.92 + densityPressure * 0.12).toFixed(3)),
-    backdropBlurPx: Math.round(PREVIEW_SUBTITLE_BACKDROP_BLUR_PX + densityPressure * 4)
+    backdropBlurPx: Math.round(PREVIEW_SUBTITLE_BACKDROP_BLUR_PX + densityPressure * 4),
+    justifyContent,
+    physics: {
+      opacity: editorialDecision?.stylePhysics.attention.typographyDominance ?? 1.0,
+      blurPx: editorialDecision?.stylePhysics.motion.blurRelease ?? 0,
+      scaleMultiplier: (editorialDecision?.stylePhysics.motion.scaleInertia ?? 0.05) * 10.0,
+      offsetX: editorialDecision?.stylePhysics.optical.offsetX ?? 0,
+      offsetY: editorialDecision?.stylePhysics.optical.offsetY ?? 0,
+      rotation: editorialDecision?.stylePhysics.optical.rotation ?? 0,
+      isSilenced: editorialDecision?.stylePhysics.silence.isSilenced ?? false,
+      impactDelayFrames: editorialDecision?.timelineRhythm.impactDelayFrames ?? 0,
+      tensionCurve: editorialDecision?.timelineRhythm.tensionCurve ?? 0.5
+    }
   };
 };

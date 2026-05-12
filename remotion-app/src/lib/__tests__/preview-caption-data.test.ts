@@ -1,7 +1,11 @@
 import {afterEach, describe, expect, it} from "vitest";
 
 import {clearCachedEnv} from "../env";
-import {buildPreviewCaptionChunks} from "../preview-caption-data";
+import {
+  buildPreviewCaptionChunks,
+  buildPreviewCaptionMediaFingerprint,
+  DEV_FIXTURE_TEST_VIDEO_MEDIA_KEY
+} from "../preview-caption-data";
 import {buildCreativePreviewCaptionChunks} from "../../creative-orchestration/preview";
 import type {CaptionChunk} from "../types";
 
@@ -43,10 +47,22 @@ afterEach(() => {
 
 describe("preview caption data", () => {
   it("builds profile-specific caption chunks for the supported profiles", () => {
-    const slcpChunks = buildPreviewCaptionChunks("slcp");
-    const hormoziChunks = buildPreviewCaptionChunks("hormozi_word_lock_v1");
-    const svgChunks = buildPreviewCaptionChunks("svg_typography_v1");
-    const longformChunks = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form");
+    const slcpChunks = buildPreviewCaptionChunks("slcp", "reel", {
+      mediaSource: "input-video.mp4",
+      durationInFrames: 900
+    });
+    const hormoziChunks = buildPreviewCaptionChunks("hormozi_word_lock_v1", "reel", {
+      mediaSource: "input-video.mp4",
+      durationInFrames: 900
+    });
+    const svgChunks = buildPreviewCaptionChunks("svg_typography_v1", "reel", {
+      mediaSource: "input-video.mp4",
+      durationInFrames: 900
+    });
+    const longformChunks = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form", {
+      mediaSource: "input-video-landscape.1b47edd6cf-mo2thocr.preview.mp4",
+      durationInFrames: 2080
+    });
 
     expect(slcpChunks.length).toBeGreaterThan(0);
     expect(hormoziChunks.length).toBeGreaterThan(0);
@@ -81,5 +97,75 @@ describe("preview caption data", () => {
       return chunk.profileId !== "slcp" || chunk.styleKey !== "tall_generic_default";
     });
     expect(rerouted).toBe(true);
+  });
+
+  it("scopes longform caption reuse to the active media identity", () => {
+    const bundledLongformChunks = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form", {
+      mediaSource: "/static-hash/input-video-landscape.1b47edd6cf-mo2thocr.mp4",
+      durationSeconds: 69.335011,
+      durationInFrames: 2080
+    });
+    const unrelatedDevFixtureChunks = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form", {
+      mediaSource: "/static-hash/dev-fixtures/another-video.mp4",
+      durationSeconds: 69.335011,
+      durationInFrames: 2080
+    });
+
+    expect(bundledLongformChunks.length).toBeGreaterThan(0);
+    expect(unrelatedDevFixtureChunks).toEqual([]);
+    expect(unrelatedDevFixtureChunks).not.toBe(bundledLongformChunks);
+  });
+
+  it("reuses cached caption chunks only when the media fingerprint matches", () => {
+    const mediaIdentity = {
+      mediaSource: "input-video-landscape.draft.m4a",
+      durationSeconds: 69.335011,
+      durationInFrames: 1041
+    };
+    const first = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form", mediaIdentity);
+    const second = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form", mediaIdentity);
+    const changedMedia = buildPreviewCaptionChunks("longform_svg_typography_v1", "long-form", {
+      ...mediaIdentity,
+      mediaSource: "dev-fixtures/another-video.mp4"
+    });
+
+    expect(first.length).toBeGreaterThan(0);
+    expect(second).toBe(first);
+    expect(changedMedia).toEqual([]);
+  });
+
+  it("builds different media fingerprints for bundled and unrelated preview assets", () => {
+    const bundledFingerprint = buildPreviewCaptionMediaFingerprint("long-form", {
+      mediaSource: "input-video-landscape.1b47edd6cf-mo2thocr.preview.mp4",
+      durationSeconds: 69.335011,
+      durationInFrames: 2080
+    });
+    const devFixtureFingerprint = buildPreviewCaptionMediaFingerprint("long-form", {
+      mediaSource: "dev-fixtures/test-video.mp4",
+      durationSeconds: 69.335011,
+      durationInFrames: 2080
+    });
+
+    expect(bundledFingerprint).not.toBe(devFixtureFingerprint);
+    expect(devFixtureFingerprint).toContain("unmatched");
+  });
+
+  it("builds a media-scoped premium typography dev fixture transcript only for test-video.mp4", () => {
+    const devFixtureChunks = buildPreviewCaptionChunks("longform_eve_typography_v1", "long-form", {
+      mediaSource: DEV_FIXTURE_TEST_VIDEO_MEDIA_KEY,
+      durationSeconds: 69.335011,
+      durationInFrames: 2080
+    });
+    const mismatchedDevFixtureChunks = buildPreviewCaptionChunks("longform_eve_typography_v1", "long-form", {
+      mediaSource: "dev-fixtures/not-test-video.mp4",
+      durationSeconds: 69.335011,
+      durationInFrames: 2080
+    });
+
+    expect(devFixtureChunks.length).toBeGreaterThan(0);
+    expect(devFixtureChunks[0]?.id).toContain("dev-fixture-hook");
+    expect(devFixtureChunks.some((chunk) => chunk.id.includes("dev-fixture-emphasis"))).toBe(true);
+    expect(devFixtureChunks.map((chunk) => chunk.text).join(" ")).not.toMatch(/whatever|i'll get to it/i);
+    expect(mismatchedDevFixtureChunks).toEqual([]);
   });
 });

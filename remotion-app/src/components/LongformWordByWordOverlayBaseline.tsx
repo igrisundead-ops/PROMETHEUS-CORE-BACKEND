@@ -3,6 +3,7 @@ import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig} from "remoti
 
 import {getCaptionContainerStyle, longformCaptionSafeZone} from "../lib/caption-layout";
 import {getLongformCaptionSizing} from "../lib/longform-caption-scale";
+import {sanitizeRenderableOverlayText, shouldRenderOverlayText} from "../lib/motion-platform/render-text-safety";
 import type {CaptionChunk, CaptionVerticalBias, TranscribedWord} from "../lib/types";
 
 type LongformWordByWordOverlayBaselineProps = {
@@ -131,6 +132,10 @@ export const LongformWordByWordOverlayBaseline: React.FC<LongformWordByWordOverl
     return null;
   }
 
+  if (!shouldRenderOverlayText(activeChunk.text)) {
+    return null;
+  }
+
   return (
     <AbsoluteFill style={{zIndex: 8, pointerEvents: "none"}}>
         <div
@@ -159,6 +164,10 @@ export const LongformWordByWordOverlayBaseline: React.FC<LongformWordByWordOverl
           }}
         >
           {activeChunk.words.map((word, index) => {
+            const safeText = sanitizeRenderableOverlayText(word.text);
+            if (!safeText) {
+              return null;
+            }
             const normalized = normalizeWord(word.text);
             const isHelper = helperWords.has(normalized);
             return (
@@ -172,7 +181,7 @@ export const LongformWordByWordOverlayBaseline: React.FC<LongformWordByWordOverl
                   letterSpacing: isHelper ? "0.01em" : "-0.02em"
                 }}
               >
-                {word.text}
+                {safeText}
               </span>
             );
           })}

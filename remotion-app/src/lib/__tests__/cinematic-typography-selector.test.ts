@@ -127,7 +127,7 @@ const makeEditorialDecision = ({
       motionDemand: "medium",
       rationale: []
     }
-  } as CaptionEditorialDecision;
+  } as unknown as CaptionEditorialDecision;
 };
 
 describe("cinematic typography selector", () => {

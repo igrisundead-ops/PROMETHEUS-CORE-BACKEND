@@ -3,6 +3,7 @@ import {routeStyleForWords} from "../lib/style-routing";
 import type {CaptionChunk, CaptionStyleProfileId} from "../lib/types";
 import {isCreativeOrchestrationEnabled} from "../lib/env";
 import {MomentSegmentationAgent} from "./segmentation/moment-segmentation-agent";
+import {orchestrateSequence} from "../lib/sequence-director-engine";
 import {TextAgent} from "./agents/text-agent";
 import {AssetAgent} from "./agents/asset-agent";
 import {BackgroundOverlayAgent} from "./agents/background-overlay-agent";
@@ -13,6 +14,9 @@ import {MattingDepthAgent} from "./agents/matting-depth-agent";
 import {RenderBudgetAgent} from "./agents/render-budget-agent";
 import {PatternMemoryAgent} from "./agents/pattern-memory-agent";
 import {CreativeDirector} from "./director/creative-director";
+import {CinematicGovernor} from "./governance/cinematic-governor";
+import {CinematicPriorityHierarchy} from "./governance/cinematic-priority-hierarchy";
+import {SubsystemProposal} from "./governance/types";
 import {AestheticCritic} from "./director/aesthetic-critic";
 import {ExistingAgentOrchestratorAdapter} from "./judgment";
 import {getUnifiedCreativeAssetCatalog} from "../lib/assets/catalog";
@@ -78,6 +82,7 @@ const applyDecisionToChunk = (chunk: CaptionChunk, decision: DirectorDecision): 
     motionKey: routed.motionKey,
     layoutVariant: routed.layoutVariant,
     suppressDefault,
+    governedPhysics: decision.governedPhysics,
     semantic: {
       ...(chunk.semantic ?? {
         intent: "default",
@@ -105,6 +110,7 @@ export const buildCreativeOrchestrationPlan = async (input: {
   featureFlags?: CreativeContext["featureFlags"];
 }): Promise<CreativeOrchestrationResult> => {
   const enabled = input.featureFlags?.creativeOrchestrationV1 ?? isCreativeOrchestrationEnabled();
+  const sequencePlan = orchestrateSequence(input.captionChunks);
   const context: CreativeContext = {
     jobId: input.jobId,
     sourceJobId: input.sourceJobId,
@@ -118,6 +124,7 @@ export const buildCreativeOrchestrationPlan = async (input: {
     patternMemory: input.patternMemory,
     judgmentInput: input.judgmentInput,
     featureFlags: input.featureFlags,
+    sequencePlan,
     revisionPass: 0
   };
 
@@ -129,6 +136,7 @@ export const buildCreativeOrchestrationPlan = async (input: {
       moments: [],
       decisions: [],
       tracks: [],
+      sequencePlan,
       diagnostics: {
         proposalCount: 0,
         approvedCount: 0,
@@ -172,7 +180,8 @@ export const buildCreativeOrchestrationPlan = async (input: {
   const judgmentDirectives = await orchestratorAdapter.buildDirectives(context, moments);
   const governedContext: CreativeContext = {
     ...context,
-    judgmentDirectives
+    judgmentDirectives,
+    sequencePlan
   };
   const patternMemoryAgent = new PatternMemoryAgent(input.patternMemory ?? []);
   const agents = [
@@ -195,15 +204,35 @@ export const buildCreativeOrchestrationPlan = async (input: {
     )
   ).flat();
   const proposalsByMoment = new Map<string, AgentProposal[]>();
+  const subsystemProposalsByMoment = new Map<string, SubsystemProposal[]>();
   for (const proposal of allProposals) {
     const bucket = proposalsByMoment.get(proposal.momentId) ?? [];
     bucket.push(proposal);
     proposalsByMoment.set(proposal.momentId, bucket);
+
+    const subBucket = subsystemProposalsByMoment.get(proposal.momentId) ?? [];
+    subBucket.push({
+      subsystemId: proposal.agentId,
+      momentId: proposal.momentId,
+      intent: {
+        aggression: (proposal.payload["aggression"] as number) ?? (proposal.type === "text" ? 0.7 : 0.5),
+        motion: (proposal.payload["motion"] as number) ?? (proposal.type === "motion" ? 0.8 : 0.5),
+        pacing: (proposal.payload["pacing"] as number) ?? 0.5,
+        dominance: (proposal.payload["dominance"] as number) ?? 0.5,
+      },
+      priority: CinematicPriorityHierarchy.getPriority(proposal.agentId),
+      confidence: proposal.confidence,
+      reasoning: proposal.reasoning,
+    });
+    subsystemProposalsByMoment.set(proposal.momentId, subBucket);
   }
+
+  const governor = new CinematicGovernor();
+  const resolutions = governor.govern(moments, subsystemProposalsByMoment);
 
   const director = new CreativeDirector();
   const critic = new AestheticCritic();
-  const firstPass = await director.decide(governedContext, moments, proposalsByMoment, 0, []);
+  const firstPass = await director.decide(governedContext, moments, proposalsByMoment, 0, [], resolutions);
   let criticReview = critic.review(firstPass.timeline, governedContext);
   let finalDecisionSet = firstPass;
 
@@ -248,7 +277,10 @@ export const buildCreativeOrchestrationPlan = async (input: {
     judgmentAuditTrail: finalDecisionSet.judgmentAuditTrail ?? [],
     feedbackSignals: finalDecisionSet.feedbackSignals ?? [],
     criticReview,
-    finalCreativeTimeline: finalDecisionSet.timeline
+    finalCreativeTimeline: {
+      ...finalDecisionSet.timeline,
+      sequencePlan
+    }
   };
 
   return {
@@ -261,7 +293,10 @@ export const buildCreativeOrchestrationPlan = async (input: {
     judgmentAuditTrail: finalDecisionSet.judgmentAuditTrail ?? [],
     feedbackSignals: finalDecisionSet.feedbackSignals ?? [],
     criticReview,
-    finalCreativeTimeline: finalDecisionSet.timeline,
+    finalCreativeTimeline: {
+      ...finalDecisionSet.timeline,
+      sequencePlan
+    },
     captionChunks,
     debugReport
   };

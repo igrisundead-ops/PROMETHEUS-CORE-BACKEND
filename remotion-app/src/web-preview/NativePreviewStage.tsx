@@ -28,6 +28,11 @@ import {
   resolveMotionDecisionZIndex
 } from "../lib/motion-graphics-agent/rendering";
 import {resolveBackgroundOverlayRenderState} from "../lib/motion-platform/background-overlay-visuals";
+import {
+  sanitizeRenderableOverlayText,
+  shouldRenderOverlayText,
+  shouldRenderPreviewOverlayAsset
+} from "../lib/motion-platform/render-text-safety";
 import {resolveSchemaStageEffectRoute} from "../lib/motion-platform/schema-mapping-resolver";
 import type {MotionGraphicsDecision, MotionGraphicsDecisionAsset} from "../lib/motion-graphics-agent/types";
 import {
@@ -136,7 +141,17 @@ const resolvePreviewViewportScale = ({
   return clamp(rawScale, MIN_PREVIEW_VIEWPORT_SCALE, 1);
 };
 
-const easeOutCubic = (value: number): number => 1 - (1 - clamp01(value)) ** 3;
+const prestigeSnap = (value: number): number => {
+  const t = clamp01(value);
+  // Approximation of cubic-bezier(0.05, 0.7, 0.1, 1.0)
+  // Fast snap up to ~0.8 progress in the first ~25% of time
+  if (t < 0.22) {
+    return (t / 0.22) * 0.82;
+  }
+  return 0.82 + ((t - 0.22) / 0.78) * 0.18;
+};
+
+const easeOutCubic = prestigeSnap;
 const easeInOutCubic = (value: number): number => {
   const t = clamp01(value);
   return t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2;
@@ -276,15 +291,15 @@ const buildPreviewWordTextShadow = ({
 }): string => {
   const baseShadow = editorialDecision?.textShadow ??
     (isActive
-      ? "0 0 16px rgba(255,255,255,0.9), 0 0 32px rgba(201,223,255,0.58), 0 6px 16px rgba(0,0,0,0.62)"
+      ? "0 2px 10px rgba(0,0,0,0.68), 0 0 16px rgba(147,197,253,0.32)"
       : highlightProgress > 0
-        ? "0 0 10px rgba(242,247,255,0.38), 0 5px 14px rgba(0,0,0,0.54)"
-        : "0 4px 14px rgba(0,0,0,0.46)");
+        ? "0 1px 6px rgba(0,0,0,0.54), 0 0 10px rgba(242,247,255,0.18)"
+        : "0 1px 4px rgba(0,0,0,0.46)");
   const glowShadow = isActive
-    ? `0 0 ${Math.round(18 * PREVIEW_TEXT_GLOW_GAIN)}px rgba(255,255,255,0.34), 0 0 ${Math.round(34 * PREVIEW_TEXT_GLOW_GAIN)}px rgba(147,197,253,0.18)`
+    ? `0 0 ${Math.round(12 * PREVIEW_TEXT_GLOW_GAIN * 0.45)}px rgba(255,255,255,0.24), 0 0 ${Math.round(22 * PREVIEW_TEXT_GLOW_GAIN * 0.35)}px rgba(147,197,253,0.12)`
     : highlightProgress > 0.02
-      ? `0 0 ${Math.round(12 * PREVIEW_TEXT_GLOW_GAIN)}px rgba(255,255,255,0.16), 0 0 ${Math.round(24 * PREVIEW_TEXT_GLOW_GAIN)}px rgba(125,168,255,0.09)`
-      : "0 0 10px rgba(255,255,255,0.05)";
+      ? `0 0 ${Math.round(8 * PREVIEW_TEXT_GLOW_GAIN * 0.35)}px rgba(255,255,255,0.12), 0 0 ${Math.round(16 * PREVIEW_TEXT_GLOW_GAIN * 0.25)}px rgba(125,168,255,0.06)`
+      : "0 0 6px rgba(255,255,255,0.02)";
 
   return `${glowShadow}, ${baseShadow}`;
 };
@@ -326,12 +341,14 @@ const getAnimatedLetterStyle = ({
   const rotateDeg = (1 - revealProgress) * directionalSign * ((pattern?.entry.rotateZ?.[0] ?? 6) * 0.42);
   const blurPx = (1 - revealProgress) * ((pattern?.entry.blur?.[0] ?? 8) * 0.24);
 
+  const isSettled = revealProgress >= 0.99 && (currentTimeMs - revealStartMs) > 320;
+
   return {
     display: "inline-block",
     opacity: Math.max(0, Math.min(1, 0.22 + revealProgress * 0.9)),
     transform: `translate3d(0, ${translateY.toFixed(2)}px, 0) rotate(${rotateDeg.toFixed(2)}deg)`,
-    filter: `blur(${blurPx.toFixed(2)}px)`,
-    willChange: "transform, opacity, filter"
+    filter: isSettled ? undefined : `blur(${blurPx.toFixed(2)}px)`,
+    willChange: isSettled ? undefined : "transform, opacity, filter"
   };
 };
 
@@ -353,6 +370,7 @@ const renderAnimatedWordLabel = ({
   return Array.from(word.text).map((character, characterIndex) => (
     <span
       key={`${word.startMs}-${characterIndex}-${character}`}
+      className={currentTimeMs >= word.startMs + 320 ? "typography-letter is-settled" : "typography-letter is-entering"}
       style={getAnimatedLetterStyle({
         word,
         characterIndex,
@@ -380,22 +398,24 @@ const getLineRevealStyle = ({
   const revealWindowMs = Math.max(240, Math.min(760, endMs - startMs + 220));
   const revealProgress = easeOutCubic(clamp01((currentTimeMs - (startMs - 180)) / revealWindowMs));
 
+  const isSettled = revealProgress >= 0.99 && (currentTimeMs - (startMs - 180)) > 420;
+
   if (variant === "split-focus") {
     return {
       clipPath: `inset(0 ${(Math.max(0, 1 - revealProgress) * 100).toFixed(2)}% 0 0)`,
-      filter: `blur(${((1 - revealProgress) * 3.8).toFixed(2)}px)`
+      filter: isSettled ? undefined : `blur(${((1 - revealProgress) * 3.8).toFixed(2)}px)`
     };
   }
 
   if (variant === "rotational-stagger") {
     return {
-      filter: `blur(${((1 - revealProgress) * 1.6).toFixed(2)}px)`
+      filter: isSettled ? undefined : `blur(${((1 - revealProgress) * 1.6).toFixed(2)}px)`
     };
   }
 
   if (variant === "blur-lift") {
     return {
-      filter: `blur(${((1 - revealProgress) * 1.8).toFixed(2)}px)`
+      filter: isSettled ? undefined : `blur(${((1 - revealProgress) * 1.8).toFixed(2)}px)`
     };
   }
 
@@ -434,8 +454,11 @@ const getWordStyle = ({
   const variant = resolvePreviewTypographyVariant(editorialDecision);
   const durationMs = Math.max(1, word.endMs - word.startMs);
   const revealLeadMs = Math.min(240, Math.max(120, durationMs * 0.42));
-  const revealProgress = easeOutCubic(clamp01((currentTimeMs - (word.startMs - revealLeadMs)) / Math.max(1, durationMs * 0.78)));
+  const revealStartMs = word.startMs - revealLeadMs;
+  const revealProgress = easeOutCubic(clamp01((currentTimeMs - revealStartMs) / Math.max(1, durationMs * 0.78)));
   const directionalSign = wordIndex % 2 === 0 ? -1 : 1;
+  const isSettled = revealProgress >= 0.99 && (currentTimeMs - revealStartMs) > 420;
+
   let extraTranslateX = 0;
   let extraTranslateY = 0;
   let extraBlur = 0;
@@ -490,7 +513,7 @@ const getWordStyle = ({
     display: "inline-block",
     opacity,
     transform: `translate3d(${extraTranslateX.toFixed(2)}px, ${(translateY + extraTranslateY).toFixed(2)}px, 0) scale(${(scale * scaleMultiplier).toFixed(3)}) rotate(${rotateDeg.toFixed(2)}deg)`,
-    filter: `blur(${(blur + extraBlur).toFixed(2)}px)`,
+    filter: isSettled ? undefined : `blur(${(blur + extraBlur).toFixed(2)}px)`,
     textShadow,
     color: editorialDecision?.textColor ?? (isActive ? "#ffffff" : hasStarted ? "rgba(243,246,255,0.94)" : "rgba(243,246,255,0.86)"),
     textTransform: editorialDecision?.uppercaseBias ? "uppercase" : undefined,
@@ -501,7 +524,7 @@ const getWordStyle = ({
     borderRadius,
     background,
     boxShadow,
-    willChange: "transform, opacity, filter"
+    willChange: isSettled ? undefined : "transform, opacity, filter"
   };
 };
 
@@ -583,10 +606,10 @@ const buildPreviewSubtitleTextShadow = ({
   revealProgress: number;
 }): string => {
   const baseShadow = editorialDecision?.textShadow ??
-    "0 8px 22px rgba(0,0,0,0.58), 0 16px 44px rgba(0,0,0,0.2)";
+    "0 4px 12px rgba(0,0,0,0.68), 0 8px 24px rgba(0,0,0,0.24)";
   const layeredGlow = isEmphasized
-    ? `0 0 ${Math.round(20 * PREVIEW_SUBTITLE_GLOW_GAIN)}px rgba(255,255,255,0.24), 0 0 ${Math.round(34 * PREVIEW_SUBTITLE_GLOW_GAIN)}px rgba(147,197,253,0.18)`
-    : `0 0 ${Math.round(10 * PREVIEW_SUBTITLE_GLOW_GAIN * Math.max(0.35, revealProgress))}px rgba(255,255,255,0.12), 0 0 ${Math.round(18 * PREVIEW_SUBTITLE_GLOW_GAIN * Math.max(0.22, revealProgress))}px rgba(147,197,253,0.08)`;
+    ? `0 0 ${Math.round(14 * PREVIEW_SUBTITLE_GLOW_GAIN)}px rgba(255,255,255,0.18), 0 0 ${Math.round(24 * PREVIEW_SUBTITLE_GLOW_GAIN)}px rgba(147,197,253,0.12)`
+    : `0 0 ${Math.round(8 * PREVIEW_SUBTITLE_GLOW_GAIN * Math.max(0.35, revealProgress))}px rgba(255,255,255,0.08), 0 0 ${Math.round(14 * PREVIEW_SUBTITLE_GLOW_GAIN * Math.max(0.22, revealProgress))}px rgba(147,197,253,0.05)`;
 
   return `${layeredGlow}, ${baseShadow}`;
 };
@@ -628,42 +651,55 @@ const getPreviewSubtitlePhraseMotionStyle = ({
   };
 };
 
+const breathEase = (value: number): number => {
+  const t = clamp01(value);
+  // Extremely slow start, linear middle, slow end (for "breathing" or "calm" energy)
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+};
+
 const getPreviewSubtitleLineRevealStyle = ({
   line,
   lineIndex,
   chunk,
   currentTimeMs,
-  mode
+  mode,
+  editorialDecision
 }: {
   line: LongformWordLine;
   lineIndex: number;
   chunk: CaptionChunk;
   currentTimeMs: number;
   mode: PreviewSubtitleAnimationMode;
+  editorialDecision?: CaptionEditorialDecision;
 }): CSSProperties => {
   const {revealProgress} = resolvePreviewSubtitlePhraseProgress({
     chunk,
     currentTimeMs
   });
   const lineDurationMs = Math.max(220, line.endMs - line.startMs + 160);
+  const motionEnergy = editorialDecision?.visualOrchestration?.motionSynchronizationPlan?.typographyMotionEnergy ?? "aggressive";
+  const lineProgressRaw = clamp01((currentTimeMs - (line.startMs - 130)) / lineDurationMs);
+  
   const lineProgress = mode === "phrase_block_reveal"
-    ? easeOutCubic(clamp01((currentTimeMs - (line.startMs - 130)) / lineDurationMs))
+    ? (motionEnergy === "calm" ? breathEase(lineProgressRaw) : easeOutCubic(lineProgressRaw))
     : revealProgress;
+
+  const isSettled = lineProgress >= 0.99 && (currentTimeMs - (line.startMs - 130)) > 340;
 
   if (mode === "phrase_block_reveal") {
     return {
       opacity: Math.max(0.22, lineProgress),
       transform: `translate3d(0, ${((1 - lineProgress) * (10 - Math.min(3, lineIndex) * 1.4) * PREVIEW_SUBTITLE_ANIMATION_GAIN).toFixed(2)}px, 0)`,
-      clipPath: `inset(0 ${(Math.max(0, 1 - lineProgress) * 100).toFixed(2)}% 0 0)`,
-      filter: `blur(${((1 - lineProgress) * 2.6).toFixed(2)}px)`,
-      willChange: "transform, opacity, filter, clip-path"
+      clipPath: isSettled ? undefined : `inset(0 ${(Math.max(0, 1 - lineProgress) * 100).toFixed(2)}% 0 0)`,
+      filter: isSettled ? undefined : `blur(${((1 - lineProgress) * (motionEnergy === "calm" ? 1.0 : 2.6)).toFixed(2)}px)`,
+      willChange: isSettled ? undefined : "transform, opacity, filter, clip-path"
     };
   }
 
   return {
     opacity: Math.max(0.9, revealProgress),
     transform: `translate3d(0, ${((1 - revealProgress) * (2.6 + lineIndex * 0.6)).toFixed(2)}px, 0)`,
-    willChange: "transform, opacity"
+    willChange: isSettled ? undefined : "transform, opacity"
   };
 };
 
@@ -689,55 +725,68 @@ const getPreviewSubtitleWordStyle = ({
   const durationMs = Math.max(320, chunk.endMs - chunk.startMs);
   const revealLeadMs = Math.min(180, Math.max(110, durationMs * 0.18));
   const direction = chunkWordIndex % 2 === 0 ? -1 : 1;
+  const motionEnergy = editorialDecision?.visualOrchestration?.motionSynchronizationPlan?.typographyMotionEnergy ?? "aggressive";
   let wordProgress = revealProgress;
+  let wordStartMs = chunk.startMs;
 
   if (mode === "phrase_stagger_reveal") {
     const staggerMs = clamp(durationMs / Math.max(4, chunk.words.length * 3.2), 34, 70);
     const revealStartMs = chunk.startMs + chunkWordIndex * staggerMs;
-    wordProgress = easeOutCubic(
-      clamp01((currentTimeMs - (revealStartMs - revealLeadMs)) / Math.max(180, durationMs * 0.42))
-    );
+    wordStartMs = revealStartMs;
+    const progressRaw = clamp01((currentTimeMs - (revealStartMs - revealLeadMs)) / Math.max(180, durationMs * 0.42));
+    wordProgress = motionEnergy === "calm" ? breathEase(progressRaw) : easeOutCubic(progressRaw);
   } else if (mode === "word_emphasis_reveal") {
     const staggerMs = isEmphasized ? 44 : 24;
     const emphasisDelayMs = isEmphasized
       ? Math.min(150, 40 + chunkWordIndex * 18)
       : chunkWordIndex * staggerMs;
-    wordProgress = easeOutCubic(
-      clamp01((currentTimeMs - (chunk.startMs + emphasisDelayMs - revealLeadMs)) / Math.max(160, durationMs * (isEmphasized ? 0.34 : 0.28)))
-    );
+    wordStartMs = chunk.startMs + emphasisDelayMs;
+    const progressRaw = clamp01((currentTimeMs - (wordStartMs - revealLeadMs)) / Math.max(160, durationMs * (isEmphasized ? 0.34 : 0.28)));
+    wordProgress = motionEnergy === "calm" ? breathEase(progressRaw) : easeOutCubic(progressRaw);
   }
 
-  const travelY = mode === "phrase_stagger_reveal"
+  const isSettled = wordProgress >= 0.99 && (currentTimeMs - (wordStartMs - revealLeadMs)) > 340;
+
+  const baseTravelY = mode === "phrase_stagger_reveal"
     ? 16
     : mode === "word_emphasis_reveal"
       ? (isEmphasized ? 13 : 10)
       : 8;
-  const translateY = (1 - wordProgress) * travelY * PREVIEW_SUBTITLE_ANIMATION_GAIN - settleProgress * (isEmphasized ? 1.3 : 0.8);
-  const translateX = mode === "phrase_stagger_reveal"
+  const travelY = motionEnergy === "calm" ? baseTravelY * 0.4 : baseTravelY;
+  const physicsAggression = editorialDecision?.stylePhysics.motion.motionAggression ?? 1.0;
+  const translateY = ((1 - wordProgress) * travelY * physicsAggression * PREVIEW_SUBTITLE_ANIMATION_GAIN - settleProgress * (isEmphasized ? 1.3 : 0.8)) / (editorialDecision?.stylePhysics.motion.damping ?? 1.0);
+  
+  const baseTranslateX = mode === "phrase_stagger_reveal"
     ? direction * (1 - wordProgress) * 6.2 * PREVIEW_SUBTITLE_ANIMATION_GAIN
     : isEmphasized
       ? direction * (1 - wordProgress) * 2.4
       : 0;
-  const rotateDeg = mode === "phrase_stagger_reveal"
+  const translateX = (motionEnergy === "calm" ? baseTranslateX * 0.2 : baseTranslateX) * physicsAggression;
+      
+  const rotateDeg = (mode === "phrase_stagger_reveal"
     ? direction * (1 - wordProgress) * 2.8
     : isEmphasized
       ? direction * (1 - wordProgress) * 1.4
-      : 0;
-  const blurPx = (1 - wordProgress) * (
+      : 0) * physicsAggression;
+      
+  const baseBlurPx = (1 - wordProgress) * (
     mode === "phrase_stagger_reveal"
       ? 4.8
       : mode === "word_emphasis_reveal"
         ? (isEmphasized ? 4.2 : 2.8)
         : 2.4
   );
+  const blurPx = (motionEnergy === "calm" ? baseBlurPx * 0.2 : baseBlurPx) * (editorialDecision?.stylePhysics.motion.blurRelease ?? 1.0) / 4.0; 
+
   const emphasisCapsule = mode === "word_emphasis_reveal" && isEmphasized;
 
   return {
     display: "inline-flex",
     alignItems: "baseline",
-    opacity: Math.max(0.18, Math.min(1, 0.14 + wordProgress * 0.9)),
+    opacity: Math.max(0.18, Math.min(1, (0.14 + wordProgress * 0.9) * (editorialDecision?.stylePhysics.motion.opacityAcceleration ?? 1.0))),
     transform: `translate3d(${translateX.toFixed(2)}px, ${translateY.toFixed(2)}px, 0) scale(${(0.972 + wordProgress * 0.028 + (isEmphasized ? revealProgress * 0.024 : 0)).toFixed(3)}) rotate(${rotateDeg.toFixed(2)}deg)`,
-    filter: `blur(${blurPx.toFixed(2)}px)`,
+    filter: isSettled ? undefined : `blur(${blurPx.toFixed(2)}px)`,
+    transition: `all ${editorialDecision?.stylePhysics.motion.durationMs}ms ${editorialDecision?.stylePhysics.motion.easing}`,
     color: editorialDecision?.textColor ?? "#f7f9ff",
     textShadow: buildPreviewSubtitleTextShadow({
       editorialDecision,
@@ -751,12 +800,12 @@ const getPreviewSubtitleWordStyle = ({
     padding: emphasisCapsule ? "0.04em 0.18em 0.08em" : undefined,
     borderRadius: emphasisCapsule ? "0.34em" : undefined,
     background: emphasisCapsule
-      ? "linear-gradient(135deg, rgba(72, 94, 255, 0.26), rgba(10, 14, 26, 0.08))"
+      ? "linear-gradient(135deg, rgba(72, 94, 255, 0.22), rgba(10, 14, 26, 0.08))"
       : undefined,
     boxShadow: emphasisCapsule
-      ? "0 0 0 1px rgba(255,255,255,0.08), 0 0 26px rgba(147,197,253,0.18), 0 10px 24px rgba(0,0,0,0.26)"
+      ? "0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(147,197,253,0.14), 0 8px 18px rgba(0,0,0,0.22)"
       : undefined,
-    willChange: "transform, opacity, filter"
+    willChange: isSettled ? undefined : "transform, opacity, filter"
   };
 };
 
@@ -1111,6 +1160,10 @@ const NativeMotionGraphicsDecisionItem: React.FC<{
     return null;
   }
 
+  if (!shouldRenderPreviewOverlayAsset(asset)) {
+    return null;
+  }
+
   const placement = resolveMotionDecisionAssetPlacement({
     selectedAsset,
     decision
@@ -1242,6 +1295,9 @@ const NativeMotionAssetOverlay: React.FC<{
         />
       ))}
       {renderLegacyAssets ? activeScene.assets.map((asset) => {
+        if (!shouldRenderPreviewOverlayAsset(asset)) {
+          return null;
+        }
         const binding = choreographyState?.scene.layerBindings.find((candidate) => candidate.sourceAssetId === asset.id);
         if (binding?.depthTreatment === "depth-worthy" && choreography3DEnabled) {
           return null;
@@ -1618,6 +1674,13 @@ const NativeShowcaseOverlay: React.FC<{
   const cueAssetSrc = activeCue.cueSource === "direct-asset"
     ? resolveCueAssetSrc(activeCue.asset.src)
     : null;
+  const safeCueLabel = sanitizeRenderableOverlayText(activeCue.canonicalLabel);
+  if (activeCue.cueSource === "direct-asset" && (!shouldRenderPreviewOverlayAsset(activeCue.asset) || !safeCueLabel)) {
+    return null;
+  }
+  if (activeCue.cueSource !== "direct-asset" && !safeCueLabel) {
+    return null;
+  }
   const canRenderAssetImage = cueAssetSrc !== null && !/\.(mp4|webm|mov)$/i.test(cueAssetSrc);
   const showcaseSchemaRoute = useMemo(() => resolveSchemaStageEffectRoute({
     text: `${activeCue.canonicalLabel} ${activeCue.reason ?? ""}`.trim()
@@ -1673,18 +1736,18 @@ const NativeShowcaseOverlay: React.FC<{
                 {canRenderAssetImage ? (
                   <StageOverlayAsset
                     src={cueAssetSrc}
-                    alt={activeCue.canonicalLabel}
+                    alt={safeCueLabel}
                     fitMode={showcaseSchemaRoute.preferAssetContain ? "contain" : "cover"}
                     filter={getCueFilter(activeCue)}
                   />
                 ) : (
                   <div className="preview-native-showcase-fallback">
-                    {activeCue.canonicalLabel}
+                    {safeCueLabel}
                   </div>
                 )}
                 {activeCue.showLabelPlate ? (
                   <div className="preview-native-showcase-label">
-                    {activeCue.canonicalLabel}
+                    {safeCueLabel}
                   </div>
                 ) : null}
               </div>
@@ -1705,7 +1768,7 @@ const NativeShowcaseOverlay: React.FC<{
 
 const NativeCaptionOverlay: React.FC<{
   currentTimeMs: number;
-  videoMetadata: Pick<VideoMetadata, "width" | "height">;
+  videoMetadata: Pick<VideoMetadata, "width" | "height" | "fps">;
   chunks: CaptionChunk[];
   captionProfileId: CaptionStyleProfileId;
   captionBias: MotionCompositionModel["captionBias"];
@@ -1775,7 +1838,8 @@ const NativeCaptionOverlay: React.FC<{
     lineCount: lines.length,
     previewViewportScale,
     captionBias,
-    editorialDecision
+    editorialDecision,
+    placementPlan: editorialDecision.visualOrchestration.placementPlan
   }), [captionBias, editorialDecision, lines, previewViewportScale, videoMetadata.height, videoMetadata.width]);
   const emphasisIndices = useMemo(() => {
     if (!activeChunk || subtitleMode !== "word_emphasis_reveal") {
@@ -1785,7 +1849,15 @@ const NativeCaptionOverlay: React.FC<{
     return resolvePreviewSubtitleEmphasisIndices(activeChunk);
   }, [activeChunk, subtitleMode]);
 
-  if (!activeChunk || activeChunk.words.length === 0) {
+  const isSilenced = subtitleSafeZone.physics.isSilenced;
+  const delayMs = (subtitleSafeZone.physics.impactDelayFrames / (videoMetadata.fps ?? 30)) * 1000;
+  const isDelayed = activeChunk && currentTimeMs < activeChunk.startMs + delayMs;
+  
+  if (!activeChunk || activeChunk.words.length === 0 || isSilenced || isDelayed) {
+    return null;
+  }
+
+  if (!shouldRenderOverlayText(activeChunk.text)) {
     return null;
   }
 
@@ -1825,6 +1897,10 @@ const NativeCaptionOverlay: React.FC<{
             <div className="preview-native-docked-caption-bar" />
             <div className="preview-native-docked-caption-words">
               {activeWords.map((word, index) => {
+                const safeText = sanitizeRenderableOverlayText(word.text);
+                if (!safeText) {
+                  return null;
+                }
                 const previousWord = index > 0 ? activeWords[index - 1] : undefined;
                 const nextWord = index < activeWords.length - 1 ? activeWords[index + 1] : undefined;
                 const motionState = getLongformWordMotionState({
@@ -1866,7 +1942,7 @@ const NativeCaptionOverlay: React.FC<{
                       willChange: "transform, opacity, filter"
                     }}
                   >
-                    {word.text}
+                    {safeText}
                   </span>
                 );
               })}
@@ -1892,7 +1968,12 @@ const NativeCaptionOverlay: React.FC<{
           bottom: `${subtitleSafeZone.bottomPercent}%`,
           display: "flex",
           alignItems: "flex-end",
-          justifyContent: "center"
+          justifyContent: subtitleSafeZone.justifyContent,
+          opacity: subtitleSafeZone.physics.opacity,
+          transform: `translate3d(${subtitleSafeZone.physics.offsetX}px, ${subtitleSafeZone.physics.offsetY}px, 0) rotate(${subtitleSafeZone.physics.rotation}deg) scale(${1.0 + subtitleSafeZone.physics.scaleMultiplier})`,
+          filter: `blur(${subtitleSafeZone.physics.blurPx}px)`,
+          transition: `all ${editorialDecision.stylePhysics.motion.durationMs}ms ${editorialDecision.stylePhysics.motion.easing}`,
+          ...editorialDecision.cssVariables as CSSProperties
         }}
       >
         <div
@@ -1904,14 +1985,15 @@ const NativeCaptionOverlay: React.FC<{
             minHeight: `${subtitleSafeZone.minHeightEm}em`,
             boxSizing: "border-box",
             padding: `${subtitleSafeZone.padBlockEm}em ${subtitleSafeZone.padInlineEm}em`,
-            textAlign: "center",
+            textAlign: subtitleSafeZone.justifyContent === "center" ? "center" : "left",
             fontFamily: editorialDecision.fontFamily,
             fontSize: `${subtitleSafeZone.fontSizePx}px`,
             lineHeight: subtitleSafeZone.lineHeight,
             letterSpacing: editorialDecision.letterSpacing,
             color: editorialDecision.textColor,
             fontWeight: editorialDecision.fontWeight,
-            textTransform: editorialDecision.uppercaseBias ? "uppercase" : undefined
+            textTransform: editorialDecision.uppercaseBias ? "uppercase" : undefined,
+            opacity: editorialDecision.opacityMultiplier ?? 1.0
           }}
         >
           <div
@@ -1937,35 +2019,56 @@ const NativeCaptionOverlay: React.FC<{
               position: "relative",
               zIndex: 1,
               display: "grid",
-              justifyItems: "center",
+              justifyItems: subtitleSafeZone.justifyContent === "center" ? "center" : "start",
               gap: `${subtitleSafeZone.lineGapEm}em`
             }}
           >
-            {lines.map((line, lineIndex) => (
-              <div
-                key={`${activeChunk.id}-${line.id}`}
-                style={{
-                  ...getPreviewSubtitleLineRevealStyle({
-                    line,
-                    lineIndex,
-                    chunk: activeChunk,
-                    currentTimeMs,
-                    mode: subtitleMode
-                  }),
-                  position: "relative",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "baseline",
-                  gap: `0 ${subtitleSafeZone.wordGapEm}em`,
-                  whiteSpace: "nowrap",
-                  color: editorialDecision.textColor,
-                  textTransform: editorialDecision.uppercaseBias ? "uppercase" : undefined,
-                  fontFamily: editorialDecision.fontFamily,
-                  fontWeight: editorialDecision.fontWeight,
-                  letterSpacing: editorialDecision.letterSpacing
-                }}
-              >
-                {line.words.map((word, wordIndex) => {
+            {lines.map((line, lineIndex) => {
+              const safeLineWords = line.words
+                .map((word) => ({
+                  word,
+                  safeText: sanitizeRenderableOverlayText(word.text)
+                }))
+                .filter((entry) => entry.safeText.length > 0);
+              if (safeLineWords.length === 0) {
+                return null;
+              }
+              const lineRole = line.role ?? "context";
+              const lineStyle = editorialDecision.lineStyles[lineRole] ?? {
+                fontSizeScale: 1,
+                fontWeight: editorialDecision.fontWeight,
+                lineHeight: 1.12,
+                letterSpacing: editorialDecision.letterSpacing
+              };
+
+              return (
+                <div
+                  key={`${activeChunk.id}-${line.id}`}
+                  style={{
+                    ...getPreviewSubtitleLineRevealStyle({
+                      line,
+                      lineIndex,
+                      chunk: activeChunk,
+                      currentTimeMs,
+                      mode: subtitleMode,
+                      editorialDecision
+                    }),
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: subtitleSafeZone.justifyContent === "center" ? "center" : "flex-start",
+                    alignItems: "baseline",
+                    gap: `0 ${subtitleSafeZone.wordGapEm}em`,
+                    whiteSpace: "nowrap",
+                    color: editorialDecision.textColor,
+                    textTransform: editorialDecision.uppercaseBias ? "uppercase" : undefined,
+                    fontFamily: editorialDecision.fontFamily,
+                    fontSize: `${Math.round(subtitleSafeZone.fontSizePx * lineStyle.fontSizeScale)}px`,
+                    fontWeight: lineStyle.fontWeight,
+                    lineHeight: lineStyle.lineHeight,
+                    letterSpacing: lineStyle.letterSpacing
+                  }}
+                >
+                  {safeLineWords.map(({word, safeText}, wordIndex) => {
                   const wordKey = getLongformWordEmphasisWordKey(word);
                   const wordMeta = activeChunkPresentation?.wordMetaByKey.get(wordKey);
                   const chunkWordIndex = Math.max(0, wordMeta?.chunkWordIndex ?? wordIndex);
@@ -1992,14 +2095,15 @@ const NativeCaptionOverlay: React.FC<{
                         overflow: "visible"
                       }}
                     >
-                      {word.text}
+                      {safeText}
                     </span>
                   );
                 })}
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
+      </div>
       </div>
     </div>
   );

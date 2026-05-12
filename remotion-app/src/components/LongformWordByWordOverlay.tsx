@@ -1,4 +1,4 @@
-import React, {useMemo} from "react";
+import React, {useEffect, useMemo} from "react";
 import {AbsoluteFill, useVideoConfig} from "remotion";
 
 import {LongformDockedInverseOverlay} from "./LongformDockedInverseOverlay";
@@ -10,11 +10,16 @@ import {
 } from "./LongformWordEmphasisAdornment";
 import type {LongformWordEmphasisPrimitiveId} from "./LongformWordEmphasisAdornment";
 import {LongformSemanticSidecallOverlay} from "./LongformSemanticSidecallOverlay";
+import {ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS} from "../lib/longform-semantic-sidecall";
 import {
   resolveCaptionEditorialDecision,
   type CaptionEditorialContext,
   type CaptionEditorialDecision
 } from "../lib/motion-platform/caption-editorial-engine";
+import {
+  sanitizeRenderableOverlayText,
+  shouldRenderOverlayText
+} from "../lib/motion-platform/render-text-safety";
 import {getCaptionContainerStyle, longformCaptionSafeZone} from "../lib/caption-layout";
 import {getLongformCaptionSizing} from "../lib/longform-caption-scale";
 import {resolveActiveLongformNumericTreatment} from "../lib/longform-numeric-treatment";
@@ -41,6 +46,7 @@ type LongformWordByWordOverlayProps = {
   stabilizePreviewTimeline?: boolean;
   previewTimelineResetVersion?: number;
   editorialContext?: Omit<CaptionEditorialContext, "chunk" | "currentTimeMs">;
+  premiumTypographyMode?: "default" | "dev-fixture-v1";
 };
 
 type PreparedLongformChunk = {
@@ -53,6 +59,59 @@ type PreparedLongformChunk = {
   }>;
 };
 
+const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+
+const resolvePremiumTypographyDevFixtureMoment = (
+  chunk: CaptionChunk | null | undefined
+): "hook" | "emphasis" | "neutral" | null => {
+  if (!chunk?.id.startsWith("dev-fixture-")) {
+    return null;
+  }
+
+  if (chunk.id.includes("-hook-")) {
+    return "hook";
+  }
+  if (chunk.id.includes("-emphasis-")) {
+    return "emphasis";
+  }
+
+  return "neutral";
+};
+
+const resolvePremiumTypographyDevFixtureTuning = (
+  moment: "hook" | "emphasis" | "neutral" | null
+): {
+  fontSizeMultiplier: number;
+  lineHeight: number;
+  maxWidthPercent: number;
+  containerLiftPx: number;
+} => {
+  if (moment === "hook") {
+    return {
+      fontSizeMultiplier: 1.18,
+      lineHeight: 0.98,
+      maxWidthPercent: 54,
+      containerLiftPx: -32
+    };
+  }
+
+  if (moment === "emphasis") {
+    return {
+      fontSizeMultiplier: 1.08,
+      lineHeight: 1,
+      maxWidthPercent: 58,
+      containerLiftPx: -16
+    };
+  }
+
+  return {
+    fontSizeMultiplier: 1,
+    lineHeight: 1.04,
+    maxWidthPercent: 64,
+    containerLiftPx: -8
+  };
+};
+
 export const getWordStyle = ({
   word,
   previousWord,
@@ -61,7 +120,8 @@ export const getWordStyle = ({
   chunkWordCount,
   chunk,
   currentTimeMs,
-  editorialDecision
+  editorialDecision,
+  premiumTypographyMode
 }: {
   word: TranscribedWord;
   previousWord?: TranscribedWord;
@@ -71,6 +131,7 @@ export const getWordStyle = ({
   chunk: CaptionChunk;
   currentTimeMs: number;
   editorialDecision: CaptionEditorialDecision;
+  premiumTypographyMode?: "default" | "dev-fixture-v1";
 }): React.CSSProperties => {
   const {opacity, translateY, blur, scale} =
     getLongformWordMotionState({
@@ -99,12 +160,32 @@ export const getWordStyle = ({
       ? Math.max(editorialDecision.fontWeight, 700)
       : editorialDecision.fontWeight
     : editorialDecision.fontWeight;
+  const durationMs = Math.max(1, word.endMs - word.startMs);
+  const patternEntry = editorialDecision.typography.pattern.entry;
+  const revealWindowMs = premiumTypographyMode === "dev-fixture-v1"
+    ? Math.max(140, Math.min(durationMs * 0.9, editorialDecision.motionProfile.snapDurationMs * 1.15))
+    : Math.max(120, Math.min(durationMs * 0.82, 280));
+  const revealStartMs = word.startMs - Math.min(220, revealWindowMs * 0.48);
+  const revealProgress = clamp01((currentTimeMs - revealStartMs) / Math.max(1, revealWindowMs));
+  const premiumTranslateY = premiumTypographyMode === "dev-fixture-v1"
+    ? (1 - revealProgress) * ((patternEntry.y?.[0] ?? 0) * 0.18)
+    : 0;
+  const premiumBlur = premiumTypographyMode === "dev-fixture-v1"
+    ? (1 - revealProgress) * ((patternEntry.blur?.[0] ?? editorialDecision.stylePhysics.motion.blurRelease ?? 0) * 0.12)
+    : 0;
+  const entryScale = patternEntry.scale?.[0] ?? 1;
+  const premiumScale = premiumTypographyMode === "dev-fixture-v1"
+    ? 1 + ((entryScale - 1) * (1 - revealProgress) * 0.26)
+    : 1;
+  const premiumOpacityFloor = premiumTypographyMode === "dev-fixture-v1"
+    ? 0.92 + clamp01(editorialDecision.opacityMultiplier - 0.92) * 0.12
+    : 1;
 
   return {
     display: "inline-block",
-    opacity: Math.min(1, opacity * hierarchyOpacity),
-    transform: `translate3d(0, ${translateY.toFixed(2)}px, 0) scale(${(scale * hierarchyScale).toFixed(3)})`,
-    filter: `blur(${blur.toFixed(2)}px)`,
+    opacity: Math.min(1, opacity * hierarchyOpacity * premiumOpacityFloor),
+    transform: `translate3d(0, ${(translateY - premiumTranslateY).toFixed(2)}px, 0) scale(${(scale * hierarchyScale * premiumScale).toFixed(3)})`,
+    filter: `blur(${(blur + premiumBlur).toFixed(2)}px)`,
     textShadow: editorialDecision.textShadow,
     color: editorialDecision.textColor,
     textTransform: editorialDecision.uppercaseBias ? "uppercase" : undefined,
@@ -183,7 +264,8 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
   captionBias = "bottom",
   stabilizePreviewTimeline = false,
   previewTimelineResetVersion = 0,
-  editorialContext
+  editorialContext,
+  premiumTypographyMode = "default"
 }) => {
   const {fps, width, height} = useVideoConfig();
   const {stableFrame} = useStablePreviewFrame({
@@ -224,8 +306,13 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
 
     return getLongformWordByWordFallbackModeForProfile(captionProfileId, activeChunk, editorialContext);
   }, [activeChunk, captionProfileId, editorialContext]);
+  const effectiveFallbackMode = premiumTypographyMode === "dev-fixture-v1"
+    ? null
+    : fallbackMode === "semantic-sidecall" && !ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS
+    ? null
+    : fallbackMode;
   const emphasisBudgetMap = useMemo(() => {
-    if (fallbackMode) {
+    if (effectiveFallbackMode) {
       return new Map<string, LongformWordEmphasisPrimitiveId>();
     }
 
@@ -233,9 +320,9 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
       chunks,
       currentTimeMs
     });
-  }, [chunks, currentTimeMs, fallbackMode]);
+  }, [chunks, currentTimeMs, effectiveFallbackMode]);
   const preparedChunks = useMemo(() => {
-    if (fallbackMode) {
+    if (effectiveFallbackMode) {
       return new Map<string, PreparedLongformChunk>();
     }
 
@@ -261,9 +348,17 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
         return [chunk.id, {lines, wordMetaByKey}];
       })
     );
-  }, [chunks, fallbackMode]);
+  }, [chunks, effectiveFallbackMode]);
   const activeChunkPresentation = activeChunk ? preparedChunks.get(activeChunk.id) ?? null : null;
   const lines = activeChunkPresentation?.lines ?? [];
+  const premiumDevFixtureMoment = useMemo(
+    () => premiumTypographyMode === "dev-fixture-v1" ? resolvePremiumTypographyDevFixtureMoment(activeChunk) : null,
+    [activeChunk, premiumTypographyMode]
+  );
+  const premiumTypographyTuning = useMemo(
+    () => resolvePremiumTypographyDevFixtureTuning(premiumDevFixtureMoment),
+    [premiumDevFixtureMoment]
+  );
   const captionSizing = useMemo(() => getLongformCaptionSizing({
     width,
     height,
@@ -271,7 +366,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
     lineCount: lines.length
   }), [height, lines, width]);
   const activeNumericTreatment = useMemo(() => {
-    if (fallbackMode) {
+    if (effectiveFallbackMode || premiumTypographyMode === "dev-fixture-v1") {
       return null;
     }
 
@@ -280,13 +375,45 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
       activeChunk,
       currentTimeMs
     });
-  }, [activeChunk, chunks, currentTimeMs, fallbackMode]);
+  }, [activeChunk, chunks, currentTimeMs, effectiveFallbackMode, premiumTypographyMode]);
+
+  useEffect(() => {
+    if (
+      premiumTypographyMode !== "dev-fixture-v1" ||
+      !activeChunk ||
+      !editorialDecision
+    ) {
+      return;
+    }
+
+    if (
+      !editorialDecision.fontSelection.fauxBoldRisk &&
+      !editorialDecision.fontSelection.fauxItalicRisk &&
+      (editorialDecision.fontSelection.runtimeDiagnostics?.length ?? 0) === 0
+    ) {
+      return;
+    }
+
+    console.warn("[premium-typography-dev-fixture]", {
+      chunkId: activeChunk.id,
+      fontCandidateId: editorialDecision.fontSelection.fontCandidateId,
+      fontPaletteId: editorialDecision.fontSelection.fontPaletteId,
+      runtimeCssFamily: editorialDecision.fontSelection.runtimeCssFamily ?? null,
+      fauxBoldRisk: editorialDecision.fontSelection.fauxBoldRisk ?? false,
+      fauxItalicRisk: editorialDecision.fontSelection.fauxItalicRisk ?? false,
+      runtimeDiagnostics: editorialDecision.fontSelection.runtimeDiagnostics ?? []
+    });
+  }, [activeChunk, editorialDecision, premiumTypographyMode]);
 
   if (!activeChunk || activeChunk.words.length === 0) {
     return null;
   }
 
-  if (editorialDecision.mode !== "normal") {
+  if (!shouldRenderOverlayText(activeChunk.text)) {
+    return null;
+  }
+
+  if (editorialDecision.mode !== "normal" && ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS) {
     return (
       <LongformSemanticSidecallOverlay
         chunks={chunks}
@@ -297,7 +424,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
     );
   }
 
-  if (fallbackMode === "semantic-sidecall") {
+  if (effectiveFallbackMode === "semantic-sidecall") {
     return (
       <LongformSemanticSidecallOverlay
         chunks={chunks}
@@ -308,7 +435,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
     );
   }
 
-  if (fallbackMode === "docked-inverse") {
+  if (effectiveFallbackMode === "docked-inverse") {
     return (
       <LongformDockedInverseOverlay
         chunks={chunks}
@@ -362,20 +489,31 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
           ...getCaptionContainerStyle(longformCaptionSafeZone, captionBias),
           display: "flex",
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
+          transform: premiumTypographyMode === "dev-fixture-v1"
+            ? `translate3d(0, ${premiumTypographyTuning.containerLiftPx}px, 0)`
+            : undefined
         }}
       >
         <div
+          data-caption-owner="longform-word-by-word"
+          data-premium-typography-mode={premiumTypographyMode}
+          data-runtime-font-candidate={editorialDecision.fontSelection.fontCandidateId}
+          data-runtime-font-palette={editorialDecision.fontSelection.fontPaletteId}
+          data-runtime-font-alias={editorialDecision.fontSelection.runtimeCssFamily ?? ""}
+          data-runtime-font-manifest-backed={String(Boolean(editorialDecision.fontSelection.manifestBacked))}
+          data-runtime-font-faux-bold-risk={String(Boolean(editorialDecision.fontSelection.fauxBoldRisk))}
+          data-runtime-font-faux-italic-risk={String(Boolean(editorialDecision.fontSelection.fauxItalicRisk))}
           style={{
             width: "100%",
-            maxWidth: `${captionSizing.maxWidthPercent}%`,
+            maxWidth: `${Math.min(captionSizing.maxWidthPercent, premiumTypographyTuning.maxWidthPercent)}%`,
             position: "relative",
             minHeight: usesTwoLineHandoff ? "2.45em" : "auto",
             boxSizing: "border-box",
             padding: "0.06em 0.12em",
             textAlign: "center",
-            fontSize: `${Math.round(captionSizing.fontSizePx * editorialDecision.fontSizeScale)}px`,
-            lineHeight: 1.04,
+            fontSize: `${Math.round(captionSizing.fontSizePx * editorialDecision.fontSizeScale * premiumTypographyTuning.fontSizeMultiplier)}px`,
+            lineHeight: premiumTypographyTuning.lineHeight,
             letterSpacing: editorialDecision.letterSpacing,
             color: editorialDecision.textColor,
             textShadow: editorialDecision.textShadow,
@@ -385,6 +523,15 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
           }}
         >
           {lines.map((line, lineIndex) => {
+            const safeLineWords = line.words
+              .map((word) => ({
+                word,
+                safeText: sanitizeRenderableOverlayText(word.text)
+              }))
+              .filter((entry) => entry.safeText.length > 0);
+            if (safeLineWords.length === 0) {
+              return null;
+            }
             const lineStyle = usesTwoLineHandoff
               ? getTwoLineStyle({lineIndex, handoffProgress})
               : getSingleLineStyle();
@@ -401,7 +548,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
                   whiteSpace: "nowrap"
                 }}
               >
-                {line.words.map((word, wordIndex) => {
+                {safeLineWords.map(({word, safeText}, wordIndex) => {
                   const wordKey = getLongformWordEmphasisWordKey(word);
                   const wordMeta = activeChunkPresentation?.wordMetaByKey.get(wordKey);
                   const chunkWordIndex = wordMeta?.chunkWordIndex ?? wordIndex;
@@ -422,7 +569,8 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
                           chunkWordCount: activeChunk.words.length,
                           chunk: activeChunk,
                           currentTimeMs,
-                          editorialDecision
+                          editorialDecision,
+                          premiumTypographyMode
                         }),
                         position: "relative",
                         overflow: "visible",
@@ -441,7 +589,7 @@ export const LongformWordByWordOverlay: React.FC<LongformWordByWordOverlayProps>
                         currentTimeMs={currentTimeMs}
                         resolvedPrimitiveId={resolvedPrimitiveId}
                       />
-                      {word.text}
+                      {safeText}
                     </span>
                   );
                 })}

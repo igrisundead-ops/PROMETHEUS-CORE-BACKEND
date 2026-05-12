@@ -18,6 +18,7 @@ import {
   LONGFORM_DRAFT_VIDEO_ASSET
 } from "./lib/draft-preview";
 import {HouseFontBootstrap} from "./lib/cinematic-typography/house-font-loader";
+import {RuntimeFontBootstrap} from "./lib/font-intelligence/font-runtime-loader";
 import {getPresentationPreset} from "./lib/presentation-presets";
 import {normalizeCaptionStyleProfileId} from "./lib/stylebooks/caption-style-profiles";
 
@@ -27,6 +28,18 @@ const envCaptionProfileId =
 const defaultCaptionProfileId = envCaptionProfileId?.trim()
   ? normalizeCaptionStyleProfileId(envCaptionProfileId)
   : undefined;
+const DEV_FIXTURE_LONGFORM_VIDEO_ASSET = "dev-fixtures/test-video.mp4";
+const DEV_FIXTURE_LONGFORM_COMPOSITION_ID = "MaleHeadVideoLongFormDevFixture";
+const KNOWN_STUDIO_COMPOSITION_IDS = new Set([
+  "FemaleCoachDeanGraziosi",
+  "MaleHeadVideoLongForm",
+  DEV_FIXTURE_LONGFORM_COMPOSITION_ID,
+  LONGFORM_DRAFT_COMPOSITION_ID,
+  "Cinematic3DDemo",
+  "CinematicChoreographyProof",
+  "TargetFocusZoomShowcase",
+  "CinematicPiPShowcase"
+]);
 const reelPreset = getPresentationPreset("reel");
 const longFormPreset = getPresentationPreset("long-form");
 const longFormDraftVideoMetadata = getLongformDraftVideoMetadata(longFormPreset.videoMetadata);
@@ -56,9 +69,18 @@ const projectScopedStudioDefaultProps = buildProjectScopedStudioDefaultProps(
 );
 
 export const RemotionRoot: React.FC = () => {
+  if (typeof window !== "undefined" && window.remotion_isReadOnlyStudio) {
+    const pathname = window.location.pathname.replace(/^\/+/, "");
+    if (pathname && !window.location.search && KNOWN_STUDIO_COMPOSITION_IDS.has(pathname)) {
+      // Read-only Studio expects routes in ?/CompositionId form, not /CompositionId.
+      window.history.replaceState({}, "Studio", `/?/${pathname}`);
+    }
+  }
+
   return (
     <>
       <HouseFontBootstrap />
+      <RuntimeFontBootstrap />
       <Composition
         id={PROJECT_SCOPED_PREVIEW_COMPOSITION_ID}
         component={ProjectScopedMotionComposition}
@@ -80,6 +102,7 @@ export const RemotionRoot: React.FC = () => {
           videoSrc: staticFile(reelPreset.videoAsset),
           videoMetadata: reelPreset.videoMetadata,
           presentationMode: reelPreset.presentationMode,
+          captionMediaSourceKey: reelPreset.videoAsset,
           motionTier: "auto",
           gradeProfileId: "auto",
           transitionPresetId: "auto",
@@ -100,6 +123,7 @@ export const RemotionRoot: React.FC = () => {
           videoSrc: staticFile(longFormPreset.videoAsset),
           videoMetadata: longFormPreset.videoMetadata,
           presentationMode: longFormPreset.presentationMode,
+          captionMediaSourceKey: longFormPreset.videoAsset,
           motionTier: "auto",
           gradeProfileId: "auto",
           transitionPresetId: "auto",
@@ -113,6 +137,33 @@ export const RemotionRoot: React.FC = () => {
         }}
       />
       <Composition
+        id={DEV_FIXTURE_LONGFORM_COMPOSITION_ID}
+        component={FemaleCoachDeanGraziosi}
+        width={longFormPreset.videoMetadata.width}
+        height={longFormPreset.videoMetadata.height}
+        fps={longFormPreset.videoMetadata.fps}
+        durationInFrames={longFormPreset.videoMetadata.durationInFrames}
+        defaultProps={{
+          // Dev-only Studio fixture: drop a browser-safe test asset into public/dev-fixtures/test-video.mp4.
+          videoSrc: staticFile(DEV_FIXTURE_LONGFORM_VIDEO_ASSET),
+          videoMetadata: longFormPreset.videoMetadata,
+          presentationMode: longFormPreset.presentationMode,
+          captionMediaSourceKey: DEV_FIXTURE_LONGFORM_VIDEO_ASSET,
+          motionTier: "auto",
+          gradeProfileId: "auto",
+          transitionPresetId: "auto",
+          matteMode: "auto",
+          captionBias: "auto",
+          captionProfileId: longFormPreset.captionProfileId,
+          motion3DMode: "editorial",
+          focusedStudioMode: true,
+          stabilizePreviewTimeline: true,
+          previewPerformanceMode: "balanced",
+          disablePreviewProxyForVideoSrc: true,
+          devFixtureExpectedPublicAssetName: DEV_FIXTURE_LONGFORM_VIDEO_ASSET
+        }}
+      />
+      <Composition
         id={LONGFORM_DRAFT_COMPOSITION_ID}
         component={CreativeAudioPreview}
         width={longFormDraftVideoMetadata.width}
@@ -123,6 +174,7 @@ export const RemotionRoot: React.FC = () => {
           sourceAudioSrc: staticFile(LONGFORM_DRAFT_VIDEO_ASSET),
           videoMetadata: longFormDraftVideoMetadata,
           presentationMode: longFormPreset.presentationMode,
+          captionMediaSourceKey: LONGFORM_DRAFT_VIDEO_ASSET,
           motionTier: "auto",
           gradeProfileId: "auto",
           transitionPresetId: "auto",
@@ -146,6 +198,7 @@ export const RemotionRoot: React.FC = () => {
           videoSrc: staticFile(reelPreset.videoAsset),
           videoMetadata: reelPreset.videoMetadata,
           presentationMode: reelPreset.presentationMode,
+          captionMediaSourceKey: reelPreset.videoAsset,
           motionTier: "premium",
           gradeProfileId: "auto",
           transitionPresetId: "auto",
@@ -169,6 +222,7 @@ export const RemotionRoot: React.FC = () => {
           videoMetadata: choreographyProofVideoMetadata,
           presentationMode: reelPreset.presentationMode,
           captionChunksOverride: choreographyProofChunks,
+          captionMediaSourceKey: reelPreset.videoAsset,
           motionTier: "premium",
           gradeProfileId: "premium-contrast",
           transitionPresetId: "auto",

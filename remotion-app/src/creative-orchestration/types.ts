@@ -1,4 +1,5 @@
 import type {CaptionChunk, CaptionStyleProfileId, MotionTier, TranscribedWord, VideoMetadata} from "../lib/types";
+import type {SequenceDirectorPlan} from "../lib/sequence-director-engine";
 import type {
   AgentJudgmentDirective,
   AssetFingerprint,
@@ -128,6 +129,7 @@ export type CreativeContext = {
     recentEscalationHistory?: EscalationHistoryEntry[];
   };
   judgmentDirectives?: Record<string, AgentJudgmentDirective>;
+  sequencePlan?: SequenceDirectorPlan;
   featureFlags?: {
     creativeOrchestrationV1?: boolean;
   };
@@ -190,6 +192,16 @@ export type DirectorDecision = {
   treatmentFamily?: TreatmentFamily;
   confidence?: number;
   negativeGrammarViolations?: string[];
+  governedPhysics?: {
+    aggression: number;
+    motion: number;
+    scale: number;
+    dominance: number;
+    opacity: number;
+    timing: number;
+    pacing: number;
+    silence: number;
+  };
 };
 
 export type CreativeTrack = {
@@ -218,6 +230,7 @@ export type CreativeTimeline = {
   moments: CreativeMoment[];
   decisions: DirectorDecision[];
   tracks: CreativeTrack[];
+  sequencePlan?: SequenceDirectorPlan;
   editDecisionPlans?: EditDecisionPlan[];
   judgmentAuditTrail?: JudgmentAuditRecord[];
   feedbackSignals?: FeedbackLogEntry[];

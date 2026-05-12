@@ -3,6 +3,10 @@ import {AbsoluteFill, Img, staticFile, useVideoConfig} from "remotion";
 
 import {
   buildLongformSemanticSidecallPresentation,
+  ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS,
+  ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS,
+  ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS,
+  sanitizeLongformSemanticPreviewText,
   type LongformSemanticSidecallPresentation
 } from "../lib/longform-semantic-sidecall";
 import {
@@ -172,6 +176,27 @@ const getHeaderBarStyle = (presentation: LongformSemanticSidecallPresentation, p
   };
 };
 
+const renderPanelHeader = (
+  presentation: LongformSemanticSidecallPresentation,
+  palette: VariantPalette,
+  label: string
+): React.ReactNode => {
+  if (!ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS) {
+    return (
+      <div style={{display: "flex", marginBottom: 12}}>
+        <div style={getHeaderBarStyle(presentation, palette)} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={getHeaderStyle(palette)}>
+      <span>{label}</span>
+      <div style={getHeaderBarStyle(presentation, palette)} />
+    </div>
+  );
+};
+
 const getTagStyle = (palette: VariantPalette): React.CSSProperties => {
   return {
     display: "inline-flex",
@@ -203,7 +228,7 @@ const renderGraphicAssetPanel = ({
   palette: VariantPalette;
 }): React.ReactNode => {
   const asset = presentation.graphicAsset;
-  if (!asset) {
+  if (!ENABLE_LONGFORM_SEMANTIC_GRAPHIC_ASSETS || !asset) {
     return null;
   }
 
@@ -222,10 +247,7 @@ const renderGraphicAssetPanel = ({
         willChange: "transform, opacity"
       }}
     >
-      <div style={getHeaderStyle(palette)}>
-        <span>{asset.label}</span>
-        <div style={getHeaderBarStyle(presentation, palette)} />
-      </div>
+      {renderPanelHeader(presentation, palette, asset.label)}
       <div
         style={{
           position: "relative",
@@ -272,18 +294,20 @@ const renderGraphicAssetPanel = ({
           >
             {asset.copy}
           </span>
-          <span
-            style={{
-              color: palette.muted,
-              fontFamily: "\"DM Sans\", sans-serif",
-              fontSize: "0.62rem",
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase"
-            }}
-          >
-            Graphic asset
-          </span>
+          {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+            <span
+              style={{
+                color: palette.muted,
+                fontFamily: "\"DM Sans\", sans-serif",
+                fontSize: "0.62rem",
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase"
+              }}
+            >
+              Graphic asset
+            </span>
+          ) : null}
         </div>
       </div>
     </div>
@@ -310,10 +334,7 @@ const renderKeywordCard = ({
   return (
     <div style={{display: "grid", gap: 10}}>
       {renderGraphicAssetPanel({presentation, currentTimeMs, chunk, palette})}
-      <div style={getHeaderStyle(palette)}>
-        <span>{presentation.intentLabel}</span>
-        <div style={getHeaderBarStyle(presentation, palette)} />
-      </div>
+      {renderPanelHeader(presentation, palette, presentation.intentLabel)}
       <div
         style={{
           display: "grid",
@@ -378,7 +399,7 @@ const renderKeywordCard = ({
                   })
                   : keyword}
               </div>
-              {index === 0 ? (
+              {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS && index === 0 ? (
                 <span style={getTagStyle(palette)}>Sidecall</span>
               ) : null}
             </div>
@@ -421,10 +442,7 @@ const renderEntityCard = ({
   return (
     <div style={{display: "grid", gap: 12}}>
       {renderGraphicAssetPanel({presentation, currentTimeMs, chunk, palette})}
-      <div style={getHeaderStyle(palette)}>
-        <span>{presentation.intentLabel}</span>
-        <div style={getHeaderBarStyle(presentation, palette)} />
-      </div>
+      {renderPanelHeader(presentation, palette, presentation.intentLabel)}
       <div
         style={{
           display: "grid",
@@ -432,20 +450,22 @@ const renderEntityCard = ({
           padding: "2px 0 4px"
         }}
       >
-        <div
-          style={{
-            color: palette.muted,
-            fontFamily: decision.fontFamily,
-            fontSize: `clamp(${Math.round(1.2 * decision.fontSizeScale * 16)}px, ${2 * decision.fontSizeScale}vw, ${Math.round(1.6 * decision.fontSizeScale * 16)}px)`,
-            lineHeight: 1,
-            letterSpacing: decision.letterSpacing,
-            textTransform: decision.uppercaseBias ? "uppercase" : "none",
-            opacity: clamp01(detailProgress),
-            transform: `translate3d(0, ${(10 - detailProgress * 10).toFixed(2)}px, 0)`
-          }}
-        >
-          Reference figure
-        </div>
+        {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+          <div
+            style={{
+              color: palette.muted,
+              fontFamily: decision.fontFamily,
+              fontSize: `clamp(${Math.round(1.2 * decision.fontSizeScale * 16)}px, ${2 * decision.fontSizeScale}vw, ${Math.round(1.6 * decision.fontSizeScale * 16)}px)`,
+              lineHeight: 1,
+              letterSpacing: decision.letterSpacing,
+              textTransform: decision.uppercaseBias ? "uppercase" : "none",
+              opacity: clamp01(detailProgress),
+              transform: `translate3d(0, ${(10 - detailProgress * 10).toFixed(2)}px, 0)`
+            }}
+          >
+            Reference figure
+          </div>
+        ) : null}
         <div
           style={{
             color: palette.text,
@@ -463,10 +483,26 @@ const renderEntityCard = ({
           {presentation.leadLabel}
         </div>
         {presentation.supportingLabel ? (
-          <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
-            <span style={getTagStyle(palette)}>{presentation.supportingLabel}</span>
-            <span style={getTagStyle(palette)}>Named cue</span>
-          </div>
+          ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+            <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
+              <span style={getTagStyle(palette)}>{presentation.supportingLabel}</span>
+              <span style={getTagStyle(palette)}>Named cue</span>
+            </div>
+          ) : (
+            <div
+              style={{
+                color: palette.muted,
+                fontFamily: decision.fontFamily,
+                fontSize: `clamp(${Math.round(18 * decision.fontSizeScale)}px, ${1.8 * decision.fontSizeScale}vw, ${Math.round(24 * decision.fontSizeScale)}px)`,
+                lineHeight: 1.05,
+                letterSpacing: decision.letterSpacing,
+                textTransform: decision.uppercaseBias ? "uppercase" : "none",
+                opacity: clamp01(detailProgress)
+              }}
+            >
+              {presentation.supportingLabel}
+            </div>
+          )
         ) : null}
       </div>
     </div>
@@ -490,22 +526,21 @@ const renderStepSequence = ({
   return (
     <div style={{display: "grid", gap: 14}}>
       {renderGraphicAssetPanel({presentation, currentTimeMs, chunk, palette})}
-      <div style={getHeaderStyle(palette)}>
-        <span>{presentation.intentLabel}</span>
-        <div style={getHeaderBarStyle(presentation, palette)} />
-      </div>
-      <div
-        style={{
-          color: palette.muted,
-          fontFamily: decision.fontFamily,
-          fontSize: `clamp(${Math.round(1.1 * decision.fontSizeScale * 16)}px, ${1.8 * decision.fontSizeScale}vw, ${Math.round(1.5 * decision.fontSizeScale * 16)}px)`,
-          lineHeight: 1,
-          letterSpacing: decision.letterSpacing,
-          textTransform: decision.uppercaseBias ? "uppercase" : "none"
-        }}
-      >
-        Fluid sequence
-      </div>
+      {renderPanelHeader(presentation, palette, presentation.intentLabel)}
+      {ENABLE_LONGFORM_SEMANTIC_SIDECALL_DEBUG_LABELS ? (
+        <div
+          style={{
+            color: palette.muted,
+            fontFamily: decision.fontFamily,
+            fontSize: `clamp(${Math.round(1.1 * decision.fontSizeScale * 16)}px, ${1.8 * decision.fontSizeScale}vw, ${Math.round(1.5 * decision.fontSizeScale * 16)}px)`,
+            lineHeight: 1,
+            letterSpacing: decision.letterSpacing,
+            textTransform: decision.uppercaseBias ? "uppercase" : "none"
+          }}
+        >
+          Fluid sequence
+        </div>
+      ) : null}
       <div
         style={{
           display: "grid",
@@ -576,6 +611,10 @@ export const LongformSemanticSidecallOverlay: React.FC<LongformSemanticSidecallO
   previewTimelineResetVersion = 0,
   editorialContext
 }) => {
+  if (!ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS) {
+    return null;
+  }
+
   const {fps} = useVideoConfig();
   const {stableFrame} = useStablePreviewFrame({
     enabled: stabilizePreviewTimeline,
@@ -631,6 +670,35 @@ export const LongformSemanticSidecallOverlay: React.FC<LongformSemanticSidecallO
     ? 0.96 + entryProgress * 0.04 - exitProgress * 0.015
     : 0.975 + entryProgress * 0.025 - exitProgress * 0.012;
   const palette = getVariantPalette(presentation, editorialDecision.surfaceTone);
+  const safeLeadLabel = sanitizeLongformSemanticPreviewText(presentation.leadLabel);
+  const safeSupportingLabel = sanitizeLongformSemanticPreviewText(presentation.supportingLabel);
+  const safeKeywords = presentation.keywords
+    .map((keyword) => sanitizeLongformSemanticPreviewText(keyword))
+    .filter((keyword): keyword is string => Boolean(keyword));
+
+  if (!safeLeadLabel && safeKeywords.length === 0 && presentation.stepItems.length === 0) {
+    return null;
+  }
+
+  const safePresentation: LongformSemanticSidecallPresentation = {
+    ...presentation,
+    leadLabel: safeLeadLabel ?? presentation.leadLabel,
+    supportingLabel: safeSupportingLabel,
+    keywords: safeKeywords,
+    stepItems: presentation.stepItems
+      .map((item) => ({
+        ...item,
+        detail: sanitizeLongformSemanticPreviewText(item.detail) ?? ""
+      }))
+      .filter((item) => item.detail.length > 0),
+    graphicAsset: presentation.graphicAsset
+      ? {
+        ...presentation.graphicAsset,
+        label: sanitizeLongformSemanticPreviewText(presentation.graphicAsset.label) ?? "",
+        copy: sanitizeLongformSemanticPreviewText(presentation.graphicAsset.copy) ?? ""
+      }
+      : null
+  };
 
   return (
     <AbsoluteFill
@@ -640,7 +708,7 @@ export const LongformSemanticSidecallOverlay: React.FC<LongformSemanticSidecallO
     >
       <div
         style={getPanelStyle({
-          presentation,
+          presentation: safePresentation,
           visibility,
           translateX,
           translateY,
@@ -661,11 +729,11 @@ export const LongformSemanticSidecallOverlay: React.FC<LongformSemanticSidecallO
           }}
         />
         <div style={{position: "relative", zIndex: 1}}>
-          {presentation.variant === "entity-card"
-            ? renderEntityCard({presentation, currentTimeMs, chunk: activeChunk, palette, decision: editorialDecision})
-            : presentation.variant === "step-row" || presentation.variant === "step-stack"
-              ? renderStepSequence({presentation, currentTimeMs, chunk: activeChunk, palette, decision: editorialDecision})
-              : renderKeywordCard({presentation, currentTimeMs, chunk: activeChunk, palette, decision: editorialDecision})}
+          {safePresentation.variant === "entity-card"
+            ? renderEntityCard({presentation: safePresentation, currentTimeMs, chunk: activeChunk, palette, decision: editorialDecision})
+            : safePresentation.variant === "step-row" || safePresentation.variant === "step-stack"
+              ? renderStepSequence({presentation: safePresentation, currentTimeMs, chunk: activeChunk, palette, decision: editorialDecision})
+              : renderKeywordCard({presentation: safePresentation, currentTimeMs, chunk: activeChunk, palette, decision: editorialDecision})}
         </div>
       </div>
     </AbsoluteFill>

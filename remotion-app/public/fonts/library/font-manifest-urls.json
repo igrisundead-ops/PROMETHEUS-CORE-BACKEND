@@ -1,0 +1,590 @@
+[
+  {
+    "fontId": "font_aesthetic-regular_b3500383bd34",
+    "familyId": "family_aesthetic_e6b80b03",
+    "familyName": "Aesthetic",
+    "fileName": "aesthetic-regular-b3500383bd34.woff2",
+    "originalFileName": "Aesthetic-Regular.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/aesthetic/aesthetic-regular-b3500383bd34.woff2",
+    "localPublicPath": "public/fonts/library/aesthetic/aesthetic-regular-b3500383bd34.woff2",
+    "license": {
+      "licenseTexts": [
+        "(c) 2022 Nirmana Visual",
+        "https://nirmanavisual.com/",
+        "Version 1.000"
+      ],
+      "canonicalSourceZip": "aesthetic_5.zip",
+      "sourceZips": [
+        "aesthetic_5.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_aesthicodemo_efbe4604facd",
+    "familyId": "family_aesthico-demo_3e6078ee",
+    "familyName": "Aesthico (Demo)",
+    "fileName": "aesthico-demo-regular-efbe4604facd.ttf",
+    "originalFileName": "Aesthico(Demo)-Regular.ttf",
+    "weight": 400,
+    "style": "normal",
+    "format": "ttf",
+    "publicUrl": "/fonts/library/aesthico-demo/aesthico-demo-regular-efbe4604facd.ttf",
+    "localPublicPath": "public/fonts/library/aesthico-demo/aesthico-demo-regular-efbe4604facd.ttf",
+    "license": {
+      "licenseTexts": [
+        "Aesthico © (Heinzel Std). 2022. All Rights Reserved",
+        "Version 1.000;March 1, 2024;FontCreator 14.0.0.2901 64-bit"
+      ],
+      "canonicalSourceZip": "aesthico.zip",
+      "sourceZips": [
+        "aesthico.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_almera_baa51ed42a1d",
+    "familyId": "family_almera_350ab2c9",
+    "familyName": "Almera",
+    "fileName": "almera-baa51ed42a1d.woff2",
+    "originalFileName": "Almera.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/almera/almera-baa51ed42a1d.woff2",
+    "localPublicPath": "public/fonts/library/almera/almera-baa51ed42a1d.woff2",
+    "license": {
+      "licenseTexts": [
+        "Typeface © SlideShoot 2022. All Rights Reserved",
+        "Version 1.00;November 3, 2023;FontCreator 13.0.0.2683 64-bit"
+      ],
+      "canonicalSourceZip": "almera.zip",
+      "sourceZips": [
+        "almera.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_amerika_134a789cf9d0",
+    "familyId": "family_amerika_709f3753",
+    "familyName": "Amerika",
+    "fileName": "amerika-134a789cf9d0.ttf",
+    "originalFileName": "AMERIKA_.ttf",
+    "weight": 400,
+    "style": "normal",
+    "format": "ttf",
+    "publicUrl": "/fonts/library/amerika/amerika-134a789cf9d0.ttf",
+    "localPublicPath": "public/fonts/library/amerika/amerika-134a789cf9d0.ttf",
+    "license": {
+      "licenseTexts": [
+        "© 2001, Apostrophic Labs. All rights reserved. Visit www.apostrophiclab.com or email info@apostrophiclab.com for more information.",
+        "1.0; 2001"
+      ],
+      "canonicalSourceZip": "amerika.zip",
+      "sourceZips": [
+        "amerika.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_amerikaalternates_26bc8e73b088",
+    "familyId": "family_amerika-alternates_fe9c4450",
+    "familyName": "Amerika Alternates",
+    "fileName": "amerikaa-26bc8e73b088.ttf",
+    "originalFileName": "AMERIKAA.ttf",
+    "weight": 400,
+    "style": "normal",
+    "format": "ttf",
+    "publicUrl": "/fonts/library/amerika-alternates/amerikaa-26bc8e73b088.ttf",
+    "localPublicPath": "public/fonts/library/amerika-alternates/amerikaa-26bc8e73b088.ttf",
+    "license": {
+      "licenseTexts": [
+        "© 2001, Apostrophic Labs. All rights reserved. Visit www.apostrophiclab.com or email info@apostrophiclab.com for more information.",
+        "1.0; 2001"
+      ],
+      "canonicalSourceZip": "amerika.zip",
+      "sourceZips": [
+        "amerika.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_antenna_a14c59300f3b",
+    "familyId": "family_antenna_47dd1274",
+    "familyName": "ANTENNA",
+    "fileName": "antenna-a14c59300f3b.ttf",
+    "originalFileName": "ANTENNA.ttf",
+    "weight": 400,
+    "style": "normal",
+    "format": "ttf",
+    "publicUrl": "/fonts/library/antenna/antenna-a14c59300f3b.ttf",
+    "localPublicPath": "public/fonts/library/antenna/antenna-a14c59300f3b.ttf",
+    "license": {
+      "licenseTexts": [
+        "ANTENNA © khoir. All Rights Reserved",
+        "Version 1.00;June 10, 2018;FontCreator 11.5.0.2427 64-bit"
+      ],
+      "canonicalSourceZip": "antenna.zip",
+      "sourceZips": [
+        "antenna.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_auliondemoregular_e016efd7fcb7",
+    "familyId": "family_aulion-demo_a572aee0",
+    "familyName": "Aulion Demo",
+    "fileName": "auliondemoregular-e016efd7fcb7.ttf",
+    "originalFileName": "AulionDemoRegular.ttf",
+    "weight": 400,
+    "style": "normal",
+    "format": "ttf",
+    "publicUrl": "/fonts/library/aulion-demo/auliondemoregular-e016efd7fcb7.ttf",
+    "localPublicPath": "public/fonts/library/aulion-demo/auliondemoregular-e016efd7fcb7.ttf",
+    "license": {
+      "licenseTexts": [
+        "©CalligraphyFonts.net",
+        "PERSONAL License - Non Commercial",
+        "Email us hi@calligraphyfonts.net",
+        "Version 1.001;Fontself Maker 3.5.1"
+      ],
+      "canonicalSourceZip": "aulion.zip",
+      "sourceZips": [
+        "aulion.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_baguile-freetrial_cc85058e7468",
+    "familyId": "family_baguile-free-trial_d5155924",
+    "familyName": "Baguile - Free Trial",
+    "fileName": "baguile-free-trial-cc85058e7468.woff2",
+    "originalFileName": "Baguile - Free Trial.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/baguile-free-trial/baguile-free-trial-cc85058e7468.woff2",
+    "localPublicPath": "public/fonts/library/baguile-free-trial/baguile-free-trial-cc85058e7468.woff2",
+    "license": {
+      "licenseTexts": [
+        "©typefactory",
+        "typefactoryco@gmail.com",
+        "http://typefactory.co/",
+        "Version 1.00;July 15, 2022;FontCreator 13.0.0.2683 64-bit"
+      ],
+      "canonicalSourceZip": "baguile.zip",
+      "sourceZips": [
+        "baguile.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_balona_2836d0eb8081",
+    "familyId": "family_balona_8bc6b382",
+    "familyName": "Balona",
+    "fileName": "balona-regular-2836d0eb8081.woff2",
+    "originalFileName": "Balona-Regular.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/balona/balona-regular-2836d0eb8081.woff2",
+    "localPublicPath": "public/fonts/library/balona/balona-regular-2836d0eb8081.woff2",
+    "license": {
+      "licenseTexts": [
+        "Version 1.000;October 7, 2022;FontCreator 14.0.0.2877 64-bit"
+      ],
+      "canonicalSourceZip": "balona.zip",
+      "sourceZips": [
+        "balona.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_berlleighregular_0dc004cf245a",
+    "familyId": "family_berlleigh_e6ff7f5d",
+    "familyName": "Berlleigh",
+    "fileName": "berlleigh-0dc004cf245a.woff",
+    "originalFileName": "Berlleigh.woff",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff",
+    "publicUrl": "/fonts/library/berlleigh/berlleigh-0dc004cf245a.woff",
+    "localPublicPath": "public/fonts/library/berlleigh/berlleigh-0dc004cf245a.woff",
+    "license": {
+      "licenseTexts": [
+        "Version 1.001;Fontself Maker 3.5.7"
+      ],
+      "canonicalSourceZip": "berlleigh.zip",
+      "sourceZips": [
+        "berlleigh.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_brushelvapersonalused_77ea8f79fb4a",
+    "familyId": "family_brushelva-personal-used_4790d981",
+    "familyName": "Brushelva Personal Used",
+    "fileName": "brushelva-personal-used-77ea8f79fb4a.woff",
+    "originalFileName": "Brushelva-Personal-Used.woff",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff",
+    "publicUrl": "/fonts/library/brushelva-personal-used/brushelva-personal-used-77ea8f79fb4a.woff",
+    "localPublicPath": "public/fonts/library/brushelva-personal-used/brushelva-personal-used-77ea8f79fb4a.woff",
+    "license": {
+      "licenseTexts": [
+        "Lettercorner Studio",
+        "Lettercorner Studio",
+        "Lettercorner Studio",
+        "Version 1.003;Fontself Maker 3.5.8"
+      ],
+      "canonicalSourceZip": "brushelva.zip",
+      "sourceZips": [
+        "brushelva.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_cavergizregular_761b0f36a3cc",
+    "familyId": "family_cavergiz_b318eb58",
+    "familyName": "Cavergiz",
+    "fileName": "cavergiz-761b0f36a3cc.woff2",
+    "originalFileName": "Cavergiz.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/cavergiz/cavergiz-761b0f36a3cc.woff2",
+    "localPublicPath": "public/fonts/library/cavergiz/cavergiz-761b0f36a3cc.woff2",
+    "license": {
+      "licenseTexts": [
+        "2022 © rvandtype foundry",
+        "https://rvandtype.com/license",
+        "Version 1.011;Fontself Maker 3.5.8"
+      ],
+      "canonicalSourceZip": "cavergiz.zip",
+      "sourceZips": [
+        "cavergiz.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_leviathan_c291e2b0aec8",
+    "familyId": "family_leviathan_79866542",
+    "familyName": "Leviathan",
+    "fileName": "leviathan-c291e2b0aec8.woff2",
+    "originalFileName": "Leviathan.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/leviathan/leviathan-c291e2b0aec8.woff2",
+    "localPublicPath": "public/fonts/library/leviathan/leviathan-c291e2b0aec8.woff2",
+    "license": {
+      "licenseTexts": [
+        "Typeface © (Kong Font). 2020. All Rights Reserved (kongvector@gmail.com).",
+        "Version 1.00;October 12, 2020;FontCreator 12.0.0.2563 64-bit"
+      ],
+      "canonicalSourceZip": "leviathan.zip",
+      "sourceZips": [
+        "leviathan.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_leviathan-italic_ac864336242c",
+    "familyId": "family_leviathan-italic_a0b0ec2c",
+    "familyName": "Leviathan Italic",
+    "fileName": "leviathan-italic-ac864336242c.woff2",
+    "originalFileName": "Leviathan Italic.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/leviathan-italic/leviathan-italic-ac864336242c.woff2",
+    "localPublicPath": "public/fonts/library/leviathan-italic/leviathan-italic-ac864336242c.woff2",
+    "license": {
+      "licenseTexts": [
+        "Typeface © (Kong Font). 2020. All Rights Reserved (kongvector@gmail.com).",
+        "Version 1.00;October 12, 2020;FontCreator 12.0.0.2563 64-bit"
+      ],
+      "canonicalSourceZip": "leviathan.zip",
+      "sourceZips": [
+        "leviathan.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_leviathan-oblique_ea2cc92ea65b",
+    "familyId": "family_leviathan-oblique_a28a9fce",
+    "familyName": "Leviathan Oblique",
+    "fileName": "leviathan-oblique-ea2cc92ea65b.woff2",
+    "originalFileName": "Leviathan Oblique.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/leviathan-oblique/leviathan-oblique-ea2cc92ea65b.woff2",
+    "localPublicPath": "public/fonts/library/leviathan-oblique/leviathan-oblique-ea2cc92ea65b.woff2",
+    "license": {
+      "licenseTexts": [
+        "Typeface © (Kong Font). 2020. All Rights Reserved (kongvector@gmail.com).",
+        "Version 1.00;October 12, 2020;FontCreator 12.0.0.2563 64-bit"
+      ],
+      "canonicalSourceZip": "leviathan.zip",
+      "sourceZips": [
+        "leviathan.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_mangkoregular_2349699ef89f",
+    "familyId": "family_mangko_779689a5",
+    "familyName": "Mangko",
+    "fileName": "mangkoregular-2349699ef89f.woff2",
+    "originalFileName": "MangkoRegular.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/mangko/mangkoregular-2349699ef89f.woff2",
+    "localPublicPath": "public/fonts/library/mangko/mangkoregular-2349699ef89f.woff2",
+    "license": {
+      "licenseTexts": [
+        "Typeface © 2024 by  Toni Studio. All Rights Reserved",
+        "Version 1.001;Fontself Maker 3.5.8"
+      ],
+      "canonicalSourceZip": "mangko.zip",
+      "sourceZips": [
+        "mangko.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_marlong_ad829d01d275",
+    "familyId": "family_marlong_f5ac3821",
+    "familyName": "MARLONG",
+    "fileName": "marlong-ad829d01d275.woff",
+    "originalFileName": "MARLONG.woff",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff",
+    "publicUrl": "/fonts/library/marlong/marlong-ad829d01d275.woff",
+    "localPublicPath": "public/fonts/library/marlong/marlong-ad829d01d275.woff",
+    "license": {
+      "licenseTexts": [
+        "Your name font © Typeline Studio 2022. All Rights Reserved",
+        "Version 1.00;October 22, 2022;FontCreator 13.0.0.2683 64-bit"
+      ],
+      "canonicalSourceZip": "marlong.zip",
+      "sourceZips": [
+        "marlong.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_ragararegular_32225374711b",
+    "familyId": "family_ragara_9c0a826c",
+    "familyName": "Ragara",
+    "fileName": "ragara-32225374711b.woff",
+    "originalFileName": "Ragara.woff",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff",
+    "publicUrl": "/fonts/library/ragara/ragara-32225374711b.woff",
+    "localPublicPath": "public/fonts/library/ragara/ragara-32225374711b.woff",
+    "license": {
+      "licenseTexts": [
+        "Ragara © Penatic Studio 2022. All Rights Reserved",
+        "Version 1.001;Fontself Maker 3.5.7"
+      ],
+      "canonicalSourceZip": "ragara.zip",
+      "sourceZips": [
+        "ragara.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_reglarik_15fb0be89377",
+    "familyId": "family_reglarik_c122d5a0",
+    "familyName": "Reglarik",
+    "fileName": "reglarik-15fb0be89377.woff2",
+    "originalFileName": "Reglarik.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/reglarik/reglarik-15fb0be89377.woff2",
+    "localPublicPath": "public/fonts/library/reglarik/reglarik-15fb0be89377.woff2",
+    "license": {
+      "licenseTexts": [
+        "©Denustudios 2022.  All Rights Reserved",
+        "©Denustudios 2022.  All Rights Reserved",
+        "https://www.denustudios.com/",
+        "Version 1.00;December 8, 2022;FontCreator 13.0.0.2680 64-bit"
+      ],
+      "canonicalSourceZip": "reglarik.zip",
+      "sourceZips": [
+        "reglarik.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  },
+  {
+    "fontId": "font_theglamoure_953defaf2136",
+    "familyId": "family_the-glamoure_0588209a",
+    "familyName": "The Glamoure",
+    "fileName": "the-glamoure-953defaf2136.woff2",
+    "originalFileName": "The Glamoure.woff2",
+    "weight": 400,
+    "style": "normal",
+    "format": "woff2",
+    "publicUrl": "/fonts/library/the-glamoure/the-glamoure-953defaf2136.woff2",
+    "localPublicPath": "public/fonts/library/the-glamoure/the-glamoure-953defaf2136.woff2",
+    "license": {
+      "licenseTexts": [
+        "Typeface © SlideShoot 2022. All Rights Reserved",
+        "Version 1.00;November 2, 2023;FontCreator 13.0.0.2683 64-bit"
+      ],
+      "canonicalSourceZip": "the_glamoure.zip",
+      "sourceZips": [
+        "the_glamoure.zip"
+      ],
+      "duplicateSourceZips": [],
+      "duplicateCount": 0
+    },
+    "needsManualLicenseReview": false,
+    "source": "hydrated-font-library",
+    "renderable": true,
+    "matchedBy": "hash",
+    "warnings": []
+  }
+]

@@ -50,6 +50,16 @@ export type CaptionChunk = {
   profileId?: CaptionStyleProfileId;
   semantic?: ChunkSemanticMeta;
   suppressDefault?: boolean;
+  governedPhysics?: {
+    aggression: number;
+    motion: number;
+    scale: number;
+    dominance: number;
+    opacity: number;
+    timing: number;
+    pacing: number;
+    silence: number;
+  };
 };
 
 export type CaptionPolicy = {

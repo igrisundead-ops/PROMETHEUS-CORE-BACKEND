@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import {loadHouseTypographyFonts} from "../lib/cinematic-typography/house-font-loader";
+import {primeRuntimeFontBootstrap} from "../lib/font-intelligence/font-runtime-loader";
 import {PreviewApp} from "./PreviewApp";
 import "./preview.css";
 
@@ -81,10 +82,20 @@ class RootErrorBoundary extends React.Component<{
   }
 }
 
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <RootErrorBoundary>
-      <PreviewApp />
-    </RootErrorBoundary>
-  </React.StrictMode>
-);
+const renderPreviewApp = (): void => {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <RootErrorBoundary>
+        <PreviewApp />
+      </RootErrorBoundary>
+    </React.StrictMode>
+  );
+};
+
+void primeRuntimeFontBootstrap()
+  .catch((error) => {
+    console.warn("[runtime-font-bootstrap] Preview bootstrap failed", error);
+  })
+  .finally(() => {
+    renderPreviewApp();
+  });

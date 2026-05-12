@@ -1,11 +1,18 @@
 import type {TypographyRoleSlotId} from "./typography-doctrine";
 import {
+  getManifestBackedPaletteForCandidate,
+  getManifestBackedPalettes,
+  type ManifestBackedEditorialFontPalette,
+  type ManifestBackedPaletteId
+} from "../font-intelligence/runtime-font-bridge";
+import {
   getActiveHouseFontDefinitions,
   type HouseFontPaletteId
 } from "./house-font-registry";
 
 export type EditorialFontPaletteId =
   | HouseFontPaletteId
+  | ManifestBackedPaletteId
   | "fraunces-editorial"
   | "playfair-contrast"
   | "cormorant-salon"
@@ -25,6 +32,7 @@ export type EditorialFontPalette = {
   primaryFamilyName: string;
   displayWeight: number;
   supportWeight: number;
+  availableWeights: number[];
   moodTags: string[];
   doctrineRoleIds: TypographyRoleSlotId[];
 };
@@ -133,6 +141,26 @@ const toEditorialFontPalette = (
   };
 };
 
+const toManifestBackedEditorialFontPalette = (
+  palette: ManifestBackedEditorialFontPalette
+): EditorialFontPalette => {
+  const primaryFamilyName = palette.familyName || extractPrimaryFamilyName(palette.displayFamily) || "Fraunces";
+  const runtimeCssFamily = palette.cssFamily || getRuntimeFontCssFamily({
+    familyId: palette.familyId,
+    fontId: palette.id
+  });
+
+  return {
+    ...palette,
+    runtimeCssFamily,
+    runtimeFontStack: buildRuntimeFontStack({
+      runtimeCssFamily,
+      fallbackStack: palette.displayFamily
+    }),
+    primaryFamilyName
+  };
+};
+
 const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
   {
     id: "jugendreisen-house",
@@ -141,6 +169,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Jugendreisen\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["luxury", "prestige", "cinematic"],
     doctrineRoleIds: ["hero_serif_primary"]
   },
@@ -151,6 +180,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Louize\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["luxury", "editorial", "soft-focus"],
     doctrineRoleIds: ["hero_serif_alternate"]
   },
@@ -161,6 +191,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Ivar Script\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["luxury", "editorial", "accent"],
     doctrineRoleIds: ["script_accent_rare"]
   },
@@ -171,6 +202,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Sokoli\", \"Arial Narrow\", sans-serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400],
     moodTags: ["directive", "pressure", "display"],
     doctrineRoleIds: ["display_sans_pressure_release"]
   },
@@ -181,6 +213,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Fraunces\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["editorial", "luxury", "cinematic"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -191,6 +224,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Playfair Display\", \"Times New Roman\", serif",
     displayWeight: 700,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["editorial", "dramatic", "headline"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -201,6 +235,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Cormorant Garamond\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["luxury", "poetic", "emotional"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -211,6 +246,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Crimson Pro\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["documentary", "editorial", "human"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -221,6 +257,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Lora\", \"Times New Roman\", serif",
     displayWeight: 600,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["documentary", "thoughtful", "clear"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -231,6 +268,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Instrument Serif\", \"Times New Roman\", serif",
     displayWeight: 400,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["luxury", "premium", "soft-focus"],
     doctrineRoleIds: ["editorial_serif_support"]
   },
@@ -241,6 +279,7 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Noto Serif Display\", \"Times New Roman\", serif",
     displayWeight: 700,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["monument", "prestige", "statement"],
     doctrineRoleIds: ["hero_serif_alternate"]
   },
@@ -251,13 +290,16 @@ const EDITORIAL_FONT_PALETTE_SEEDS: EditorialFontPaletteSeed[] = [
     italicFamily: "\"Fraunces\", \"Times New Roman\", serif",
     displayWeight: 700,
     supportWeight: 500,
+    availableWeights: [400, 500, 600, 700, 800],
     moodTags: ["modern", "precision", "directive"],
     doctrineRoleIds: ["neutral_sans_core"]
   }
 ];
 
-export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] =
-  EDITORIAL_FONT_PALETTE_SEEDS.map(toEditorialFontPalette);
+export const EDITORIAL_FONT_PALETTES: EditorialFontPalette[] = [
+  ...EDITORIAL_FONT_PALETTE_SEEDS.map(toEditorialFontPalette),
+  ...getManifestBackedPalettes().map(toManifestBackedEditorialFontPalette)
+];
 
 const fontPaletteMap = new Map(EDITORIAL_FONT_PALETTES.map((palette) => [palette.id, palette]));
 
@@ -286,6 +328,11 @@ export const getEditorialFontPalettesForRole = (
 export const getRuntimePaletteIdForTypographyCandidate = (
   candidateId: string
 ): EditorialFontPaletteId | null => {
+  const manifestBackedPalette = getManifestBackedPaletteForCandidate(candidateId);
+  if (manifestBackedPalette) {
+    return manifestBackedPalette.id;
+  }
+
   const activeHouseFont = getActiveHouseFontDefinitions().find((definition) => definition.candidateId === candidateId);
   if (activeHouseFont) {
     return activeHouseFont.paletteId;
@@ -298,5 +345,8 @@ export const isRuntimeSelectableTypographyCandidate = (candidateId: string): boo
 };
 
 export const getRuntimeSelectableTypographyCandidateIds = (): string[] => {
-  return Object.keys(TYPOGRAPHY_RUNTIME_CANDIDATE_TO_PALETTE);
+  return [...new Set([
+    ...getManifestBackedPalettes().map((palette) => palette.candidateId),
+    ...Object.keys(TYPOGRAPHY_RUNTIME_CANDIDATE_TO_PALETTE)
+  ])];
 };

@@ -8,7 +8,17 @@ import {
   type TypographyRoleSlotId
 } from "./typography-doctrine";
 
-export type FontCompatibilityRelation = "supports" | "fallback" | "contrast" | "redundant" | "avoid";
+export type FontCompatibilityRelation = 
+  | "supports" 
+  | "fallback" 
+  | "contrast" 
+  | "redundant" 
+  | "avoid"
+  | "impact_vs_reading"
+  | "editorial_vs_neutral"
+  | "brutal_vs_elegant"
+  | "same_family_hierarchy"
+  | "forbidden_pair";
 
 export type FontCompatibilityNode = {
   id: string;
@@ -29,6 +39,8 @@ export type FontCompatibilityEdge = {
   to: string;
   relation: FontCompatibilityRelation;
   score: number;
+  bestUseCase?: string;
+  forbiddenUseCases?: string[];
   rationale: string;
 };
 

@@ -18,6 +18,7 @@ import {
   type CaptionEditorialContext,
   type CaptionEditorialDecision
 } from "../lib/motion-platform/caption-editorial-engine";
+import {sanitizeRenderableOverlayText, shouldRenderOverlayText} from "../lib/motion-platform/render-text-safety";
 import type {TypographyPartPreset} from "../lib/presets/typography-presets";
 import type {CaptionChunk, CaptionVerticalBias} from "../lib/types";
 
@@ -240,6 +241,10 @@ const getWordStyle = ({
 const CaptionTreatmentLayer: React.FC<{
   plan: CinematicCaptionPlan;
 }> = ({plan}) => {
+  if (!shouldRenderOverlayText(plan.chunk.text)) {
+    return null;
+  }
+
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const currentTimeMs = (frame / fps) * 1000;
@@ -298,8 +303,12 @@ const CaptionTreatmentLayer: React.FC<{
                 }}
               >
                 {line.words.map((word, wordIndex) => {
+                  const safeDisplayText = sanitizeRenderableOverlayText(word.displayText);
+                  if (!safeDisplayText) {
+                    return null;
+                  }
                   const isActive = isTokenActiveAtTimeStrict({
-                    text: word.displayText,
+                    text: safeDisplayText,
                     wordIndex: word.wordIndex,
                     startMs: word.word.startMs,
                     endMs: word.word.endMs
@@ -343,7 +352,7 @@ const CaptionTreatmentLayer: React.FC<{
                         ...wordMotionStyle
                       }}
                     >
-                      {word.displayText}
+                      {safeDisplayText}
                     </span>
                   );
                 })}

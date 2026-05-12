@@ -1,0 +1,183 @@
+{
+  "mediaSource": "dev-fixtures/test-video.mp4",
+  "expectedMediaKey": "dev-fixtures/test-video.mp4",
+  "words": [
+    {
+      "text": "This",
+      "startMs": 420,
+      "endMs": 760,
+      "confidence": 0.998,
+      "semanticRole": "lead",
+      "momentType": "hook"
+    },
+    {
+      "text": "is",
+      "startMs": 760,
+      "endMs": 980,
+      "confidence": 0.999,
+      "semanticRole": "lead",
+      "momentType": "hook"
+    },
+    {
+      "text": "the",
+      "startMs": 980,
+      "endMs": 1240,
+      "confidence": 0.999,
+      "semanticRole": "lead",
+      "momentType": "hook"
+    },
+    {
+      "text": "moment.",
+      "startMs": 1240,
+      "endMs": 1880,
+      "confidence": 0.997,
+      "semanticRole": "lead",
+      "emphasis": true,
+      "momentType": "hook"
+    },
+    {
+      "text": "Where",
+      "startMs": 2540,
+      "endMs": 2880,
+      "confidence": 0.997,
+      "semanticRole": "context",
+      "momentType": "neutral"
+    },
+    {
+      "text": "the",
+      "startMs": 2880,
+      "endMs": 3120,
+      "confidence": 0.999,
+      "semanticRole": "context",
+      "momentType": "neutral"
+    },
+    {
+      "text": "decision",
+      "startMs": 3120,
+      "endMs": 3720,
+      "confidence": 0.998,
+      "semanticRole": "context",
+      "emphasis": true,
+      "momentType": "neutral"
+    },
+    {
+      "text": "changes.",
+      "startMs": 3720,
+      "endMs": 4520,
+      "confidence": 0.996,
+      "semanticRole": "context",
+      "emphasis": true,
+      "momentType": "neutral"
+    },
+    {
+      "text": "Watch",
+      "startMs": 5480,
+      "endMs": 5840,
+      "confidence": 0.998,
+      "semanticRole": "accent",
+      "emphasis": true,
+      "momentType": "emphasis"
+    },
+    {
+      "text": "what",
+      "startMs": 5840,
+      "endMs": 6160,
+      "confidence": 0.999,
+      "semanticRole": "accent",
+      "momentType": "emphasis"
+    },
+    {
+      "text": "happens",
+      "startMs": 6160,
+      "endMs": 6820,
+      "confidence": 0.998,
+      "semanticRole": "accent",
+      "emphasis": true,
+      "momentType": "emphasis"
+    },
+    {
+      "text": "next.",
+      "startMs": 6820,
+      "endMs": 7580,
+      "confidence": 0.997,
+      "semanticRole": "accent",
+      "emphasis": true,
+      "momentType": "emphasis"
+    },
+    {
+      "text": "The",
+      "startMs": 8600,
+      "endMs": 8900,
+      "confidence": 0.998,
+      "semanticRole": "support",
+      "momentType": "neutral"
+    },
+    {
+      "text": "frame",
+      "startMs": 8900,
+      "endMs": 9300,
+      "confidence": 0.998,
+      "semanticRole": "support",
+      "momentType": "neutral"
+    },
+    {
+      "text": "stays",
+      "startMs": 9300,
+      "endMs": 9680,
+      "confidence": 0.997,
+      "semanticRole": "support",
+      "momentType": "neutral"
+    },
+    {
+      "text": "clean",
+      "startMs": 9680,
+      "endMs": 10180,
+      "confidence": 0.998,
+      "semanticRole": "support",
+      "emphasis": true,
+      "momentType": "neutral"
+    },
+    {
+      "text": "and",
+      "startMs": 10180,
+      "endMs": 10440,
+      "confidence": 0.999,
+      "semanticRole": "support",
+      "momentType": "neutral"
+    },
+    {
+      "text": "the",
+      "startMs": 10440,
+      "endMs": 10680,
+      "confidence": 0.999,
+      "semanticRole": "support",
+      "momentType": "neutral"
+    },
+    {
+      "text": "type",
+      "startMs": 10680,
+      "endMs": 11220,
+      "confidence": 0.998,
+      "semanticRole": "support",
+      "emphasis": true,
+      "momentType": "neutral"
+    },
+    {
+      "text": "holds",
+      "startMs": 11220,
+      "endMs": 11820,
+      "confidence": 0.997,
+      "semanticRole": "support",
+      "momentType": "neutral"
+    },
+    {
+      "text": "focus.",
+      "startMs": 11820,
+      "endMs": 12680,
+      "confidence": 0.996,
+      "semanticRole": "support",
+      "emphasis": true,
+      "momentType": "neutral"
+    }
+  ]
+}

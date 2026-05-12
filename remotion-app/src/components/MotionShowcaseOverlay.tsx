@@ -13,6 +13,10 @@ import {
   shouldWindowPreviewCues,
   useStablePreviewFrame
 } from "../lib/preview-runtime-stability";
+import {
+  shouldRenderOverlayText,
+  shouldRenderPreviewOverlayAsset
+} from "../lib/motion-platform/render-text-safety";
 import {selectActiveMotionShowcaseCueAtTime} from "../lib/motion-platform/showcase-motion-planner";
 import type {CaptionChunk, MotionShowcaseCue, TranscribedWord} from "../lib/types";
 import type {MotionCompositionModel} from "../lib/motion-platform/scene-engine";
@@ -269,6 +273,10 @@ const RawCueAsset: React.FC<{
   rotation: number;
   style?: CSSProperties;
 }> = ({cue, visibility, translateY, scale, rotation, style}) => {
+  if (!shouldRenderPreviewOverlayAsset(cue.asset)) {
+    return null;
+  }
+
   const widthEm = getCueAssetWidthEm(cue);
   return (
     <div
@@ -379,6 +387,14 @@ export const MotionShowcaseOverlay: React.FC<MotionShowcaseOverlayProps> = ({
   );
 
   if (!activeCue) {
+    return null;
+  }
+
+  if (activeCue.cueSource === "direct-asset") {
+    if (!shouldRenderPreviewOverlayAsset(activeCue.asset) || !shouldRenderOverlayText(activeCue.canonicalLabel)) {
+      return null;
+    }
+  } else if (!shouldRenderOverlayText(activeCue.canonicalLabel)) {
     return null;
   }
 

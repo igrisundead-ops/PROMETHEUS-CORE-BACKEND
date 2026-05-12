@@ -32,6 +32,8 @@ import {CinematicCaptionOverlay} from "../components/CinematicCaptionOverlay";
 import {SvgCaptionOverlay, isSvgCaptionChunk} from "../components/SvgCaptionOverlay";
 import {MotionShowcaseOverlay} from "../components/MotionShowcaseOverlay";
 import {loadEditorialCaptionFonts} from "../lib/cinematic-typography/editorial-fonts";
+import type {ManualSelectedRuntimeFont} from "../lib/font-intelligence/font-runtime-registry";
+import {ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS} from "../lib/longform-semantic-sidecall";
 import {buildPreviewCaptionChunks} from "../lib/preview-caption-data";
 import {
   getDefaultCaptionProfileIdForPresentationMode,
@@ -89,6 +91,7 @@ export type CreativeAudioPreviewProps = {
   readonly videoMetadata?: Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames">;
   readonly presentationMode?: PresentationModeSetting;
   readonly captionChunksOverride?: CaptionChunk[];
+  readonly captionMediaSourceKey?: string | null;
   readonly motionTier?: MotionTier | "auto";
   readonly gradeProfileId?: MotionGradeProfileId | "auto";
   readonly transitionPresetId?: string;
@@ -109,6 +112,10 @@ export type CreativeAudioPreviewProps = {
   readonly showDebugOverlay?: boolean;
   readonly renderJobActive?: boolean;
   readonly videoLoaded?: boolean;
+  readonly debugSelectedFontId?: string | null;
+  readonly debugSelectedFont?: ManualSelectedRuntimeFont | null;
+  readonly selectedFontId?: string | null;
+  readonly selectedFont?: ManualSelectedRuntimeFont | null;
 };
 
 const treatmentTone = (finalTreatment: string): string => {
@@ -342,6 +349,7 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
   videoMetadata,
   presentationMode = "auto",
   captionChunksOverride,
+  captionMediaSourceKey = null,
   motionTier = "auto",
   gradeProfileId,
   transitionPresetId = "auto",
@@ -361,7 +369,11 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
   audioErrorMessage = null,
   showDebugOverlay = false,
   renderJobActive = false,
-  videoLoaded = false
+  videoLoaded = false,
+  debugSelectedFontId,
+  debugSelectedFont,
+  selectedFontId,
+  selectedFont
 }) => {
   const resolvedVideoMetadata = videoMetadata ?? getDefaultVideoMetadataForPresentationMode("long-form");
   const resolvedPresentationMode = resolvePresentationMode(resolvedVideoMetadata, presentationMode);
@@ -371,8 +383,24 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
       : getDefaultCaptionProfileIdForPresentationMode(resolvedPresentationMode)
   );
   const captionChunks = useMemo(
-    () => captionChunksOverride ?? buildPreviewCaptionChunks(effectiveCaptionProfileId, resolvedPresentationMode),
-    [captionChunksOverride, effectiveCaptionProfileId, resolvedPresentationMode]
+    () => captionChunksOverride ?? buildPreviewCaptionChunks(
+      effectiveCaptionProfileId,
+      resolvedPresentationMode,
+      {
+        mediaSource: captionMediaSourceKey ?? sourceAudioSrc ?? null,
+        durationSeconds: resolvedVideoMetadata.durationSeconds,
+        durationInFrames: resolvedVideoMetadata.durationInFrames
+      }
+    ),
+    [
+      captionChunksOverride,
+      captionMediaSourceKey,
+      effectiveCaptionProfileId,
+      resolvedPresentationMode,
+      resolvedVideoMetadata.durationInFrames,
+      resolvedVideoMetadata.durationSeconds,
+      sourceAudioSrc
+    ]
   );
   const longformCaptionRenderMode = useMemo(
     () => getLongformCaptionRenderMode(effectiveCaptionProfileId),
@@ -422,13 +450,21 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
     backgroundOverlayPlan: motionModel.backgroundOverlayPlan,
     captionBias: motionModel.captionBias,
     motionTier: motionModel.tier,
-    compositionCombatPlan: motionModel.compositionCombatPlan
+    compositionCombatPlan: motionModel.compositionCombatPlan,
+    debugSelectedFontId,
+    debugSelectedFont,
+    selectedFontId,
+    selectedFont
   }), [
+    debugSelectedFont,
+    debugSelectedFontId,
     motionModel.backgroundOverlayPlan,
     motionModel.captionBias,
     motionModel.compositionCombatPlan,
     motionModel.gradeProfile,
-    motionModel.tier
+    motionModel.tier,
+    selectedFont,
+    selectedFontId
   ]);
   const showBackgroundOverlay = previewPerformanceMode !== "turbo";
   const showMotionAssetOverlay = previewPerformanceMode !== "turbo";
@@ -537,9 +573,18 @@ export const CreativeAudioPreview: React.FC<CreativeAudioPreviewProps> = ({
           stabilizePreviewTimeline={false}
           previewTimelineResetVersion={previewTimelineResetVersion}
         />
-      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" ? (
+      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" && ENABLE_LONGFORM_SEMANTIC_SIDECALL_OVERLAYS ? (
         <LongformSemanticSidecallOverlay
           chunks={captionChunks}
+          editorialContext={captionEditorialContext}
+          stabilizePreviewTimeline={false}
+          previewTimelineResetVersion={previewTimelineResetVersion}
+        />
+      ) : resolvedPresentationMode === "long-form" && longformCaptionRenderMode === "semantic-sidecall" ? (
+        <LongformWordByWordOverlay
+          captionProfileId={effectiveCaptionProfileId}
+          chunks={captionChunks}
+          captionBias={motionModel.captionBias}
           editorialContext={captionEditorialContext}
           stabilizePreviewTimeline={false}
           previewTimelineResetVersion={previewTimelineResetVersion}

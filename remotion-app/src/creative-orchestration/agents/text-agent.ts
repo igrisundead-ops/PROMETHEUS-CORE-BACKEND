@@ -67,7 +67,8 @@ export class TextAgent implements CreativeAgent<CreativeContext> {
     const editorialDecision = resolveCaptionEditorialDecision({
       chunk: context.chunks.find((chunk) => moment.chunkIds?.includes(chunk.id)) ?? context.chunks[0]!,
       captionProfileId: context.captionProfileId ?? undefined,
-      motionTier: context.motionTier ?? undefined
+      motionTier: context.motionTier ?? undefined,
+      sequencePlan: context.sequencePlan
     });
 
     const basePriority = Math.round(moment.importance * 100);

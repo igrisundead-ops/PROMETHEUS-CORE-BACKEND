@@ -25,6 +25,7 @@ const makeEditorialDecision = (): CaptionEditorialDecision => ({
   fontFamily: getEditorialFontPalette("fraunces-editorial").runtimeFontStack,
   fontWeight: 650,
   fontSizeScale: 1,
+  opacityMultiplier: 1,
   uppercaseBias: false,
   letterSpacing: "-0.016em",
   keywordPhrases: [],
@@ -69,6 +70,25 @@ const makeEditorialDecision = (): CaptionEditorialDecision => ({
     reasoning: [],
     readabilitySafeguards: []
   },
+  lineStyles: {},
+  hierarchyMetadata: {
+    lines: [],
+    aggressionLevel: 0,
+    emotionalWeight: 0,
+    tokens: []
+  },
+  motionProfile: {
+    easing: "ease-out",
+    snapDurationMs: 180,
+    axis: "y"
+  },
+  visualOrchestration: {} as CaptionEditorialDecision["visualOrchestration"],
+  stylePhysics: {
+    motion: {
+      blurRelease: 0
+    }
+  } as CaptionEditorialDecision["stylePhysics"],
+  timelineRhythm: {} as CaptionEditorialDecision["timelineRhythm"],
   fontSelection: {
     requestedRoleId: "hero_serif_alternate",
     selectedRoleId: "hero_serif_alternate",

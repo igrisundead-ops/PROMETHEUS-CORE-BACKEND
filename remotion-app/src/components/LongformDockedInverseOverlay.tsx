@@ -5,6 +5,7 @@ import {
   resolveCaptionEditorialDecision,
   type CaptionEditorialContext
 } from "../lib/motion-platform/caption-editorial-engine";
+import {sanitizeRenderableOverlayText, shouldRenderOverlayText} from "../lib/motion-platform/render-text-safety";
 import {useStablePreviewFrame} from "../lib/preview-runtime-stability";
 import {
   getLongformWordMotionState,
@@ -68,6 +69,9 @@ export const LongformDockedInverseOverlay: React.FC<LongformDockedInverseOverlay
   }, [activeChunk, chunks, currentTimeMs, editorialContext]);
 
   const activeWords = activeChunk?.words ?? [];
+  if (activeChunk && !shouldRenderOverlayText(activeChunk.text)) {
+    return null;
+  }
   const dominantWordIndex = activeWords.length > 0 ? getDominantWordIndex(activeWords, currentTimeMs) : 0;
   const isLightSurface = editorialDecision.surfaceTone === "light";
   const cardBackground = isLightSurface
@@ -139,6 +143,10 @@ export const LongformDockedInverseOverlay: React.FC<LongformDockedInverseOverlay
             }}
           >
             {activeWords.map((word, index) => {
+              const safeText = sanitizeRenderableOverlayText(word.text);
+              if (!safeText) {
+                return null;
+              }
               const previousWord = index > 0 ? activeWords[index - 1] : undefined;
               const nextWord = index < activeWords.length - 1 ? activeWords[index + 1] : undefined;
               const motionState = getLongformWordMotionState({
@@ -174,7 +182,7 @@ export const LongformDockedInverseOverlay: React.FC<LongformDockedInverseOverlay
                     willChange: "transform, opacity, filter"
                   }}
                 >
-                  {word.text}
+                  {safeText}
                 </span>
               );
             })}
