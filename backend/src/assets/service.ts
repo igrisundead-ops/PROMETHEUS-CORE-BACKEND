@@ -3,7 +3,34 @@ import {z} from "zod";
 
 import type {BackendEnv} from "../config";
 import {createHash} from "node:crypto";
-import {createEmbeddingProvider, type EmbeddingProvider} from "../../../remotion-app/src/lib/embeddings/provider";
+
+type EmbeddingProvider = {
+  embedTexts(texts: string[]): Promise<number[][]>;
+};
+
+const loadEmbeddingProviderModule = async (): Promise<{
+  createEmbeddingProvider: (input: {
+    provider: string;
+    model: string;
+    dimensions: number;
+    apiKey: string;
+    baseUrl: string;
+    pythonBin: string;
+    useFp16: boolean;
+    localBatchSize: number;
+  }) => EmbeddingProvider;
+}> => Function("return import('../../../remotion-app/src/lib/embeddings/provider')")() as Promise<{
+  createEmbeddingProvider: (input: {
+    provider: string;
+    model: string;
+    dimensions: number;
+    apiKey: string;
+    baseUrl: string;
+    pythonBin: string;
+    useFp16: boolean;
+    localBatchSize: number;
+  }) => EmbeddingProvider;
+}>;
 
 const requestSchema = z.object({
   queryText: z.string().min(1),
@@ -246,27 +273,12 @@ const resolveHttpMilvusEndpoint = (address: string): string => {
 export class AssetRetrievalService {
   private client: MilvusClient | HttpClient | null;
   private readonly useHttpMilvus: boolean;
-  private readonly embeddingProvider: EmbeddingProvider | null;
+  private embeddingProvider: EmbeddingProvider | null;
 
   constructor(private readonly env: BackendEnv) {
     this.useHttpMilvus = env.ASSET_MILVUS_ENABLED && isHttpMilvusAddress(env.MILVUS_ADDRESS);
     this.client = null;
-    this.embeddingProvider = env.ASSET_EMBEDDING_PROVIDER === "local-test"
-      ? null
-      : createEmbeddingProvider({
-          provider: env.ASSET_EMBEDDING_PROVIDER,
-          model: env.ASSET_EMBEDDING_MODEL,
-          dimensions: env.ASSET_EMBEDDING_DIMENSIONS,
-          apiKey: env.ASSET_EMBEDDING_API_KEY || env.OPENAI_API_KEY,
-          baseUrl: env.OPENAI_BASE_URL,
-          pythonBin: env.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
-            ? env.BGE_M3_LOCAL_PYTHON_BIN
-            : env.LOCAL_EMBEDDING_PYTHON_BIN,
-          useFp16: env.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
-            ? env.BGE_M3_LOCAL_USE_FP16
-            : env.LOCAL_EMBEDDING_USE_FP16,
-          localBatchSize: 16
-        });
+    this.embeddingProvider = null;
 
     console.log(
       `[assets:retrieve] Initialized provider=${env.ASSET_EMBEDDING_PROVIDER} model=${env.ASSET_EMBEDDING_MODEL} ` +
@@ -300,12 +312,44 @@ export class AssetRetrievalService {
     return this.client;
   }
 
+  private async getEmbeddingProvider(): Promise<EmbeddingProvider> {
+    if (this.embeddingProvider) {
+      return this.embeddingProvider;
+    }
+
+    try {
+      const {createEmbeddingProvider} = await loadEmbeddingProviderModule();
+      this.embeddingProvider = createEmbeddingProvider({
+        provider: this.env.ASSET_EMBEDDING_PROVIDER,
+        model: this.env.ASSET_EMBEDDING_MODEL,
+        dimensions: this.env.ASSET_EMBEDDING_DIMENSIONS,
+        apiKey: this.env.ASSET_EMBEDDING_API_KEY || this.env.OPENAI_API_KEY,
+        baseUrl: this.env.OPENAI_BASE_URL,
+        pythonBin: this.env.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
+          ? this.env.BGE_M3_LOCAL_PYTHON_BIN
+          : this.env.LOCAL_EMBEDDING_PYTHON_BIN,
+        useFp16: this.env.ASSET_EMBEDDING_PROVIDER === "bge-m3-local"
+          ? this.env.BGE_M3_LOCAL_USE_FP16
+          : this.env.LOCAL_EMBEDDING_USE_FP16,
+        localBatchSize: 16
+      });
+      return this.embeddingProvider;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(
+        "Asset retrieval embeddings are unavailable because the shared remotion-app sources could not be loaded. " +
+        `Deploy the repo root or include remotion-app alongside backend. Original error: ${message}`
+      );
+    }
+  }
+
   private async embedQueryText(queryText: string): Promise<number[]> {
     if (this.env.ASSET_EMBEDDING_PROVIDER === "local-test") {
       return buildDeterministicVector(queryText, this.env.ASSET_EMBEDDING_DIMENSIONS);
     }
 
-    const [embedding] = await this.embeddingProvider!.embedTexts([queryText]);
+    const provider = await this.getEmbeddingProvider();
+    const [embedding] = await provider.embedTexts([queryText]);
     return embedding ?? [];
   }
 

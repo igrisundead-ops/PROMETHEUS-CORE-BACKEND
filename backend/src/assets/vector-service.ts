@@ -1,14 +1,35 @@
 import type {BackendEnv} from "../config";
-import {
-  createEmbeddingClient,
-  createMilvusCreativeClient,
-  loadVectorConfig,
-  searchCreativeAssetRecords,
-  vectorSearchRequestSchema,
-  type EmbeddingClient,
-  type VectorConfig,
-  type VectorSearchResponse
-} from "../../../remotion-app/src/lib/vector";
+
+type EmbeddingClient = {
+  embedTexts(texts: string[]): Promise<number[][]>;
+};
+
+type VectorSearchRequest = {
+  queryText: string;
+};
+
+type VectorSearchResponse = Record<string, unknown>;
+
+type VectorRuntime = {
+  config: {
+    EMBEDDING_PROVIDER: string;
+    EMBEDDING_MODEL: string;
+    EMBEDDING_DIMENSIONS: number;
+    MILVUS_COLLECTION: string;
+  };
+  embeddingClient: EmbeddingClient;
+  parseRequest: (body: unknown) => VectorSearchRequest;
+  createClient: (config: unknown) => unknown;
+  search: (input: {
+    client: unknown;
+    config: unknown;
+    queryVector: number[];
+    request: unknown;
+  }) => Promise<VectorSearchResponse>;
+};
+
+const loadVectorModule = async (): Promise<any> =>
+  Function("return import('../../../remotion-app/src/lib/vector')")() as Promise<any>;
 
 const toVectorOverrides = (env: BackendEnv): Partial<NodeJS.ProcessEnv> => ({
   MILVUS_ADDRESS: env.MILVUS_ADDRESS,
@@ -33,18 +54,54 @@ const toVectorOverrides = (env: BackendEnv): Partial<NodeJS.ProcessEnv> => ({
 });
 
 export class VectorRetrievalService {
-  private readonly config: VectorConfig;
   private readonly enabled: boolean;
-  private readonly embeddingClient: EmbeddingClient;
+  private runtimePromise: Promise<VectorRuntime> | null;
+  private readonly env: BackendEnv;
 
   constructor(env: BackendEnv) {
+    this.env = env;
     this.enabled = env.ASSET_MILVUS_ENABLED;
-    this.config = loadVectorConfig(toVectorOverrides(env));
-    this.embeddingClient = createEmbeddingClient(this.config);
-    console.log(
-      `[vector:retrieve] Initialized provider=${this.config.EMBEDDING_PROVIDER} model=${this.config.EMBEDDING_MODEL} ` +
-      `dims=${this.config.EMBEDDING_DIMENSIONS} collection=${this.config.MILVUS_COLLECTION}.`
-    );
+    this.runtimePromise = null;
+  }
+
+  private async getRuntime(): Promise<VectorRuntime> {
+    if (this.runtimePromise) {
+      return this.runtimePromise;
+    }
+
+    this.runtimePromise = (async () => {
+      try {
+        const vectorModule = await loadVectorModule();
+        const config = vectorModule.loadVectorConfig(toVectorOverrides(this.env)) as VectorRuntime["config"];
+        const embeddingClient = vectorModule.createEmbeddingClient(config) as EmbeddingClient;
+        console.log(
+          `[vector:retrieve] Initialized provider=${config.EMBEDDING_PROVIDER} model=${config.EMBEDDING_MODEL} ` +
+          `dims=${config.EMBEDDING_DIMENSIONS} collection=${config.MILVUS_COLLECTION}.`
+        );
+        return {
+          config,
+          embeddingClient,
+          parseRequest: (body: unknown) => vectorModule.vectorSearchRequestSchema.parse(body) as VectorSearchRequest,
+          createClient: (runtimeConfig: unknown) => vectorModule.createMilvusCreativeClient(runtimeConfig),
+          search: async ({client, config: runtimeConfig, queryVector, request}) =>
+            vectorModule.searchCreativeAssetRecords({
+              client,
+              config: runtimeConfig,
+              queryVector,
+              request
+            }) as Promise<VectorSearchResponse>
+        };
+      } catch (error) {
+        this.runtimePromise = null;
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          "Vector retrieval is unavailable because the shared remotion-app sources could not be loaded. " +
+          `Deploy the repo root or include remotion-app alongside backend. Original error: ${message}`
+        );
+      }
+    })();
+
+    return this.runtimePromise;
   }
 
   async retrieve(body: unknown): Promise<VectorSearchResponse> {
@@ -52,12 +109,13 @@ export class VectorRetrievalService {
       throw new Error("ASSET_MILVUS_ENABLED=false");
     }
 
-    const request = vectorSearchRequestSchema.parse(body);
-    const [queryVector] = await this.embeddingClient.embedTexts([request.queryText]);
-    const client = createMilvusCreativeClient(this.config);
-    return searchCreativeAssetRecords({
+    const runtime = await this.getRuntime();
+    const request = runtime.parseRequest(body);
+    const [queryVector] = await runtime.embeddingClient.embedTexts([request.queryText]);
+    const client = runtime.createClient(runtime.config);
+    return runtime.search({
       client,
-      config: this.config,
+      config: runtime.config,
       queryVector,
       request
     });
