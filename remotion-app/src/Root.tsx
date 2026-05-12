@@ -2,6 +2,10 @@ import React from "react";
 import {Composition, staticFile} from "remotion";
 
 import {FemaleCoachDeanGraziosi} from "./compositions/FemaleCoachDeanGraziosi";
+import {
+  PROJECT_SCOPED_PREVIEW_COMPOSITION_ID,
+  ProjectScopedPreviewComposition
+} from "./compositions/ProjectScopedPreviewComposition";
 import {CreativeAudioPreview} from "./compositions/CreativeAudioPreview";
 import {CinematicPiPShowcase} from "./compositions/CinematicPiPShowcase";
 import {TargetFocusZoomShowcase} from "./compositions/TargetFocusZoomShowcase";
@@ -15,7 +19,9 @@ import {HouseFontBootstrap} from "./lib/cinematic-typography/house-font-loader";
 import {getPresentationPreset} from "./lib/presentation-presets";
 import {normalizeCaptionStyleProfileId} from "./lib/stylebooks/caption-style-profiles";
 
-const envCaptionProfileId = typeof process !== "undefined" ? process.env.CAPTION_STYLE_PROFILE : undefined;
+const importMetaEnv = typeof import.meta !== "undefined" ? import.meta.env : undefined;
+const envCaptionProfileId =
+  importMetaEnv?.VITE_CAPTION_STYLE_PROFILE?.trim() || importMetaEnv?.CAPTION_STYLE_PROFILE?.trim();
 const defaultCaptionProfileId = envCaptionProfileId?.trim()
   ? normalizeCaptionStyleProfileId(envCaptionProfileId)
   : undefined;
@@ -48,6 +54,28 @@ export const RemotionRoot: React.FC = () => {
   return (
     <>
       <HouseFontBootstrap />
+      <Composition
+        id={PROJECT_SCOPED_PREVIEW_COMPOSITION_ID}
+        component={ProjectScopedPreviewComposition}
+        width={longFormPreset.videoMetadata.width}
+        height={longFormPreset.videoMetadata.height}
+        fps={longFormPreset.videoMetadata.fps}
+        durationInFrames={longFormPreset.videoMetadata.durationInFrames}
+        defaultProps={{
+          videoSrc: staticFile(longFormPreset.videoAsset),
+          videoMetadata: longFormPreset.videoMetadata,
+          presentationMode: longFormPreset.presentationMode,
+          motionTier: "auto",
+          gradeProfileId: "auto",
+          transitionPresetId: "auto",
+          matteMode: "auto",
+          captionBias: "auto",
+          captionProfileId: defaultCaptionProfileId ?? longFormPreset.captionProfileId,
+          motion3DMode: "editorial",
+          stabilizePreviewTimeline: true,
+          previewPerformanceMode: "balanced"
+        }}
+      />
       <Composition
         id="FemaleCoachDeanGraziosi"
         component={FemaleCoachDeanGraziosi}

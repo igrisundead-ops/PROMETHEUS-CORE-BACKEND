@@ -184,4 +184,91 @@ describe("edit session live preview route", () => {
     expect(sourceResponse.headers["content-type"]).toContain("video/mp4");
     expect(sourceResponse.body).toBe("fake-video-file");
   });
+
+  it("streams enough session metadata over SSE subscribers to avoid immediate manifest and artifact polling", async () => {
+    const deps: BackendDependencies = {
+      probeVideoMetadata: async () => ({
+        width: 1920,
+        height: 1080,
+        fps: 30,
+        duration_seconds: 10,
+        duration_in_frames: 300
+      }),
+      extractPreviewAudioBuffer: async () => Buffer.from("preview-audio"),
+      streamPreviewAudio: async ({callbacks}) => {
+        await callbacks?.onTurn?.({
+          transcript: "SSE owns the preview contract",
+          utterance: "SSE owns the preview contract",
+          endOfTurn: true,
+          turnOrder: 1,
+          endOfTurnConfidence: 0.93,
+          words: [],
+          isFormatted: true
+        });
+      },
+      transcribeMedia: async () => ([
+        {text: "SSE", start_ms: 0, end_ms: 120},
+        {text: "owns", start_ms: 120, end_ms: 260},
+        {text: "the", start_ms: 260, end_ms: 360},
+        {text: "preview", start_ms: 360, end_ms: 560},
+        {text: "contract", start_ms: 560, end_ms: 820}
+      ])
+    };
+
+    context = await createTestApp({
+      storageDir: tempDir,
+      deps
+    });
+
+    const multipart = buildMultipartBody([
+      {
+        name: "source_video",
+        value: Buffer.from("fake-video-file"),
+        filename: "sse-preview-source.mp4",
+        contentType: "video/mp4"
+      }
+    ]);
+
+    const response = await context.app.inject({
+      method: "POST",
+      url: "/api/edit-sessions/live-preview",
+      payload: multipart.body,
+      headers: {
+        "content-type": multipart.contentType
+      }
+    });
+
+    expect(response.statusCode).toBe(202);
+    const body = response.json() as {id: string};
+    const events: Array<{type: string; session: Record<string, unknown>}> = [];
+    const unsubscribe = context.editSessions.subscribe(body.id, (event) => {
+      events.push(event as {type: string; session: Record<string, unknown>});
+    });
+
+    await waitFor(async () => {
+      return events.some((event) => event.type === "preview_text_ready");
+    });
+
+    unsubscribe();
+
+    const previewReadyEvent = events.find((event) => event.type === "preview_text_ready");
+    expect(previewReadyEvent).toBeTruthy();
+    expect(previewReadyEvent?.session["sourceMediaUrl"]).toBe(`/api/edit-sessions/${body.id}/source`);
+    expect(previewReadyEvent?.session["sourceMediaKind"]).toBe("session_source_stream");
+    expect(previewReadyEvent?.session["previewArtifactUrl"]).not.toBeUndefined();
+    expect(previewReadyEvent?.session["previewArtifactKind"]).not.toBeUndefined();
+    expect(previewReadyEvent?.session["previewArtifactContentType"]).not.toBeUndefined();
+
+    const lanes = previewReadyEvent?.session["lanes"] as Record<string, unknown>;
+    expect(lanes.defaultInteractive).toBe("hyperframes");
+    expect(lanes.interactive).toEqual(["hyperframes"]);
+
+    const routes = previewReadyEvent?.session["routes"] as Record<string, unknown>;
+    expect(routes.status).toBe(`/api/edit-sessions/${body.id}/status`);
+    expect(routes.previewManifest).toBe(`/api/edit-sessions/${body.id}/preview-manifest`);
+    expect(routes.previewArtifact).toBe(`/api/edit-sessions/${body.id}/preview-artifact`);
+    expect(routes.events).toBe(`/api/edit-sessions/${body.id}/events`);
+
+    expect(previewReadyEvent?.session["previewDiagnostics"]).toBeTruthy();
+  });
 });

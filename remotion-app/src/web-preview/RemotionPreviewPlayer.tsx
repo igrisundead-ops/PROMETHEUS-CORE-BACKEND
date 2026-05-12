@@ -1,7 +1,7 @@
-import React, {useEffect, useMemo} from "react";
+import React, {useEffect, useMemo, useRef} from "react";
 import {Player} from "@remotion/player";
 
-import {FemaleCoachDeanGraziosi} from "../compositions/FemaleCoachDeanGraziosi";
+import {ProjectScopedPreviewComposition} from "../compositions/ProjectScopedPreviewComposition";
 import type {CaptionStyleProfileId, PreviewPerformanceMode, VideoMetadata} from "../lib/types";
 import type {MotionCompositionModel} from "../lib/motion-platform/scene-engine";
 import type {PreviewPlaybackHealth} from "./preview-telemetry";
@@ -25,6 +25,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
   onHealthChange,
   onErrorMessageChange
 }) => {
+  const playerInstanceIdRef = useRef(`project-preview-player-${Math.random().toString(36).slice(2, 10)}`);
   const inputProps = useMemo(() => {
     return {
       videoSrc,
@@ -47,11 +48,44 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
     onErrorMessageChange?.(null);
   }, [onErrorMessageChange, onHealthChange]);
 
+  useEffect(() => {
+    if (!import.meta.env.DEV) {
+      return;
+    }
+
+    console.info("[RemotionPreviewPlayer] Player mounted", {
+      playerInstanceId: playerInstanceIdRef.current
+    });
+
+    return () => {
+      console.info("[RemotionPreviewPlayer] Player unmounted", {
+        playerInstanceId: playerInstanceIdRef.current
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) {
+      return;
+    }
+
+    console.info("[RemotionPreviewPlayer] Player props updated without remount", {
+      playerInstanceId: playerInstanceIdRef.current,
+      captionProfileId,
+      previewPerformanceMode,
+      motionTier: motionModel.tier,
+      videoSrc
+    });
+  }, [captionProfileId, motionModel.tier, previewPerformanceMode, videoSrc]);
+
   return (
-    <div className="remotion-preview-player-shell" data-preview-mode="remotion-player">
+    <div
+      className="remotion-preview-player-shell"
+      data-preview-mode="remotion-player"
+      data-player-instance-id={playerInstanceIdRef.current}
+    >
       <Player
-        key={`${videoSrc}-${motionModel.tier}-${captionProfileId}-${previewPerformanceMode}`}
-        component={FemaleCoachDeanGraziosi}
+        component={ProjectScopedPreviewComposition}
         inputProps={inputProps}
         durationInFrames={videoMetadata.durationInFrames}
         compositionWidth={videoMetadata.width}

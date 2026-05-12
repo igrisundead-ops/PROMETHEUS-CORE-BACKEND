@@ -1,5 +1,3 @@
-import {config as loadDotenv} from "dotenv";
-import path from "node:path";
 import {z} from "zod";
 
 import type {AppEnv} from "./types";
@@ -36,29 +34,43 @@ const envSchema = z.object({
 
 let cachedEnv: AppEnv | null = null;
 
-export const clearCachedEnv = (): void => {
-  cachedEnv = null;
-};
+const readImportMetaEnv = (): Record<string, string | undefined> => {
+  const importMetaEnv =
+    typeof import.meta !== "undefined"
+      ? (import.meta.env as Record<string, string | boolean | undefined> | undefined)
+      : undefined;
 
-export const loadEnv = (): AppEnv => {
-  if (cachedEnv) {
-    return cachedEnv;
+  if (!importMetaEnv) {
+    return {};
   }
 
-  loadDotenv();
-  loadDotenv({
-    path: path.resolve(process.cwd(), "..", ".env")
-  });
-  loadDotenv({
-    path: path.resolve(process.cwd(), ".env.local"),
-    override: true
-  });
-  loadDotenv({
-    path: path.resolve(process.cwd(), "..", ".env.local"),
-    override: true
-  });
-  cachedEnv = parseEnv(process.env);
-  return cachedEnv;
+  return Object.fromEntries(
+    Object.entries(importMetaEnv).map(([key, value]) => [key, typeof value === "string" ? value : undefined])
+  );
+};
+
+const readProcessEnv = (): Record<string, string | undefined> => {
+  if (typeof process === "undefined") {
+    return {};
+  }
+
+  return process.env;
+};
+
+const readFlagValue = (key: string): string | undefined => {
+  const importMetaEnv = readImportMetaEnv();
+  const processEnv = readProcessEnv();
+
+  return (
+    importMetaEnv[`VITE_${key}`]?.trim() ||
+    importMetaEnv[key]?.trim() ||
+    processEnv[`VITE_${key}`]?.trim() ||
+    processEnv[key]?.trim()
+  );
+};
+
+export const clearCachedEnv = (): void => {
+  cachedEnv = null;
 };
 
 export const parseEnv = (rawEnv: NodeJS.ProcessEnv): AppEnv => {
@@ -81,10 +93,7 @@ export const assertSupabaseDisabled = (env: AppEnv): void => {
 };
 
 export const isCreativeOrchestrationEnabled = (): boolean => {
-  const globalProcess = globalThis as typeof globalThis & {
-    process?: {env?: Record<string, string | undefined>};
-  };
-  const liveValue = globalProcess.process?.env?.CREATIVE_ORCHESTRATION_V1;
+  const liveValue = readFlagValue("CREATIVE_ORCHESTRATION_V1");
   if (typeof liveValue === "string") {
     return liveValue === "true";
   }

@@ -29,6 +29,14 @@ export type AudioCreativePreviewSession = {
   renderMode: CreativeRenderMode;
 };
 
+export type BackendPreviewPlan = {
+  previewText?: string | null;
+  previewLines?: string[];
+  previewMotionSequence?: LivePreviewMotionCue[];
+  transcriptWords?: LivePreviewBackendWord[];
+  motionModel?: MotionCompositionModel | null;
+};
+
 const DEFAULT_AUDIO_PREVIEW_FALLBACK_LINES = [
   "Build the message first",
   "Then scale the motion"
@@ -337,6 +345,82 @@ const buildCaptionChunksFromLiveSource = ({
   return [];
 };
 
+const hasBackendPreviewPlan = (plan?: BackendPreviewPlan | null): boolean => {
+  if (!plan) {
+    return false;
+  }
+
+  const hasMotionModel = Boolean(plan.motionModel);
+  const hasTranscriptWords = (plan.transcriptWords?.length ?? 0) > 0;
+  const hasPreviewLines = (plan.previewLines?.length ?? 0) > 0;
+  const hasPreviewMotionSequence = (plan.previewMotionSequence?.length ?? 0) > 0;
+
+  return hasMotionModel || hasTranscriptWords || hasPreviewLines || hasPreviewMotionSequence;
+};
+
+const buildAudioCreativePreviewSessionFromBackendPlan = async (input: {
+  jobId: string;
+  captionProfileId: CaptionStyleProfileId;
+  motionTier: MotionTier | "auto";
+  presentationMode?: PresentationModeSetting | null;
+  baseVideoMetadata?: Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames"> | null;
+  allowFallbackDemoData?: boolean;
+  backendPreviewPlan: BackendPreviewPlan;
+}): Promise<AudioCreativePreviewSession> => {
+  const captionChunks = buildCaptionChunksFromLiveSource({
+    captionProfileId: input.captionProfileId,
+    presentationMode: input.presentationMode,
+    transcriptWords: input.backendPreviewPlan.transcriptWords,
+    previewLines: input.backendPreviewPlan.previewLines,
+    previewMotionSequence: input.backendPreviewPlan.previewMotionSequence,
+    allowFallbackDemoData: input.allowFallbackDemoData
+  });
+  const resolvedRenderMode = resolveCreativePreviewRenderMode({
+    baseVideoMetadata: input.baseVideoMetadata
+  });
+  const lastTrackEndMs = (input.backendPreviewPlan.previewMotionSequence ?? []).reduce(
+    (max, cue) => Math.max(max, cue.startMs + cue.durationMs),
+    0
+  );
+  const lastCaptionEndMs = captionChunks.reduce((max, chunk) => Math.max(max, chunk.endMs), 0);
+  const durationMs = resolveAudioCreativePreviewDurationMs({
+    lastTrackEndMs,
+    lastCaptionEndMs,
+    fallbackDurationMs: input.baseVideoMetadata?.durationSeconds
+      ? input.baseVideoMetadata.durationSeconds * 1000
+      : null
+  });
+  const videoMetadata = resolveAudioCreativePreviewVideoMetadata({
+    presentationMode: input.presentationMode,
+    durationMs,
+    baseVideoMetadata: input.baseVideoMetadata
+  });
+  const creativeTimeline = createEmptyCreativeTimeline({
+    jobId: input.jobId,
+    durationMs
+  });
+  const motionModel = input.backendPreviewPlan.motionModel ?? buildMotionCompositionModel({
+    chunks: captionChunks,
+    tier: input.motionTier,
+    fps: videoMetadata.fps,
+    videoMetadata,
+    captionProfileId: input.captionProfileId
+  });
+
+  return {
+    captionChunks,
+    creativeTimeline,
+    debugReport: createLiteDebugReport({
+      jobId: input.jobId,
+      timeline: creativeTimeline
+    }),
+    motionModel,
+    videoMetadata,
+    durationMs,
+    renderMode: resolvedRenderMode
+  };
+};
+
 export const buildAudioCreativePreviewSession = async (input: {
   jobId: string;
   captionProfileId: CaptionStyleProfileId;
@@ -347,10 +431,23 @@ export const buildAudioCreativePreviewSession = async (input: {
   previewLines?: string[];
   previewMotionSequence?: LivePreviewMotionCue[];
   allowFallbackDemoData?: boolean;
+  backendPreviewPlan?: BackendPreviewPlan | null;
   featureFlags?: {
     creativeOrchestrationV1?: boolean;
   };
 }): Promise<AudioCreativePreviewSession> => {
+  if (hasBackendPreviewPlan(input.backendPreviewPlan)) {
+    return buildAudioCreativePreviewSessionFromBackendPlan({
+      jobId: input.jobId,
+      captionProfileId: input.captionProfileId,
+      motionTier: input.motionTier,
+      presentationMode: input.presentationMode,
+      baseVideoMetadata: input.baseVideoMetadata,
+      allowFallbackDemoData: input.allowFallbackDemoData,
+      backendPreviewPlan: input.backendPreviewPlan!
+    });
+  }
+
   if (input.featureFlags?.creativeOrchestrationV1 === false) {
     return buildFastAudioCreativePreviewSession(input);
   }

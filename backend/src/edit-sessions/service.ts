@@ -349,8 +349,77 @@ const buildPreviewDiagnostics = ({
   });
 };
 
-const toPublicSession = (session: EditSessionState): EditSessionPublicState => {
-  return editSessionPublicStateSchema.parse(session);
+const buildSessionRoutes = (sessionId: string, sourceMedia: string | null) => ({
+  status: `/api/edit-sessions/${sessionId}/status`,
+  previewManifest: `/api/edit-sessions/${sessionId}/preview-manifest`,
+  previewArtifact: `/api/edit-sessions/${sessionId}/preview-artifact`,
+  preview: `/api/edit-sessions/${sessionId}/preview`,
+  render: `/api/edit-sessions/${sessionId}/render`,
+  renderStatus: `/api/edit-sessions/${sessionId}/render-status`,
+  sourceMedia,
+  events: `/api/edit-sessions/${sessionId}/events`
+});
+
+const buildSessionLanes = (renderConfig: RenderConfig) => {
+  const interactive = renderConfig.ENABLE_REMOTION_PREVIEW
+    ? ["hyperframes", "remotion"] as const
+    : ["hyperframes"] as const;
+
+  return {
+    defaultInteractive:
+      renderConfig.PREVIEW_ENGINE === "remotion" && renderConfig.ENABLE_REMOTION_PREVIEW
+        ? "remotion"
+        : "hyperframes",
+    interactive: [...interactive],
+    export: "remotion" as const
+  };
+};
+
+const resolvePublicPreviewArtifact = (session: EditSessionState): {
+  previewArtifactUrl: string | null;
+  previewArtifactKind: "html_composition" | "video" | null;
+  previewArtifactContentType: string | null;
+} => {
+  return {
+    previewArtifactUrl:
+      typeof session.metadata.previewArtifactUrl === "string" && session.metadata.previewArtifactUrl.trim()
+        ? session.metadata.previewArtifactUrl
+        : session.renderOutputUrl ?? null,
+    previewArtifactKind:
+      session.metadata.previewArtifactKind === "html_composition" || session.metadata.previewArtifactKind === "video"
+        ? session.metadata.previewArtifactKind
+        : null,
+    previewArtifactContentType:
+      typeof session.metadata.previewArtifactContentType === "string" && session.metadata.previewArtifactContentType.trim()
+        ? session.metadata.previewArtifactContentType.trim()
+        : null
+  };
+};
+
+const toPublicSession = (session: EditSessionState, renderConfig: RenderConfig): EditSessionPublicState => {
+  const sourceMediaUrl = resolvePreviewManifestSourceUrl(session);
+  const {previewArtifactUrl, previewArtifactKind, previewArtifactContentType} = resolvePublicPreviewArtifact(session);
+
+  return editSessionPublicStateSchema.parse({
+    ...session,
+    routes: buildSessionRoutes(session.id, sourceMediaUrl),
+    lanes: buildSessionLanes(renderConfig),
+    sourceMediaUrl,
+    sourceMediaKind: resolvePreviewManifestSourceKind(session),
+    sourceLabel:
+      typeof session.metadata.sourceDisplayName === "string" && session.metadata.sourceDisplayName.trim()
+        ? session.metadata.sourceDisplayName.trim()
+        : session.sourceFilename,
+    previewArtifactUrl,
+    previewArtifactKind,
+    previewArtifactContentType,
+    previewDiagnostics: buildPreviewDiagnostics({
+      session,
+      renderConfig,
+      artifactAvailable: Boolean(previewArtifactUrl),
+      artifactUrl: previewArtifactUrl
+    })
+  });
 };
 
 const CONTENT_TYPE_BY_EXTENSION: Record<string, string> = {
@@ -744,11 +813,11 @@ export class EditSessionManager {
 
     this.sessions.set(sessionId, session);
     await this.persistSession(sessionId);
-    return toPublicSession(session);
+    return toPublicSession(session, this.renderConfig);
   }
 
   public async getSession(sessionId: string): Promise<EditSessionPublicState> {
-    return toPublicSession(await this.loadSession(sessionId));
+    return toPublicSession(await this.loadSession(sessionId), this.renderConfig);
   }
 
   public async getPreview(sessionId: string): Promise<Record<string, unknown>> {
@@ -815,29 +884,21 @@ export class EditSessionManager {
     const baseVideoSrc = hasVideo ? sourceUrl : null;
     const separateAudioSrc = hasVideo ? null : sourceUrl;
 
-    const interactiveLanes = this.renderConfig.ENABLE_REMOTION_PREVIEW
-      ? ["hyperframes", "remotion"] as const
-      : ["hyperframes"] as const;
-    const defaultInteractive = this.renderConfig.PREVIEW_ENGINE === "remotion" && this.renderConfig.ENABLE_REMOTION_PREVIEW
-      ? "remotion"
-      : "hyperframes";
+    const sessionLanes = buildSessionLanes(this.renderConfig);
+    const sessionRoutes = buildSessionRoutes(session.id, sourceUrl);
 
     return editSessionPreviewManifestSchema.parse({
       schemaVersion: "hyperframes-preview-manifest/v1",
       sessionId: session.id,
       captionProfileId: session.captionProfileId,
       motionTier: session.motionTier,
-      lanes: {
-        defaultInteractive,
-        interactive: [...interactiveLanes],
-        export: "remotion"
-      },
+      lanes: sessionLanes,
       routes: {
-        status: `/api/edit-sessions/${session.id}/status`,
-        preview: `/api/edit-sessions/${session.id}/preview`,
-        render: `/api/edit-sessions/${session.id}/render`,
-        renderStatus: `/api/edit-sessions/${session.id}/render-status`,
-        sourceMedia: sourceUrl
+        status: sessionRoutes.status,
+        preview: sessionRoutes.preview,
+        render: sessionRoutes.render,
+        renderStatus: sessionRoutes.renderStatus,
+        sourceMedia: sessionRoutes.sourceMedia
       },
       baseVideo: {
         src: baseVideoSrc,
@@ -853,7 +914,7 @@ export class EditSessionManager {
         src: separateAudioSrc,
         source: hasVideo ? "video-element" : separateAudioSrc ? "separate-audio" : "none"
       },
-      session: toPublicSession(session),
+      session: toPublicSession(session, this.renderConfig),
       overlayPlan: {
         previewText: session.previewText,
         previewLines: session.previewLines,
@@ -1018,7 +1079,7 @@ export class EditSessionManager {
     const input = editSessionRenderStartRequestSchema.parse(payload ?? {});
     const current = await this.loadSession(sessionId);
     if (current.renderStartedAt || current.renderStatus === "render_complete") {
-      return toPublicSession(current);
+      return toPublicSession(current, this.renderConfig);
     }
 
     const resolvedSourcePath = resolveLocalSourcePath(current);
@@ -1029,7 +1090,7 @@ export class EditSessionManager {
         errorCode: session.errorCode ?? "render_source_missing",
         errorMessage: session.errorMessage ?? "Render could not start because the source media is unavailable."
       }), "failed");
-      return toPublicSession(failed);
+      return toPublicSession(failed, this.renderConfig);
     }
 
     const now = nowIso(this.deps);
@@ -1153,7 +1214,7 @@ export class EditSessionManager {
       };
     }, "failed");
 
-    return toPublicSession(failed);
+    return toPublicSession(failed, this.renderConfig);
   }
 
   public subscribe(sessionId: string, listener: (event: EditSessionEvent) => void): () => void {
@@ -1166,7 +1227,7 @@ export class EditSessionManager {
         listener({
           type: "session_snapshot",
           at: nowIso(this.deps),
-          session: toPublicSession(session)
+          session: toPublicSession(session, this.renderConfig)
         });
       })
       .catch(() => undefined);
@@ -1769,7 +1830,7 @@ export class EditSessionManager {
       this.broadcast(sessionId, {
         type: eventType,
         at: now,
-        session: toPublicSession(merged),
+        session: toPublicSession(merged, this.renderConfig),
         detail
       });
     }
@@ -1820,7 +1881,7 @@ export class EditSessionManager {
       throw new Error("Live compositor requires a video file with a real video track. Audio-only sources are not allowed in this lane.");
     }
     if (current.previewStartedAt) {
-      return toPublicSession(current);
+      return toPublicSession(current, this.renderConfig);
     }
 
     const now = nowIso(this.deps);

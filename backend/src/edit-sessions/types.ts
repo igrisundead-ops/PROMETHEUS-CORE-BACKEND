@@ -171,6 +171,23 @@ export const editSessionRenderStateSchema = z.object({
   outputPath: z.string().nullable()
 });
 
+export const editSessionPublicRoutesSchema = z.object({
+  status: z.string(),
+  previewManifest: z.string(),
+  previewArtifact: z.string(),
+  preview: z.string(),
+  render: z.string(),
+  renderStatus: z.string(),
+  sourceMedia: z.string().nullable(),
+  events: z.string()
+});
+
+export const editSessionPublicLanesSchema = z.object({
+  defaultInteractive: editSessionPreviewManifestInteractiveLaneSchema,
+  interactive: z.array(editSessionPreviewManifestInteractiveLaneSchema),
+  export: z.literal("remotion")
+});
+
 export const editSessionCreateRequestSchema = z.object({
   mediaUrl: z.string().trim().optional(),
   storageKey: z.string().trim().optional(),
@@ -259,6 +276,16 @@ export const editSessionStateSchema = z.object({
 
 export const editSessionPublicStateSchema = editSessionStateSchema.omit({
   sourcePath: true
+}).extend({
+  routes: editSessionPublicRoutesSchema,
+  lanes: editSessionPublicLanesSchema,
+  sourceMediaUrl: z.string().nullable(),
+  sourceMediaKind: editSessionPreviewManifestSourceKindSchema,
+  sourceLabel: z.string().nullable(),
+  previewArtifactUrl: z.string().nullable(),
+  previewArtifactKind: z.enum(["html_composition", "video"]).nullable(),
+  previewArtifactContentType: z.string().nullable(),
+  previewDiagnostics: z.record(z.string(), z.unknown()).default({})
 });
 
 export const editSessionPreviewManifestSchema = z.object({

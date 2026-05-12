@@ -1,7 +1,7 @@
 import {mkdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 
-import {loadEnv} from "../src/lib/env";
+import {loadEnv} from "../src/lib/env.server";
 import {
   normalizeMotionAssetCatalog,
   type MotionAssetSourceRecord

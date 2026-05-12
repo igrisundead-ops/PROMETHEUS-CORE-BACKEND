@@ -8,7 +8,7 @@ import {
   getChunkPolicyStats,
   mapWordChunksToCaptionChunks
 } from "../src/lib/caption-chunker";
-import {loadEnv, assertSupabaseDisabled} from "../src/lib/env";
+import {loadEnv, assertSupabaseDisabled} from "../src/lib/env.server";
 import {buildGroqEnhancedChunks} from "../src/lib/groq-intelligence";
 // @ts-ignore Native config loading needs the explicit extension for this Node-only import path.
 import {sha256File, sha256Text} from "../src/lib/hash.ts";

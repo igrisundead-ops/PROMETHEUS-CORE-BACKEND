@@ -13,8 +13,8 @@ import type {
   VideoMetadata
 } from "../lib/types";
 import {
+  type BackendPreviewPlan,
   buildAudioCreativePreviewSession,
-  buildFastAudioCreativePreviewSession,
   type AudioCreativePreviewAudioStatus,
   type AudioCreativePreviewSession,
   type AudioCreativePreviewState,
@@ -55,7 +55,7 @@ export type CreativeAudioLivePlayerProps = {
 
 type BuildState = "idle" | "building-timeline" | "ready" | "error";
 
-type PreviewGovernorMode = "lite-preview" | "full-live-preview";
+type PreviewGovernorMode = "backend-preview-plan" | "browser-orchestration-fallback";
 
 type PreviewTimingState = {
   runId: string;
@@ -68,9 +68,8 @@ type PreviewTimingState = {
   fullReadyAtMs: number | null;
 };
 
-const STATUS_FALLBACK_POLL_INTERVAL_MS = 4000;
-const BACKEND_UPDATE_STALE_AFTER_MS = 3200;
-const FULL_PREVIEW_MIN_TRANSCRIPT_WORDS = 12;
+const STATUS_FALLBACK_POLL_INTERVAL_MS = 10000;
+const BACKEND_UPDATE_STALE_AFTER_MS = 10000;
 const EDIT_SESSION_EVENT_TYPES = [
   "preview_initializing",
   "preview_placeholder_ready",
@@ -83,7 +82,7 @@ const EDIT_SESSION_EVENT_TYPES = [
   "failed"
 ] as const;
 
-type LiveEditSessionPublicState = {
+export type LiveEditSessionPublicState = {
   id: string;
   status: string;
   captionProfileId: CaptionStyleProfileId;
@@ -105,15 +104,28 @@ type LiveEditSessionPublicState = {
   sourceHeight?: number | null;
   sourceFps?: number | null;
   sourceHasVideo?: boolean;
-};
-
-type LivePreviewPayload = {
-  id: string;
-  status: string;
+  routes?: {
+    status: string;
+    previewManifest: string;
+    previewArtifact: string;
+    preview: string;
+    render: string;
+    renderStatus: string;
+    sourceMedia: string | null;
+    events: string;
+  };
+  lanes?: {
+    defaultInteractive: "hyperframes" | "remotion";
+    interactive: Array<"hyperframes" | "remotion">;
+    export: "remotion";
+  };
+  sourceMediaUrl?: string | null;
+  sourceMediaKind?: HyperframesPreviewManifest["baseVideo"]["sourceKind"];
+  sourceLabel?: string | null;
   previewArtifactUrl?: string | null;
   previewArtifactKind?: "html_composition" | "video" | null;
   previewArtifactContentType?: string | null;
-  diagnostics?: Record<string, unknown>;
+  previewDiagnostics?: Record<string, unknown> | null;
 };
 
 export type LiveAudioPreviewBackendState = {
@@ -299,7 +311,26 @@ const normalizeSessionSnapshot = (payload: LiveEditSessionPublicState): LiveEdit
     previewLines: Array.isArray(payload.previewLines) ? payload.previewLines : [],
     previewMotionSequence: Array.isArray(payload.previewMotionSequence) ? payload.previewMotionSequence : [],
     transcriptWords: Array.isArray(payload.transcriptWords) ? payload.transcriptWords : [],
-    sourceHasVideo: payload.sourceHasVideo === true
+    sourceHasVideo: payload.sourceHasVideo === true,
+    lanes: payload.lanes
+      ? {
+          defaultInteractive: payload.lanes.defaultInteractive,
+          interactive: Array.isArray(payload.lanes.interactive) ? payload.lanes.interactive : [],
+          export: payload.lanes.export
+        }
+      : undefined,
+    routes: payload.routes
+      ? {
+          ...payload.routes,
+          sourceMedia: payload.routes.sourceMedia ?? null
+        }
+      : undefined,
+    sourceMediaUrl: payload.sourceMediaUrl ?? null,
+    sourceLabel: payload.sourceLabel ?? null,
+    previewArtifactUrl: payload.previewArtifactUrl ?? null,
+    previewArtifactKind: payload.previewArtifactKind ?? null,
+    previewArtifactContentType: payload.previewArtifactContentType ?? null,
+    previewDiagnostics: payload.previewDiagnostics ?? null
   };
 };
 
@@ -338,10 +369,6 @@ const buildSessionSignature = (
           }
         : null
   });
-};
-
-const shouldUseFullPreviewBuild = (state: LiveEditSessionPublicState): boolean => {
-  return state.transcriptStatus === "full_transcript_ready" || state.transcriptWords.length >= FULL_PREVIEW_MIN_TRANSCRIPT_WORDS;
 };
 
 const createPreviewTimingState = (jobId: string, resetVersion: number): PreviewTimingState => ({
@@ -403,6 +430,147 @@ const buildBaseVideoMetadata = (
   };
 };
 
+export const buildBackendPreviewPlan = (state: LiveEditSessionPublicState): BackendPreviewPlan | null => {
+  if (
+    state.transcriptWords.length === 0 &&
+    state.previewMotionSequence.length === 0 &&
+    state.previewLines.length === 0
+  ) {
+    return null;
+  }
+
+  return {
+    previewText: state.previewLines.join("\n") || null,
+    previewLines: state.previewLines,
+    previewMotionSequence: state.previewMotionSequence,
+    transcriptWords: state.transcriptWords
+  };
+};
+
+export const resolveApiUrl = (apiBase: string, candidate?: string | null): string | null => {
+  const value = candidate?.trim() ?? "";
+  if (!value) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+
+  const normalizedBase = apiBase.replace(/\/+$/, "");
+  return value.startsWith("/") ? `${normalizedBase}${value}` : `${normalizedBase}/${value}`;
+};
+
+export const buildPreviewManifestFromSessionState = (
+  sessionState: LiveEditSessionPublicState | null,
+  apiBase: string
+): HyperframesPreviewManifest | null => {
+  if (!sessionState?.routes || !sessionState.lanes) {
+    return null;
+  }
+
+  return hyperframesPreviewManifestSchema.parse({
+    schemaVersion: "hyperframes-preview-manifest/v1",
+    sessionId: sessionState.id,
+    captionProfileId: sessionState.captionProfileId,
+    motionTier: sessionState.motionTier,
+    lanes: sessionState.lanes,
+    routes: {
+      status: sessionState.routes.status,
+      preview: sessionState.routes.preview,
+      render: sessionState.routes.render,
+      renderStatus: sessionState.routes.renderStatus,
+      sourceMedia: sessionState.routes.sourceMedia
+    },
+    baseVideo: {
+      src: resolveApiUrl(apiBase, sessionState.sourceMediaUrl ?? sessionState.routes.sourceMedia),
+      sourceKind: sessionState.sourceMediaKind ?? "none",
+      sourceLabel: sessionState.sourceLabel ?? sessionState.sourceFilename ?? null,
+      hasVideo: sessionState.sourceHasVideo === true,
+      width: sessionState.sourceWidth ?? null,
+      height: sessionState.sourceHeight ?? null,
+      fps: sessionState.sourceFps ?? null,
+      durationMs: sessionState.sourceDurationMs ?? null
+    },
+    audio: {
+      src: sessionState.sourceHasVideo === true ? null : resolveApiUrl(apiBase, sessionState.sourceMediaUrl ?? sessionState.routes.sourceMedia),
+      source: sessionState.sourceHasVideo === true
+        ? "video-element"
+        : sessionState.sourceMediaUrl || sessionState.routes.sourceMedia
+          ? "separate-audio"
+          : "none"
+    },
+    session: {
+      id: sessionState.id,
+      status: sessionState.status,
+      previewStatus: sessionState.previewStatus,
+      transcriptStatus: sessionState.transcriptStatus,
+      analysisStatus: sessionState.analysisStatus,
+      motionGraphicsStatus: sessionState.motionGraphicsStatus,
+      renderStatus: sessionState.renderStatus,
+      previewText: sessionState.previewLines.join("\n") || null,
+      previewLines: sessionState.previewLines,
+      previewMotionSequence: sessionState.previewMotionSequence,
+      transcriptWords: sessionState.transcriptWords,
+      errorMessage: sessionState.errorMessage,
+      sourceFilename: sessionState.sourceFilename ?? null,
+      sourceDurationMs: sessionState.sourceDurationMs ?? null,
+      sourceAspectRatio: sessionState.sourceAspectRatio ?? null,
+      sourceWidth: sessionState.sourceWidth ?? null,
+      sourceHeight: sessionState.sourceHeight ?? null,
+      sourceFps: sessionState.sourceFps ?? null,
+      sourceHasVideo: sessionState.sourceHasVideo === true,
+      lastEventType: sessionState.lastEventType ?? null,
+      previewPlaceholder: {
+        active: false,
+        styleId: sessionState.captionProfileId,
+        copy: "",
+        reason: "waiting_for_audio",
+        line1: "",
+        line2: null
+      },
+      renderOutputUrl: null,
+      renderOutputPath: null
+    },
+    overlayPlan: {
+      previewText: sessionState.previewLines.join("\n") || null,
+      previewLines: sessionState.previewLines,
+      previewMotionSequence: sessionState.previewMotionSequence,
+      transcriptWords: sessionState.transcriptWords,
+      placeholder: {
+        active: false,
+        styleId: sessionState.captionProfileId,
+        copy: "",
+        reason: "waiting_for_audio",
+        line1: "",
+        line2: null
+      }
+    },
+    export: {
+      remotion: {
+        available: true,
+        renderStatus: sessionState.renderStatus,
+        outputUrl: null,
+        outputPath: null
+      }
+    }
+  });
+};
+
+export const createProjectScopedPreviewResetState = (): {
+  session: null;
+  liveSessionState: null;
+  buildState: BuildState;
+  buildError: null;
+  sessionBuildSignature: string;
+} => ({
+  session: null,
+  liveSessionState: null,
+  buildState: "building-timeline",
+  buildError: null,
+  sessionBuildSignature: ""
+});
+
 export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = ({
   jobId,
   captionProfileId,
@@ -429,11 +597,6 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
   const [playbackSourcePending, setPlaybackSourcePending] = useState(false);
   const [playbackSourceError, setPlaybackSourceError] = useState<string | null>(null);
   const [liveSessionState, setLiveSessionState] = useState<LiveEditSessionPublicState | null>(null);
-  const [previewManifest, setPreviewManifest] = useState<HyperframesPreviewManifest | null>(null);
-  const [previewArtifactUrl, setPreviewArtifactUrl] = useState<string | null>(null);
-  const [previewArtifactKind, setPreviewArtifactKind] = useState<"html_composition" | "video" | null>(null);
-  const [previewArtifactContentType, setPreviewArtifactContentType] = useState<string | null>(null);
-  const [previewDiagnostics, setPreviewDiagnostics] = useState<Record<string, unknown> | null>(null);
   const [browserVideoMetadata, setBrowserVideoMetadata] = useState<Pick<VideoMetadata, "width" | "height" | "fps" | "durationSeconds" | "durationInFrames"> | null>(null);
   const [nativePreviewHealth, setNativePreviewHealth] = useState<PreviewPlaybackHealth>("booting");
   const [nativePreviewErrorMessage, setNativePreviewErrorMessage] = useState<string | null>(null);
@@ -461,11 +624,25 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     return candidate;
   }, [sourceFile, sourceMediaSrc]);
   const sessionVideoSrc = useMemo(() => {
-    if (!liveSessionState?.id || liveSessionState.sourceHasVideo !== true) {
+    if (!liveSessionState || liveSessionState.sourceHasVideo !== true) {
       return "";
     }
-    return resolveEditSessionSourceUrl(apiBase, liveSessionState.id);
+    return (
+      resolveApiUrl(apiBase, liveSessionState.sourceMediaUrl ?? liveSessionState.routes?.sourceMedia) ??
+      resolveEditSessionSourceUrl(apiBase, liveSessionState.id)
+    );
   }, [apiBase, liveSessionState]);
+  const previewManifest = useMemo(
+    () => buildPreviewManifestFromSessionState(liveSessionState, apiBase),
+    [apiBase, liveSessionState]
+  );
+  const previewArtifactUrl = useMemo(
+    () => resolveApiUrl(apiBase, liveSessionState?.previewArtifactUrl),
+    [apiBase, liveSessionState?.previewArtifactUrl]
+  );
+  const previewArtifactKind = liveSessionState?.previewArtifactKind ?? null;
+  const previewArtifactContentType = liveSessionState?.previewArtifactContentType ?? null;
+  const previewDiagnostics = liveSessionState?.previewDiagnostics ?? null;
   const fallbackVideoMetadata = useMemo(() => {
     const liveVideoMetadata = buildBaseVideoMetadata(liveSessionState);
     const fallbackDurationMs = liveSessionState?.sourceDurationMs ??
@@ -565,122 +742,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     setNativePreviewHealth("booting");
     setNativePreviewErrorMessage(null);
     setDisplayGodFallbackReason(null);
-    setPreviewArtifactUrl(null);
-    setPreviewArtifactKind(null);
-    setPreviewArtifactContentType(null);
-    setPreviewDiagnostics(null);
   }, [previewTimelineResetVersion, resolvedVideoSrc]);
-
-  useEffect(() => {
-    const sessionId = liveSessionState?.id;
-    if (!sessionId) {
-      setPreviewManifest(null);
-      return;
-    }
-
-    let cancelled = false;
-    let intervalId = 0;
-    const abortController = new AbortController();
-    const manifestUrl = `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${sessionId}/preview-manifest`;
-
-    const refreshManifest = async (): Promise<void> => {
-      try {
-        const response = await fetch(manifestUrl, {
-          cache: "no-store",
-          signal: abortController.signal
-        });
-        if (!response.ok) {
-          throw new Error(`Preview manifest request failed with ${response.status}.`);
-        }
-
-        const payload = hyperframesPreviewManifestSchema.parse(await response.json());
-        if (!cancelled) {
-          setPreviewManifest(payload);
-        }
-      } catch (error) {
-        if (cancelled || abortController.signal.aborted) {
-          return;
-        }
-
-        if (import.meta.env.DEV) {
-          console.warn("[CreativeAudioLivePlayer] Preview manifest refresh failed", {
-            sessionId,
-            error: error instanceof Error ? error.message : String(error)
-          });
-        }
-      }
-    };
-
-    setPreviewManifest(null);
-    void refreshManifest();
-    intervalId = window.setInterval(() => {
-      void refreshManifest();
-    }, 1200);
-
-    return () => {
-      cancelled = true;
-      abortController.abort();
-      if (intervalId !== 0) {
-        window.clearInterval(intervalId);
-      }
-    };
-  }, [apiBase, liveSessionState?.id, previewTimelineResetVersion]);
-
-  useEffect(() => {
-    const sessionId = liveSessionState?.id;
-    if (!sessionId) {
-      setPreviewArtifactUrl(null);
-      setPreviewDiagnostics(null);
-      return;
-    }
-
-    let cancelled = false;
-    let intervalId = 0;
-    const abortController = new AbortController();
-    const endpoint = `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${sessionId}/preview`;
-
-    const refresh = async (): Promise<void> => {
-      try {
-        const response = await fetch(endpoint, {
-          cache: "no-store",
-          signal: abortController.signal
-        });
-        if (!response.ok) {
-          return;
-        }
-
-        const payload = await response.json() as LivePreviewPayload;
-        if (cancelled) {
-          return;
-        }
-
-        const nextUrl = typeof payload.previewArtifactUrl === "string" && payload.previewArtifactUrl.trim()
-          ? `${apiBase.replace(/\/+$/, "")}${payload.previewArtifactUrl}`
-          : null;
-        setPreviewArtifactUrl(nextUrl);
-        setPreviewArtifactKind(payload.previewArtifactKind ?? null);
-        setPreviewArtifactContentType(payload.previewArtifactContentType ?? null);
-        setPreviewDiagnostics(payload.diagnostics ?? null);
-      } catch {
-        if (!cancelled && !abortController.signal.aborted) {
-          // Keep the last successful artifact payload.
-        }
-      }
-    };
-
-    void refresh();
-    intervalId = window.setInterval(() => {
-      void refresh();
-    }, 1200);
-
-    return () => {
-      cancelled = true;
-      abortController.abort();
-      if (intervalId !== 0) {
-        window.clearInterval(intervalId);
-      }
-    };
-  }, [apiBase, liveSessionState?.id]);
 
   useEffect(() => {
     if (!directBrowserVideoSrc || typeof document === "undefined") {
@@ -936,33 +998,23 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
 
       try {
         const baseVideoMetadata = buildBaseVideoMetadata(nextState);
-        const governorMode: PreviewGovernorMode = shouldUseFullPreviewBuild(nextState)
-          ? "full-live-preview"
-          : "lite-preview";
+        const backendPreviewPlan = buildBackendPreviewPlan(nextState);
+        const governorMode: PreviewGovernorMode = backendPreviewPlan
+          ? "backend-preview-plan"
+          : "browser-orchestration-fallback";
         const buildStartedAtMs = performance.now();
-        const nextSession = governorMode === "full-live-preview"
-          ? await buildAudioCreativePreviewSession({
-              jobId: nextState.id,
-              captionProfileId,
-              motionTier,
-              presentationMode,
-              baseVideoMetadata,
-              transcriptWords: nextState.transcriptWords,
-              previewLines: nextState.previewLines,
-              previewMotionSequence: nextState.previewMotionSequence,
-              allowFallbackDemoData: false
-            })
-          : await buildFastAudioCreativePreviewSession({
-              jobId: nextState.id,
-              captionProfileId,
-              motionTier,
-              presentationMode,
-              baseVideoMetadata,
-              transcriptWords: nextState.transcriptWords,
-              previewLines: nextState.previewLines,
-              previewMotionSequence: nextState.previewMotionSequence,
-              allowFallbackDemoData: false
-            });
+        const nextSession = await buildAudioCreativePreviewSession({
+          jobId: nextState.id,
+          captionProfileId,
+          motionTier,
+          presentationMode,
+          baseVideoMetadata,
+          transcriptWords: nextState.transcriptWords,
+          previewLines: nextState.previewLines,
+          previewMotionSequence: nextState.previewMotionSequence,
+          allowFallbackDemoData: false,
+          backendPreviewPlan
+        });
 
         if (cancelled) {
           return;
@@ -980,13 +1032,6 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
             logPreviewGovernorStage(timing, "preview_ready", {
               governorMode,
               buildElapsedMs
-            });
-          } else if (governorMode === "full-live-preview" && timing.fullReadyAtMs === null) {
-            timing.fullReadyAtMs = performance.now();
-            logPreviewGovernorStage(timing, "preview_upgraded", {
-              governorMode,
-              buildElapsedMs,
-              transcriptWords: nextState.transcriptWords.length
             });
           } else {
             logPreviewGovernorStage(timing, "preview_rebuilt", {
@@ -1022,11 +1067,12 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
         return;
       }
 
-      setSession(null);
-      setLiveSessionState(null);
-      setBuildState("building-timeline");
-      setBuildError(null);
-      sessionBuildSignatureRef.current = "";
+      const resetState = createProjectScopedPreviewResetState();
+      setSession(resetState.session);
+      setLiveSessionState(resetState.liveSessionState);
+      setBuildState(resetState.buildState);
+      setBuildError(resetState.buildError);
+      sessionBuildSignatureRef.current = resetState.sessionBuildSignature;
       previewTimingRef.current = createPreviewTimingState(jobId, previewTimelineResetVersion);
       lastBackendUpdateAtRef.current = 0;
       previewStateCallbackRef.current?.("building-timeline");
@@ -1089,12 +1135,9 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
         });
         await updateSessionFromBackend(payload);
 
-        const statusUrl = payload.urls?.status
-          ? `${apiBase.replace(/\/+$/, "")}${payload.urls.status}`
-          : `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${payload.id}/status`;
-        const eventsUrl = payload.urls?.events
-          ? `${apiBase.replace(/\/+$/, "")}${payload.urls.events}`
-          : null;
+        const statusUrl = resolveApiUrl(apiBase, payload.routes?.status ?? payload.urls?.status) ??
+          `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${payload.id}/status`;
+        const eventsUrl = resolveApiUrl(apiBase, payload.routes?.events ?? payload.urls?.events);
 
         const refreshStatus = async (): Promise<void> => {
           try {
@@ -1156,8 +1199,9 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
             void refreshStatus();
           }
         }, STATUS_FALLBACK_POLL_INTERVAL_MS);
-
-        void refreshStatus();
+        if (!eventsUrl || typeof window === "undefined" || typeof window.EventSource !== "function") {
+          void refreshStatus();
+        }
       } catch (error) {
         if (cancelled || abortController.signal.aborted) {
           return;
