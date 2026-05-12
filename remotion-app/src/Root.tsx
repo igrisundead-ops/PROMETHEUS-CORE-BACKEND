@@ -2,10 +2,12 @@ import React from "react";
 import {Composition, staticFile} from "remotion";
 
 import {FemaleCoachDeanGraziosi} from "./compositions/FemaleCoachDeanGraziosi";
+import {ProjectScopedMotionComposition} from "./compositions/ProjectScopedMotionComposition";
+import {PROJECT_SCOPED_PREVIEW_COMPOSITION_ID} from "./compositions/ProjectScopedPreviewComposition";
 import {
-  PROJECT_SCOPED_PREVIEW_COMPOSITION_ID,
-  ProjectScopedPreviewComposition
-} from "./compositions/ProjectScopedPreviewComposition";
+  buildProjectScopedStudioDefaultProps,
+  projectScopedStudioPropsSchema
+} from "./compositions/project-scoped-studio-defaults";
 import {CreativeAudioPreview} from "./compositions/CreativeAudioPreview";
 import {CinematicPiPShowcase} from "./compositions/CinematicPiPShowcase";
 import {TargetFocusZoomShowcase} from "./compositions/TargetFocusZoomShowcase";
@@ -49,6 +51,9 @@ const cinematicPiPShowcaseVideoMetadata = {
   durationSeconds: 12,
   durationInFrames: longFormPreset.videoMetadata.fps * 12
 };
+const projectScopedStudioDefaultProps = buildProjectScopedStudioDefaultProps(
+  defaultCaptionProfileId ?? longFormPreset.captionProfileId
+);
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -56,25 +61,13 @@ export const RemotionRoot: React.FC = () => {
       <HouseFontBootstrap />
       <Composition
         id={PROJECT_SCOPED_PREVIEW_COMPOSITION_ID}
-        component={ProjectScopedPreviewComposition}
+        component={ProjectScopedMotionComposition}
+        schema={projectScopedStudioPropsSchema}
         width={longFormPreset.videoMetadata.width}
         height={longFormPreset.videoMetadata.height}
         fps={longFormPreset.videoMetadata.fps}
         durationInFrames={longFormPreset.videoMetadata.durationInFrames}
-        defaultProps={{
-          videoSrc: staticFile(longFormPreset.videoAsset),
-          videoMetadata: longFormPreset.videoMetadata,
-          presentationMode: longFormPreset.presentationMode,
-          motionTier: "auto",
-          gradeProfileId: "auto",
-          transitionPresetId: "auto",
-          matteMode: "auto",
-          captionBias: "auto",
-          captionProfileId: defaultCaptionProfileId ?? longFormPreset.captionProfileId,
-          motion3DMode: "editorial",
-          stabilizePreviewTimeline: true,
-          previewPerformanceMode: "balanced"
-        }}
+        defaultProps={projectScopedStudioDefaultProps}
       />
       <Composition
         id="FemaleCoachDeanGraziosi"
@@ -92,12 +85,13 @@ export const RemotionRoot: React.FC = () => {
           transitionPresetId: "auto",
           matteMode: "auto",
           captionBias: "auto",
-          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId
+          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId,
+          debugMotionArtifacts: true
         }}
       />
       <Composition
         id="MaleHeadVideoLongForm"
-        component={FemaleCoachDeanGraziosi}
+        component={ProjectScopedMotionComposition}
         width={longFormPreset.videoMetadata.width}
         height={longFormPreset.videoMetadata.height}
         fps={longFormPreset.videoMetadata.fps}
@@ -114,7 +108,8 @@ export const RemotionRoot: React.FC = () => {
           captionProfileId: defaultCaptionProfileId ?? longFormPreset.captionProfileId,
           motion3DMode: "editorial",
           stabilizePreviewTimeline: true,
-          previewPerformanceMode: "balanced"
+          previewPerformanceMode: "balanced",
+          debugMotionArtifacts: true
         }}
       />
       <Composition
@@ -142,7 +137,7 @@ export const RemotionRoot: React.FC = () => {
       />
       <Composition
         id="Cinematic3DDemo"
-        component={FemaleCoachDeanGraziosi}
+        component={ProjectScopedMotionComposition}
         width={reelPreset.videoMetadata.width}
         height={reelPreset.videoMetadata.height}
         fps={reelPreset.videoMetadata.fps}
@@ -158,12 +153,13 @@ export const RemotionRoot: React.FC = () => {
           motion3DMode: "showcase",
           matteMode: "auto",
           captionBias: "auto",
-          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId
+          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId,
+          debugMotionArtifacts: true
         }}
       />
       <Composition
         id="CinematicChoreographyProof"
-        component={FemaleCoachDeanGraziosi}
+        component={ProjectScopedMotionComposition}
         width={choreographyProofVideoMetadata.width}
         height={choreographyProofVideoMetadata.height}
         fps={choreographyProofVideoMetadata.fps}
@@ -181,7 +177,8 @@ export const RemotionRoot: React.FC = () => {
           matteMode: "off",
           captionBias: "middle",
           hideCaptionOverlays: true,
-          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId
+          captionProfileId: defaultCaptionProfileId ?? reelPreset.captionProfileId,
+          debugMotionArtifacts: true
         }}
       />
       <Composition

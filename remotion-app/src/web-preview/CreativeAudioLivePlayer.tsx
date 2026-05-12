@@ -5,6 +5,7 @@ import {DisplayGodPreviewStage} from "./DisplayGodPreviewStage";
 import {NativePreviewStage} from "./NativePreviewStage";
 import type {PreviewPlaybackHealth} from "./preview-telemetry";
 import {RemotionPreviewPlayer} from "./RemotionPreviewPlayer";
+import type {ProjectScopedLivePreviewSessionData} from "../compositions/ProjectScopedMotionComposition";
 import {buildMotionCompositionModel} from "../lib/motion-platform/scene-engine";
 import type {
   CaptionStyleProfileId,
@@ -56,6 +57,7 @@ export type CreativeAudioLivePlayerProps = {
 type BuildState = "idle" | "building-timeline" | "ready" | "error";
 
 type PreviewGovernorMode = "backend-preview-plan" | "browser-orchestration-fallback";
+type InteractivePreviewSurface = "artifact" | "remotion-player" | "display-god" | "native-stage";
 
 type PreviewTimingState = {
   runId: string;
@@ -557,6 +559,61 @@ export const buildPreviewManifestFromSessionState = (
   });
 };
 
+export const buildProjectScopedLivePreviewSessionData = (
+  sessionState: LiveEditSessionPublicState | null
+): ProjectScopedLivePreviewSessionData | null => {
+  if (!sessionState) {
+    return null;
+  }
+
+  return {
+    sessionId: sessionState.id,
+    status: sessionState.status,
+    previewStatus: sessionState.previewStatus,
+    transcriptStatus: sessionState.transcriptStatus,
+    analysisStatus: sessionState.analysisStatus,
+    motionGraphicsStatus: sessionState.motionGraphicsStatus,
+    renderStatus: sessionState.renderStatus,
+    sourceLabel: sessionState.sourceLabel ?? null,
+    sourceFilename: sessionState.sourceFilename ?? null,
+    sourceHasVideo: sessionState.sourceHasVideo === true,
+    sourceWidth: sessionState.sourceWidth ?? null,
+    sourceHeight: sessionState.sourceHeight ?? null,
+    sourceFps: sessionState.sourceFps ?? null,
+    sourceDurationMs: sessionState.sourceDurationMs ?? null,
+    previewLines: sessionState.previewLines,
+    previewMotionSequence: sessionState.previewMotionSequence,
+    transcriptWords: sessionState.transcriptWords
+  };
+};
+
+export const resolveLivePreviewSessionEndpoints = ({
+  apiBase,
+  payload
+}: {
+  apiBase: string;
+  payload: LiveEditSessionPublicState & {
+    urls?: {
+      status?: string;
+      events?: string;
+    };
+  };
+}): {
+  sessionId: string;
+  statusUrl: string;
+  eventsUrl: string | null;
+} => {
+  const normalizedApiBase = apiBase.replace(/\/+$/, "");
+
+  return {
+    sessionId: payload.id,
+    statusUrl:
+      resolveApiUrl(apiBase, payload.routes?.status ?? payload.urls?.status) ??
+      `${normalizedApiBase}/api/edit-sessions/${payload.id}/status`,
+    eventsUrl: resolveApiUrl(apiBase, payload.routes?.events ?? payload.urls?.events)
+  };
+};
+
 export const createProjectScopedPreviewResetState = (): {
   session: null;
   liveSessionState: null;
@@ -570,6 +627,32 @@ export const createProjectScopedPreviewResetState = (): {
   buildError: null,
   sessionBuildSignature: ""
 });
+
+export const resolveInteractivePreviewSurface = ({
+  previewRenderer,
+  canRenderArtifact,
+  canRenderNativeVideoStage,
+  shouldUseDisplayGod
+}: {
+  previewRenderer: "hyperframes" | "remotion";
+  canRenderArtifact: boolean;
+  canRenderNativeVideoStage: boolean;
+  shouldUseDisplayGod: boolean;
+}): InteractivePreviewSurface => {
+  if (previewRenderer === "hyperframes" && canRenderArtifact) {
+    return "artifact";
+  }
+
+  if (previewRenderer === "remotion" && canRenderNativeVideoStage) {
+    return "remotion-player";
+  }
+
+  if (shouldUseDisplayGod) {
+    return "display-god";
+  }
+
+  return "native-stage";
+};
 
 export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = ({
   jobId,
@@ -635,6 +718,14 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
   const previewManifest = useMemo(
     () => buildPreviewManifestFromSessionState(liveSessionState, apiBase),
     [apiBase, liveSessionState]
+  );
+  const currentBackendPreviewPlan = useMemo(
+    () => liveSessionState ? buildBackendPreviewPlan(liveSessionState) : null,
+    [liveSessionState]
+  );
+  const livePreviewSessionData = useMemo(
+    () => buildProjectScopedLivePreviewSessionData(liveSessionState),
+    [liveSessionState]
   );
   const previewArtifactUrl = useMemo(
     () => resolveApiUrl(apiBase, liveSessionState?.previewArtifactUrl),
@@ -1135,9 +1226,17 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
         });
         await updateSessionFromBackend(payload);
 
-        const statusUrl = resolveApiUrl(apiBase, payload.routes?.status ?? payload.urls?.status) ??
-          `${apiBase.replace(/\/+$/, "")}/api/edit-sessions/${payload.id}/status`;
-        const eventsUrl = resolveApiUrl(apiBase, payload.routes?.events ?? payload.urls?.events);
+        const {sessionId, statusUrl, eventsUrl} = resolveLivePreviewSessionEndpoints({
+          apiBase,
+          payload
+        });
+        if (import.meta.env.DEV) {
+          console.info("[CreativeAudioLivePlayer] Live preview session attached", {
+            sessionId,
+            statusUrl,
+            eventsUrl
+          });
+        }
 
         const refreshStatus = async (): Promise<void> => {
           try {
@@ -1270,8 +1369,12 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
       previewLineCount: liveSessionState?.previewLines.length ?? 0,
       previewMotionCueCount: liveSessionState?.previewMotionSequence.length ?? 0,
       transcriptWordCount: liveSessionState?.transcriptWords.length ?? 0,
+      backendPreviewPlanExists: Boolean(currentBackendPreviewPlan),
+      captionChunksOverrideCount: session?.captionChunks.length ?? 0,
+      motionModelOverridePresent: Boolean(session?.motionModel),
       sourceMediaSrcPresent: Boolean(sourceMediaSrc?.trim()),
       sourceVideoSrcPresent: Boolean(resolvedVideoSrc),
+      videoSrcPresent: Boolean(resolvedVideoSrc),
       sourceAudioSrcPresent: Boolean(resolvedAudioSrc),
       playbackSourcePending,
       playbackSourceError: playbackSourceError ?? nativePreviewErrorMessage,
@@ -1286,6 +1389,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     });
   }, [
     buildState,
+    currentBackendPreviewPlan,
     jobId,
     liveSessionState,
     previewManifest,
@@ -1326,17 +1430,17 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     displayTimeline &&
     !displayGodFallbackReason
   );
-  const remotionInteractiveAllowed = previewManifest?.lanes.interactive.includes("remotion") ?? false;
-  const shouldUseRemotionPreview = Boolean(
-    previewRenderer === "remotion" &&
-    remotionInteractiveAllowed &&
-    canRenderNativeVideoStage
-  );
   const stageStatusMessage = nativePreviewErrorMessage ?? buildError;
-  const canRenderArtifact = Boolean(previewArtifactUrl);
+  const canRenderArtifact = previewRenderer === "hyperframes" && Boolean(previewArtifactUrl);
   const allowLegacyInteractiveFallback = Boolean(showDebugOverlay && import.meta.env.DEV);
   const enforceArtifactOnly = previewRenderer === "hyperframes" && !allowLegacyInteractiveFallback;
   const shouldRenderVideoArtifact = canRenderArtifact && previewArtifactKind === "video";
+  const interactivePreviewSurface = resolveInteractivePreviewSurface({
+    previewRenderer,
+    canRenderArtifact,
+    canRenderNativeVideoStage,
+    shouldUseDisplayGod
+  });
   const artifactWidth = previewManifest?.baseVideo.width ??
     liveSessionState?.sourceWidth ??
     browserVideoMetadata?.width ??
@@ -1356,7 +1460,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     display: "block"
   };
 
-  if (canRenderArtifact && previewArtifactUrl) {
+  if (interactivePreviewSurface === "artifact" && previewArtifactUrl) {
     return (
       <div style={{display: "grid", gap: 10}}>
         {shouldRenderVideoArtifact ? (
@@ -1424,13 +1528,15 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
     return (
       <div style={{display: "grid"}}>
         <div style={{gridArea: "1 / 1"}}>
-          {shouldUseRemotionPreview ? (
+          {interactivePreviewSurface === "remotion-player" ? (
             <RemotionPreviewPlayer
               videoSrc={resolvedVideoSrc}
               videoMetadata={session?.videoMetadata ?? fallbackVideoMetadata}
               motionModel={session?.motionModel ?? fallbackMotionModel}
+              captionChunks={session?.captionChunks ?? []}
               captionProfileId={captionProfileId}
               previewPerformanceMode="balanced"
+              livePreviewSession={livePreviewSessionData}
               onHealthChange={(health) => {
                 setNativePreviewHealth(health);
               }}
@@ -1442,7 +1548,7 @@ export const CreativeAudioLivePlayer: React.FC<CreativeAudioLivePlayerProps> = (
                 }
               }}
             />
-          ) : shouldUseDisplayGod && displayTimeline ? (
+          ) : interactivePreviewSurface === "display-god" && displayTimeline ? (
             <DisplayGodPreviewStage
               displayTimeline={displayTimeline}
               manifest={previewManifest}

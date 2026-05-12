@@ -1,7 +1,7 @@
 import React from "react";
 import {staticFile} from "remotion";
 
-import {FemaleCoachDeanGraziosi} from "./FemaleCoachDeanGraziosi";
+import {ProjectScopedMotionComposition} from "./ProjectScopedMotionComposition";
 import {getPresentationPreset} from "../lib/presentation-presets";
 import {normalizeCaptionStyleProfileId} from "../lib/stylebooks/caption-style-profiles";
 
@@ -10,7 +10,7 @@ const defaultCaptionProfileId = normalizeCaptionStyleProfileId(longformPreset.ca
 
 export const CinematicPiPShowcase: React.FC = () => {
   return (
-    <FemaleCoachDeanGraziosi
+    <ProjectScopedMotionComposition
       videoSrc={staticFile(longformPreset.videoAsset)}
       videoMetadata={longformPreset.videoMetadata}
       presentationMode={longformPreset.presentationMode}
@@ -29,7 +29,7 @@ export const CinematicPiPShowcase: React.FC = () => {
       pipSubtextText="The free frame is a storytelling surface."
       stabilizePreviewTimeline
       previewPerformanceMode="balanced"
+      debugMotionArtifacts
     />
   );
 };
-

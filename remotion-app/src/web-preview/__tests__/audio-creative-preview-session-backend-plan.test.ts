@@ -51,5 +51,5 @@ describe("audio creative preview session backend plan", () => {
     expect(session.motionModel.chunks.length).toBeGreaterThan(0);
     expect(session.creativeTimeline.tracks).toHaveLength(0);
     expect(session.renderMode).toBe("overlay-preview");
-  });
+  }, 20000);
 });

@@ -74,3 +74,6 @@ font-intelligence/specimens/
 font-intelligence/outputs/font-embeddings.jsonl
 font-intelligence/outputs/font-manifest.json
 font-intelligence/outputs/font-descriptors.jsonl
+
+# Local consolidated deployment env
+CONSOLIDATED.env

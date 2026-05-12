@@ -9,6 +9,8 @@ export default defineConfig({
     include: [
       "src/lib/__tests__/**/*.test.ts",
       "src/lib/vector/__tests__/**/*.test.ts",
+      "src/compositions/__tests__/**/*.test.ts",
+      "src/compositions/__tests__/**/*.test.tsx",
       "src/creative-orchestration/__tests__/**/*.test.ts",
       "src/creative-orchestration/judgment/__tests__/**/*.test.ts",
       "src/web-preview/__tests__/**/*.test.ts",

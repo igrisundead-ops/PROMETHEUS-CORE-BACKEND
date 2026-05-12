@@ -1,4 +1,4 @@
-import React, {Suspense, lazy, useEffect, useMemo, useRef, useState} from "react";
+import React, {lazy, useEffect, useMemo, useRef, useState} from "react";
 
 import type {LiveAudioPreviewBackendState} from "./CreativeAudioLivePlayer";
 import type {
@@ -11,15 +11,123 @@ type CaptionProfileId =
   | "longform_svg_typography_v1"
 type MotionTier = "premium" | "hero" | "editorial";
 type DeliveryMode = "speed-draft" | "master-render";
-type LivePreviewRenderer = "hyperframes";
+type LivePreviewRenderer = "hyperframes" | "remotion";
 type BackendHealth = "checking" | "connected" | "offline";
 type LocalPreviewState = "idle" | "running" | "completed" | "failed";
 type LocalPreviewStage = "idle" | "cleaning" | "ingesting" | "drafting" | "mastering" | "completed" | "failed";
 type LocalPreviewOutputKind = "none" | "source-preview" | "speed-draft" | "master-render";
+type DevLivePreviewLaunch = {
+  sourcePath: string;
+  captionProfileId: CaptionProfileId;
+  motionTier: MotionTier;
+};
+type PreviewShellVariant = "hyperframes-shell" | "remotion-only";
+type PreviewShellConfig = {
+  variant: PreviewShellVariant;
+  headerKicker: string;
+  headerTitle: string;
+  headerCopy: string;
+  setupHeading: string;
+  setupModeLabels: string[];
+  pathFieldHelpText: string;
+  emptyPreviewMessage: string;
+  showDeliveryModePicker: boolean;
+  showRendererComparison: boolean;
+  showPreviewDownloads: boolean;
+  showCleanRunToggle: boolean;
+  showPipelinePanel: boolean;
+  showLiveLogPanel: boolean;
+};
 const CreativeAudioLivePlayer = lazy(async () => {
   const module = await import("./CreativeAudioLivePlayer");
   return {default: module.CreativeAudioLivePlayer};
 });
+const DEFAULT_LIVE_PREVIEW_RENDERER: LivePreviewRenderer = "remotion";
+const DEFAULT_CAPTION_PROFILE_ID: CaptionProfileId = "longform_svg_typography_v1";
+const DEFAULT_MOTION_TIER: MotionTier = "premium";
+
+export const resolveLivePreviewRendererFromSearch = (search: string): LivePreviewRenderer => {
+  const params = new URLSearchParams(search);
+  const previewLane = params.get("previewLane")?.trim().toLowerCase();
+  return previewLane === "hyperframes" ? "hyperframes" : DEFAULT_LIVE_PREVIEW_RENDERER;
+};
+
+export const resolvePreviewShellVariant = (previewRenderer: LivePreviewRenderer): PreviewShellVariant => {
+  return previewRenderer === "hyperframes" ? "hyperframes-shell" : "remotion-only";
+};
+
+export const resolvePreviewShellConfig = (previewRenderer: LivePreviewRenderer): PreviewShellConfig => {
+  if (previewRenderer === "hyperframes") {
+    return {
+      variant: "hyperframes-shell",
+      headerKicker: "Prometheus Long-Form Render Control",
+      headerTitle: "Pick the lane. Preview should converge on a governed cinematic artifact, not a browser overlay hack.",
+      headerCopy:
+        "The frontend should request preview jobs, receive governed output, and show diagnostics. The backend owns typography, motion decisions, and render authority.",
+      setupHeading: "Run Setup",
+      setupModeLabels: ["Live Compositor", "Final Render", "Hyperframes Preview"],
+      pathFieldHelpText:
+        "Local paths are used by backend-assisted previews and final renders. Uploaded videos play directly in the browser when available.",
+      emptyPreviewMessage:
+        "Run the live preview and the active interactive preview surface will appear here when the backend session starts streaming.",
+      showDeliveryModePicker: true,
+      showRendererComparison: true,
+      showPreviewDownloads: true,
+      showCleanRunToggle: true,
+      showPipelinePanel: true,
+      showLiveLogPanel: true
+    };
+  }
+
+  return {
+    variant: "remotion-only",
+    headerKicker: "Remotion Preview",
+    headerTitle: "Local interactive preview for the project-scoped Remotion composition.",
+    headerCopy:
+      "Load a local clip, start a live preview session, and inspect the Remotion player path backed by the edit-session SSE stream.",
+    setupHeading: "Remotion Preview Setup",
+    setupModeLabels: [],
+    pathFieldHelpText:
+      "Local paths are posted to the live-preview session endpoint for local development. Uploaded videos play directly in the browser when available.",
+    emptyPreviewMessage:
+      "Start Remotion Preview to attach a live edit session and mount the Remotion player here.",
+    showDeliveryModePicker: false,
+    showRendererComparison: false,
+    showPreviewDownloads: false,
+    showCleanRunToggle: false,
+    showPipelinePanel: false,
+    showLiveLogPanel: false
+  };
+};
+
+const resolveCaptionProfileIdFromSearch = (candidate: string | null | undefined): CaptionProfileId => {
+  return candidate?.trim() === DEFAULT_CAPTION_PROFILE_ID
+    ? DEFAULT_CAPTION_PROFILE_ID
+    : DEFAULT_CAPTION_PROFILE_ID;
+};
+
+const resolveMotionTierFromSearch = (candidate: string | null | undefined): MotionTier => {
+  const normalized = candidate?.trim().toLowerCase();
+  if (normalized === "hero" || normalized === "editorial" || normalized === "premium") {
+    return normalized;
+  }
+
+  return DEFAULT_MOTION_TIER;
+};
+
+export const resolveDevLivePreviewLaunchFromSearch = (search: string): DevLivePreviewLaunch | null => {
+  const params = new URLSearchParams(search);
+  const sourcePath = params.get("sourcePath")?.trim() ?? "";
+  if (!sourcePath) {
+    return null;
+  }
+
+  return {
+    sourcePath,
+    captionProfileId: resolveCaptionProfileIdFromSearch(params.get("captionProfileId")),
+    motionTier: resolveMotionTierFromSearch(params.get("motionTier"))
+  };
+};
 
 const isLiveAudioPreviewLane = (deliveryMode: DeliveryMode): boolean => {
   return deliveryMode === "speed-draft";
@@ -106,7 +214,7 @@ const API_BASE = ((import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "
 
 const captionOptions: Array<{value: CaptionProfileId; label: string; description: string}> = [
   {
-    value: "longform_svg_typography_v1",
+    value: DEFAULT_CAPTION_PROFILE_ID,
     label: "Governed SVG Typography",
     description: "Locked premium preview lane. Session-coherent SVG typography with no alternate caption renderer routing."
   }
@@ -114,7 +222,7 @@ const captionOptions: Array<{value: CaptionProfileId; label: string; description
 
 const motionOptions: Array<{value: MotionTier; label: string; description: string}> = [
   {
-    value: "premium",
+    value: DEFAULT_MOTION_TIER,
     label: "Premium",
     description: "Recommended. Strong motion graphics and sound design without crowding the frame."
   },
@@ -416,15 +524,32 @@ const InstantOverlayPreview: React.FC<{
 };
 
 export const PreviewApp: React.FC = () => {
+  const initialDevLivePreviewLaunch = useMemo(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    return resolveDevLivePreviewLaunchFromSearch(window.location.search);
+  }, []);
+  const devLivePreviewLaunchRef = useRef(initialDevLivePreviewLaunch);
+  const devLivePreviewAppliedRef = useRef(false);
   const [backendHealth, setBackendHealth] = useState<BackendHealth>("checking");
   const [status, setStatus] = useState<LocalPreviewStatus>(emptyStatus);
-  const [sourcePath, setSourcePath] = useState("");
+  const [sourcePath, setSourcePath] = useState(() => initialDevLivePreviewLaunch?.sourcePath ?? "");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFilePreviewUrl, setSelectedFilePreviewUrl] = useState<string | null>(null);
-  const [captionProfileId, setCaptionProfileId] = useState<CaptionProfileId>("longform_svg_typography_v1");
-  const [motionTier, setMotionTier] = useState<MotionTier>("premium");
+  const [captionProfileId, setCaptionProfileId] = useState<CaptionProfileId>(() => initialDevLivePreviewLaunch?.captionProfileId ?? DEFAULT_CAPTION_PROFILE_ID);
+  const [motionTier, setMotionTier] = useState<MotionTier>(() => initialDevLivePreviewLaunch?.motionTier ?? DEFAULT_MOTION_TIER);
   const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>("speed-draft");
-  const [livePreviewRenderer] = useState<LivePreviewRenderer>("hyperframes");
+  const [livePreviewRenderer] = useState<LivePreviewRenderer>(() => {
+    if (typeof window === "undefined") {
+      return DEFAULT_LIVE_PREVIEW_RENDERER;
+    }
+
+    return resolveLivePreviewRendererFromSearch(window.location.search);
+  });
+  const previewShellConfig = useMemo(() => resolvePreviewShellConfig(livePreviewRenderer), [livePreviewRenderer]);
+  const isRemotionOnlyShell = previewShellConfig.variant === "remotion-only";
   const [cleanRun, setCleanRun] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -436,6 +561,39 @@ export const PreviewApp: React.FC = () => {
   const [audioPreviewAudioStatus, setAudioPreviewAudioStatus] = useState<AudioCreativePreviewAudioStatus>("missing");
   const [audioPreviewAudioError, setAudioPreviewAudioError] = useState<string | null>(null);
   const [liveAudioPreviewStatus, setLiveAudioPreviewStatus] = useState<LiveAudioPreviewBackendState | null>(null);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || devLivePreviewAppliedRef.current) {
+      return;
+    }
+
+    const launch = devLivePreviewLaunchRef.current;
+    if (!launch) {
+      return;
+    }
+
+    devLivePreviewAppliedRef.current = true;
+    setBackendHealth("checking");
+    setDeliveryMode("speed-draft");
+    setStatus(emptyStatus);
+    setSelectedFile(null);
+    setInstantPreview(null);
+    setFormError(null);
+    setConnectionError(null);
+    setLiveAudioPreviewStatus(null);
+    setAudioPreviewState("building-timeline");
+    setAudioPreviewAudioStatus("loading");
+    setAudioPreviewAudioError(null);
+    if (import.meta.env.DEV) {
+      console.info("[PreviewApp] auto-launching live preview from query params", {
+        previewLane: livePreviewRenderer,
+        sourcePath: launch.sourcePath,
+        captionProfileId: launch.captionProfileId,
+        motionTier: launch.motionTier
+      });
+    }
+    setAudioPreviewRunId((value) => value + 1);
+  }, [livePreviewRenderer]);
 
   useEffect(() => {
     if (!selectedFile) {
@@ -450,16 +608,6 @@ export const PreviewApp: React.FC = () => {
       URL.revokeObjectURL(nextUrl);
     };
   }, [selectedFile]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const url = new URL(window.location.href);
-    url.searchParams.set("previewLane", livePreviewRenderer);
-    window.history.replaceState({}, "", url);
-  }, [livePreviewRenderer]);
 
   useEffect(() => {
     if (deliveryMode === "speed-draft") {
@@ -605,7 +753,9 @@ export const PreviewApp: React.FC = () => {
     () => buildPipelineItems(status, audioPreviewState, deliveryMode, liveAudioPreviewStatus),
     [audioPreviewState, deliveryMode, liveAudioPreviewStatus, status]
   );
-  const livePreviewRendererLabel = livePreviewRenderer === "hyperframes" ? "Hyperframes / Display God" : "Remotion Player";
+  const livePreviewRendererLabel = livePreviewRenderer === "hyperframes"
+    ? "Hyperframes / Display God"
+    : "Remotion Player";
   const stageTone = isLiveAudioPreviewLane(deliveryMode)
     ? backendHealth === "offline" && audioPreviewRunId === 0
       ? "danger"
@@ -733,6 +883,29 @@ export const PreviewApp: React.FC = () => {
       ? status.deliveryMode
       : deliveryMode;
   const visibleError = connectionError ?? formError;
+  const primaryRunButtonLabel = isRemotionOnlyShell
+    ? audioPreviewState === "building-timeline"
+      ? "Starting Remotion Preview..."
+      : audioPreviewState === "playing"
+        ? "Remotion Preview Playing"
+        : audioPreviewRunId > 0
+          ? "Restart Remotion Preview"
+          : "Start Remotion Preview"
+    : status.state === "running"
+      ? "Render lane in progress"
+      : isSubmitting
+        ? "Submitting render lane..."
+        : deliveryMode === "speed-draft"
+          ? audioPreviewState === "building-timeline"
+            ? "Building Live Preview..."
+            : audioPreviewState === "playing"
+              ? "Playing Live Preview"
+              : audioPreviewRunId > 0
+                ? "Refresh Live Preview"
+                : "Run Live Preview"
+          : deliveryMode === "master-render"
+            ? "Run Final Render"
+            : "Run Live Preview";
 
   const handleSubmit = async (): Promise<void> => {
     setFormError(null);
@@ -874,12 +1047,9 @@ export const PreviewApp: React.FC = () => {
       <section className="quick-stage">
         <header className="quick-stage-header">
           <div>
-            <p className="quick-kicker">Prometheus Long-Form Render Control</p>
-            <h1>Pick the lane. Preview should converge on a governed cinematic artifact, not a browser overlay hack.</h1>
-            <p className="quick-copy">
-              The frontend should request preview jobs, receive governed output, and show diagnostics. The backend owns
-              typography, motion decisions, and render authority.
-            </p>
+            <p className="quick-kicker">{previewShellConfig.headerKicker}</p>
+            <h1>{previewShellConfig.headerTitle}</h1>
+            <p className="quick-copy">{previewShellConfig.headerCopy}</p>
           </div>
           <div className={`quick-status-pill is-${stageTone}`}>
             <span>
@@ -915,13 +1085,20 @@ export const PreviewApp: React.FC = () => {
 
         <div className="quick-preview-card">
           <div className="quick-preview-topline quick-preview-topline-rich">
-            <div className="quick-preview-meta">
-              <span>Active Lane</span>
-              <strong>{activeDeliveryMode === "master-render" ? "Final Render" : "Live Compositor"}</strong>
-            </div>
+            {isRemotionOnlyShell ? (
+              <div className="quick-preview-meta">
+                <span>Preview Mode</span>
+                <strong>Remotion Interactive Preview</strong>
+              </div>
+            ) : (
+              <div className="quick-preview-meta">
+                <span>Active Lane</span>
+                <strong>{activeDeliveryMode === "master-render" ? "Final Render" : "Live Compositor"}</strong>
+              </div>
+            )}
             <div className="quick-preview-meta">
               <span>Interactive Renderer</span>
-              <strong>{isLiveAudioPreviewLane(deliveryMode) ? livePreviewRendererLabel : "Export Lane"}</strong>
+              <strong>{isRemotionOnlyShell ? "Remotion Player" : isLiveAudioPreviewLane(deliveryMode) ? livePreviewRendererLabel : "Export Lane"}</strong>
             </div>
             <div className="quick-preview-meta">
               <span>Current Output</span>
@@ -965,7 +1142,7 @@ export const PreviewApp: React.FC = () => {
               ) : (
                 <div className="quick-preview-empty">
                   <strong>No live preview started yet.</strong>
-                  <span>Run the live preview and the first governed preview artifact will appear here when the backend finishes the pass.</span>
+                  <span>{previewShellConfig.emptyPreviewMessage}</span>
                 </div>
               )
             ) : hasInstantPreview ? (
@@ -996,59 +1173,67 @@ export const PreviewApp: React.FC = () => {
             )}
           </div>
 
-          <div className="quick-preview-actions">
-            <div className="quick-action-row">
-              <a
-                className={`quick-action ${status.draftOutputUrl ? "" : "is-disabled"}`}
-                href={status.draftOutputUrl ?? "#"}
-                download
-                aria-disabled={!status.draftOutputUrl}
-              >
-                Download Draft Preview
-              </a>
-              <a
-                className={`quick-action quick-action-secondary ${status.masterOutputUrl ? "" : "is-disabled"}`}
-                href={status.masterOutputUrl ?? "#"}
-                download
-                aria-disabled={!status.masterOutputUrl}
-              >
-                Download Master
-              </a>
+          {previewShellConfig.showPreviewDownloads ? (
+            <div className="quick-preview-actions">
+              <div className="quick-action-row">
+                <a
+                  className={`quick-action ${status.draftOutputUrl ? "" : "is-disabled"}`}
+                  href={status.draftOutputUrl ?? "#"}
+                  download
+                  aria-disabled={!status.draftOutputUrl}
+                >
+                  Download Draft Preview
+                </a>
+                <a
+                  className={`quick-action quick-action-secondary ${status.masterOutputUrl ? "" : "is-disabled"}`}
+                  href={status.masterOutputUrl ?? "#"}
+                  download
+                  aria-disabled={!status.masterOutputUrl}
+                >
+                  Download Master
+                </a>
+              </div>
+              <div className="quick-inline-note">
+                AssemblyAI handles transcript generation. Preview now stays on the native browser video path with live
+                overlays, and the heavy offline lane only kicks in when you choose to export a final video.
+              </div>
             </div>
-            <div className="quick-inline-note">
-              AssemblyAI handles transcript generation. Preview now stays on the native browser video path with live
-              overlays, and the heavy offline lane only kicks in when you choose to export a final video.
-            </div>
-          </div>
+          ) : null}
         </div>
       </section>
 
       <aside className="quick-sidebar">
         <div className="quick-card">
-          <h2>Run Setup</h2>
+          <h2>{previewShellConfig.setupHeading}</h2>
 
-          <div className="quick-mode-grid">
-            {deliveryModeOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className={`quick-mode-card ${deliveryMode === option.value ? "is-active" : ""}`}
-                onClick={() => setDeliveryMode(option.value)}
-              >
-                <strong>{option.label}</strong>
-                <span>{option.description}</span>
-              </button>
-            ))}
-          </div>
+          {previewShellConfig.showDeliveryModePicker ? (
+            <div className="quick-mode-grid">
+              {deliveryModeOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`quick-mode-card ${deliveryMode === option.value ? "is-active" : ""}`}
+                  onClick={() => setDeliveryMode(option.value)}
+                >
+                  <strong>{option.label}</strong>
+                  <span>{option.description}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
 
-          {deliveryMode === "speed-draft" ? (
+          {previewShellConfig.showRendererComparison && deliveryMode === "speed-draft" ? (
             <div className="quick-compare-grid">
               <button
                 type="button"
                 className="quick-mode-card quick-compare-card is-active"
               >
-                <strong>Hyperframes Preview</strong>
-                <span>Locked default lane. Preview stays on the governed Hyperframes path and reports its artifact type explicitly.</span>
+                <strong>{livePreviewRenderer === "hyperframes" ? "Hyperframes Preview" : "Remotion Preview"}</strong>
+                <span>
+                  {livePreviewRenderer === "hyperframes"
+                    ? "Explicit query lane. Preview stays on the governed Hyperframes path and reports its artifact type explicitly."
+                    : "Default testing lane. Live preview stays on the Remotion player path fed by the backend edit-session SSE contract."}
+                </span>
               </button>
             </div>
           ) : null}
@@ -1070,7 +1255,7 @@ export const PreviewApp: React.FC = () => {
               value={sourcePath}
               onChange={(event) => setSourcePath(event.target.value)}
             />
-            <small>Local paths are used by backend-assisted previews and final renders. Uploaded videos play directly in the browser when available.</small>
+            <small>{previewShellConfig.pathFieldHelpText}</small>
           </label>
 
           <label className="quick-field">
@@ -1103,17 +1288,19 @@ export const PreviewApp: React.FC = () => {
             <small>{motionOptions.find((option) => option.value === motionTier)?.description}</small>
           </label>
 
-          <label className="quick-toggle">
-            <input
-              type="checkbox"
-              checked={cleanRun}
-              onChange={(event) => setCleanRun(event.target.checked)}
-            />
-            <div>
-              <strong>Reset stale outputs first</strong>
-              <span>Clears old preview/master MP4s and manifests but keeps reusable caches that help speed.</span>
-            </div>
-          </label>
+          {previewShellConfig.showCleanRunToggle ? (
+            <label className="quick-toggle">
+              <input
+                type="checkbox"
+                checked={cleanRun}
+                onChange={(event) => setCleanRun(event.target.checked)}
+              />
+              <div>
+                <strong>Reset stale outputs first</strong>
+                <span>Clears old preview/master MP4s and manifests but keeps reusable caches that help speed.</span>
+              </div>
+            </label>
+          ) : null}
 
           {selectedFile ? (
             <div className="quick-chip-row">
@@ -1138,21 +1325,7 @@ export const PreviewApp: React.FC = () => {
               }}
               disabled={!canRun}
             >
-              {status.state === "running"
-                ? "Render lane in progress"
-                : isSubmitting
-                  ? "Submitting render lane..."
-                  : deliveryMode === "speed-draft"
-                    ? audioPreviewState === "building-timeline"
-                      ? "Building Live Preview..."
-                      : audioPreviewState === "playing"
-                        ? "Playing Live Preview"
-                        : audioPreviewRunId > 0
-                          ? "Refresh Live Preview"
-                          : "Run Live Preview"
-                    : deliveryMode === "master-render"
-                    ? "Run Final Render"
-                    : "Run Live Preview"}
+              {primaryRunButtonLabel}
             </button>
             <button
               type="button"
@@ -1173,82 +1346,86 @@ export const PreviewApp: React.FC = () => {
           </div>
         </div>
 
-        <div className="quick-card">
-          <h2>Pipeline</h2>
+        {previewShellConfig.showPipelinePanel ? (
+          <div className="quick-card">
+            <h2>Pipeline</h2>
 
-          <div className="quick-pipeline">
-            {pipelineItems.map((item) => (
-              <div key={item.label} className={`quick-pipeline-step is-${item.state}`}>
-                <strong>{item.label}</strong>
-                <span>
-                  {item.state === "done"
-                    ? "Done"
-                    : item.state === "active"
-                      ? "Live"
-                      : item.state === "skipped"
-                        ? "Skipped"
-                        : "Waiting"}
-                </span>
+            <div className="quick-pipeline">
+              {pipelineItems.map((item) => (
+                <div key={item.label} className={`quick-pipeline-step is-${item.state}`}>
+                  <strong>{item.label}</strong>
+                  <span>
+                    {item.state === "done"
+                      ? "Done"
+                      : item.state === "active"
+                        ? "Live"
+                        : item.state === "skipped"
+                          ? "Skipped"
+                          : "Waiting"}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <dl className="quick-stats">
+              <div>
+                <dt>Stage</dt>
+                <dd>{status.stageLabel}</dd>
               </div>
-            ))}
-          </div>
+              <div>
+                <dt>Started</dt>
+                <dd>{formatDateTime(status.startedAt)}</dd>
+              </div>
+              <div>
+                <dt>Finished</dt>
+                <dd>{formatDateTime(status.finishedAt)}</dd>
+              </div>
+              <div>
+                <dt>Total</dt>
+                <dd>{formatDuration(status.stageTimingsMs.total)}</dd>
+              </div>
+              <div>
+                <dt>Ingest</dt>
+                <dd>{formatDuration(status.stageTimingsMs.ingest)}</dd>
+              </div>
+              <div>
+                <dt>Draft Preview</dt>
+                <dd>{formatDuration(status.stageTimingsMs.draftRender)}</dd>
+              </div>
+              <div>
+                <dt>Master</dt>
+                <dd>{formatDuration(status.stageTimingsMs.masterRender)}</dd>
+              </div>
+              <div>
+                <dt>Transcript</dt>
+                <dd>{status.ingestSummary?.transcriptionProvider ?? status.transcriptionMode}</dd>
+              </div>
+            </dl>
 
-          <dl className="quick-stats">
-            <div>
-              <dt>Stage</dt>
-              <dd>{status.stageLabel}</dd>
+            <div className="quick-stack-note">
+              <strong>Always included</strong>
+              <span>AssemblyAI transcript timing, editorial caption decisions, motion graphics, soundtrack bed, and sound effects.</span>
             </div>
-            <div>
-              <dt>Started</dt>
-              <dd>{formatDateTime(status.startedAt)}</dd>
-            </div>
-            <div>
-              <dt>Finished</dt>
-              <dd>{formatDateTime(status.finishedAt)}</dd>
-            </div>
-            <div>
-              <dt>Total</dt>
-              <dd>{formatDuration(status.stageTimingsMs.total)}</dd>
-            </div>
-            <div>
-              <dt>Ingest</dt>
-              <dd>{formatDuration(status.stageTimingsMs.ingest)}</dd>
-            </div>
-            <div>
-              <dt>Draft Preview</dt>
-              <dd>{formatDuration(status.stageTimingsMs.draftRender)}</dd>
-            </div>
-            <div>
-              <dt>Master</dt>
-              <dd>{formatDuration(status.stageTimingsMs.masterRender)}</dd>
-            </div>
-            <div>
-              <dt>Transcript</dt>
-              <dd>{status.ingestSummary?.transcriptionProvider ?? status.transcriptionMode}</dd>
-            </div>
-          </dl>
+          </div>
+        ) : null}
 
-          <div className="quick-stack-note">
-            <strong>Always included</strong>
-            <span>AssemblyAI transcript timing, editorial caption decisions, motion graphics, soundtrack bed, and sound effects.</span>
+        {previewShellConfig.showLiveLogPanel ? (
+          <div className="quick-card quick-log-card">
+            <div className="quick-card-header">
+              <h2>Live Log</h2>
+              <span>{recentLogs.length} lines</span>
+            </div>
+            <div className="quick-log-window">
+              {recentLogs.length > 0 ? (
+                recentLogs.map((entry, index) => (
+                  <p key={`${entry}-${index}`}>{entry}</p>
+                ))
+              ) : (
+                <p>No run output yet.</p>
+              )}
+            </div>
           </div>
-        </div>
-
-        <div className="quick-card quick-log-card">
-          <div className="quick-card-header">
-            <h2>Live Log</h2>
-            <span>{recentLogs.length} lines</span>
-          </div>
-          <div className="quick-log-window">
-            {recentLogs.length > 0 ? (
-              recentLogs.map((entry, index) => (
-                <p key={`${entry}-${index}`}>{entry}</p>
-              ))
-            ) : (
-              <p>No run output yet.</p>
-            )}
-          </div>
-        </div>
+        ) : null}
       </aside>
     </div>
   );

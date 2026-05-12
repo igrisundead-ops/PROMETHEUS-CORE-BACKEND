@@ -2,7 +2,7 @@ House Font Drop Zone
 
 This folder is the runtime home for licensed Prometheus house fonts.
 
-Expected structure:
+Expected registry structure today:
 
 - `public/fonts/house/jugendreisen/Jugendreisen-Regular.otf`
 - `public/fonts/house/louize/Louize-Regular.otf`
@@ -15,6 +15,7 @@ Current behavior:
 - The codebase already knows about these font families.
 - They are scaffolded but disabled in `src/lib/cinematic-typography/house-font-registry.ts`.
 - Dropping the files here is not enough by itself. After the files are present, flip the matching `enabled` flags to `true`.
+- No commercial font binaries should be committed.
 
 Recommended activation order:
 
@@ -28,3 +29,11 @@ After enabling any font:
 1. Run `npm run typography:graph`
 2. Run `npm run typography:audit`
 3. Verify the lane moved from `doctrine-only` to runtime-backed in `docs/generated/typography-font-graph-report.md`
+
+Safe local-only activation steps:
+
+1. Place your licensed binaries under `remotion-app/public/fonts/house/<family>/<file>.woff2` or the exact registry path you plan to use.
+2. If you use `.woff2` instead of the current `.otf` scaffold, update `src/lib/cinematic-typography/house-font-registry.ts` so the `path` and `format` match the local file.
+3. Set `enabled: true` only for entries whose files actually exist locally.
+4. Restart Remotion Studio or the Vite preview shell.
+5. Confirm the Studio typography diagnostics show `fontRuntimeLoaded: true` and a non-zero `loadedHouseFontCount`.

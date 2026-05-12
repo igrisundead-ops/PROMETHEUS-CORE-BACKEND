@@ -7,6 +7,7 @@
     "captions:sync": "tsx scripts/captions-sync.ts",
     "captions:sync:longform": "tsx scripts/captions-sync.ts --presentation long-form",
     "dev": "vite --configLoader native --port 3010",
+    "studio": "remotion studio src/index.ts --port 3011",
     "matte:sync": "tsx scripts/matte-sync.ts",
     "motion-assets:sync": "tsx scripts/motion-assets-sync.ts",
     "motion-assets:sync:authoring": "tsx scripts/motion-assets-authoring-sync.ts",

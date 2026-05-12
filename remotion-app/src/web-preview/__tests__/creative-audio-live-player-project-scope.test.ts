@@ -1,9 +1,14 @@
+import path from "node:path";
+import {readFileSync} from "node:fs";
+
 import {describe, expect, it} from "vitest";
 
 import {
   buildBackendPreviewPlan,
   buildPreviewManifestFromSessionState,
+  buildProjectScopedLivePreviewSessionData,
   createProjectScopedPreviewResetState,
+  resolveLivePreviewSessionEndpoints,
   type LiveEditSessionPublicState
 } from "../CreativeAudioLivePlayer";
 
@@ -76,6 +81,50 @@ describe("CreativeAudioLivePlayer project scope", () => {
     expect(backendPreviewPlan?.previewLines).toEqual(["Project A live preview"]);
   });
 
+  it("consumes the returned live session routes for status and events", () => {
+    expect(resolveLivePreviewSessionEndpoints({
+      apiBase: "http://127.0.0.1:8000",
+      payload: liveSessionState
+    })).toEqual({
+      sessionId: "project-a",
+      statusUrl: "http://127.0.0.1:8000/api/edit-sessions/project-a/status",
+      eventsUrl: "http://127.0.0.1:8000/api/edit-sessions/project-a/events"
+    });
+  });
+
+  it("maps live backend preview state into canonical project-scoped composition props", () => {
+    expect(buildProjectScopedLivePreviewSessionData(liveSessionState)).toEqual({
+      sessionId: "project-a",
+      status: "preview_text_ready",
+      previewStatus: "preview_text_ready",
+      transcriptStatus: "full_transcript_ready",
+      analysisStatus: "analysis_ready",
+      motionGraphicsStatus: "motion_graphics_ready",
+      renderStatus: "idle",
+      sourceLabel: "Project A",
+      sourceFilename: "project-a.mp4",
+      sourceHasVideo: true,
+      sourceWidth: 1920,
+      sourceHeight: 1080,
+      sourceFps: 30,
+      sourceDurationMs: 12000,
+      previewLines: ["Project A live preview"],
+      previewMotionSequence: [
+        {
+          cueId: "cue-project-a-1",
+          text: "Project A live preview",
+          startMs: 0,
+          durationMs: 900,
+          lineIndex: 0
+        }
+      ],
+      transcriptWords: [
+        {text: "Project", start_ms: 0, end_ms: 160},
+        {text: "A", start_ms: 160, end_ms: 260}
+      ]
+    });
+  });
+
   it("clears stale manifest and backend-plan state on project switch reset", () => {
     const resetState = createProjectScopedPreviewResetState();
 
@@ -85,5 +134,22 @@ describe("CreativeAudioLivePlayer project scope", () => {
     expect(resetState.buildError).toBeNull();
     expect(resetState.sessionBuildSignature).toBe("");
     expect(buildPreviewManifestFromSessionState(resetState.liveSessionState, "http://127.0.0.1:8000")).toBeNull();
+  });
+
+  it("keeps the active edit-session preview path isolated from local-preview draft scripts", () => {
+    const sourcePath = path.resolve("src/web-preview/CreativeAudioLivePlayer.tsx");
+    const source = readFileSync(sourcePath, "utf8");
+
+    expect(source).not.toContain("draft-preview-longform");
+    expect(source).toContain("api/edit-sessions/live-preview");
+  });
+
+  it("keeps the sidebar stack above the preview player containment layer", () => {
+    const sourcePath = path.resolve("src/web-preview/preview.css");
+    const source = readFileSync(sourcePath, "utf8");
+
+    expect(source).toContain(".quick-sidebar");
+    expect(source).toContain("z-index: 4;");
+    expect(source).toContain("contain: layout paint;");
   });
 });

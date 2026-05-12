@@ -1,16 +1,16 @@
 import React from "react";
 
 import {
-  FemaleCoachDeanGraziosi,
-  type FemaleCoachDeanGraziosiProps
-} from "./FemaleCoachDeanGraziosi";
+  ProjectScopedMotionComposition,
+  type ProjectScopedMotionCompositionProps
+} from "./ProjectScopedMotionComposition";
 
-export type ProjectScopedPreviewCompositionProps = FemaleCoachDeanGraziosiProps;
+export type ProjectScopedPreviewCompositionProps = ProjectScopedMotionCompositionProps;
 
-export const PROJECT_SCOPED_PREVIEW_COMPOSITION_ID = "ProjectScopedPreview";
+export const PROJECT_SCOPED_PREVIEW_COMPOSITION_ID = "project-scoped-preview";
 
 export const ProjectScopedPreviewComposition: React.FC<ProjectScopedPreviewCompositionProps> = (props) => {
-  return <FemaleCoachDeanGraziosi {...props} />;
+  return <ProjectScopedMotionComposition {...props} />;
 };
 
 ProjectScopedPreviewComposition.displayName = "ProjectScopedPreviewComposition";

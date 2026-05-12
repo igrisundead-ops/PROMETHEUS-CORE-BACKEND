@@ -5,7 +5,8 @@ import {
   EDITORIAL_FONT_PALETTES
 } from "./font-runtime-registry";
 import {
-  getActiveHouseFontDefinitions
+  getActiveHouseFontDefinitions,
+  validateHouseFontRegistry
 } from "./house-font-registry";
 import type {HouseFontAssetSource, HouseFontDefinition} from "./house-font-registry";
 
@@ -218,6 +219,27 @@ export const loadHouseTypographyFonts = (): void => {
 
 export const getHouseTypographyPreviewFontFamilies = (): string[] => {
   return getActiveHouseFontDefinitions().map((definition) => definition.family);
+};
+
+export const getHouseTypographyRuntimeState = () => {
+  const validation = validateHouseFontRegistry();
+  const loadedFamilies = getActiveHouseFontDefinitions()
+    .filter((definition) =>
+      definition.sources.every((source) =>
+        loadedHouseFontSourceKeys.has(`${definition.id}:${source.path}:${source.weight}:${source.style}`)
+      )
+    )
+    .map((definition) => definition.family);
+
+  return {
+    houseFontsRequested,
+    houseFontsAvailable: loadedFamilies.length > 0,
+    enabledHouseFontCount: validation.enabledHouseFontCount,
+    enabledHouseFontFamilies: validation.enabledHouseFontFamilies,
+    expectedHouseFontPaths: validation.expectedFontPaths,
+    loadedHouseFontCount: loadedFamilies.length,
+    loadedHouseFontFamilies: loadedFamilies
+  };
 };
 
 export const HouseFontBootstrap: React.FC = () => {

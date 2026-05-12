@@ -26,6 +26,17 @@ export type HouseFontDefinition = {
   sources: HouseFontAssetSource[];
 };
 
+export type HouseFontRegistryValidation = {
+  expectedFontFamilies: string[];
+  expectedFontPaths: string[];
+  enabledHouseFontCount: number;
+  enabledHouseFontFamilies: string[];
+  enabledHouseFontPaths: string[];
+  missingExpectedFontPaths: string[];
+  missingEnabledFontPaths: string[];
+  houseFontsAvailable: boolean;
+};
+
 export const HOUSE_FONT_DEFINITIONS: HouseFontDefinition[] = [
   {
     id: "jugendreisen",
@@ -133,4 +144,35 @@ export const getActiveHouseFontDefinitions = (): HouseFontDefinition[] => {
 
 export const getActiveHouseFontPaletteIds = (): HouseFontPaletteId[] => {
   return getActiveHouseFontDefinitions().map((definition) => definition.paletteId);
+};
+
+export const validateHouseFontRegistry = ({
+  fileExists
+}: {
+  fileExists?: (path: string) => boolean;
+} = {}): HouseFontRegistryValidation => {
+  const expectedFontPaths = HOUSE_FONT_DEFINITIONS.flatMap((definition) =>
+    definition.sources.map((source) => source.path)
+  );
+  const enabledDefinitions = getActiveHouseFontDefinitions();
+  const enabledHouseFontPaths = enabledDefinitions.flatMap((definition) =>
+    definition.sources.map((source) => source.path)
+  );
+  const missingExpectedFontPaths = fileExists
+    ? expectedFontPaths.filter((fontPath) => !fileExists(fontPath))
+    : [];
+  const missingEnabledFontPaths = fileExists
+    ? enabledHouseFontPaths.filter((fontPath) => !fileExists(fontPath))
+    : [];
+
+  return {
+    expectedFontFamilies: HOUSE_FONT_DEFINITIONS.map((definition) => definition.family),
+    expectedFontPaths,
+    enabledHouseFontCount: enabledDefinitions.length,
+    enabledHouseFontFamilies: enabledDefinitions.map((definition) => definition.family),
+    enabledHouseFontPaths,
+    missingExpectedFontPaths,
+    missingEnabledFontPaths,
+    houseFontsAvailable: enabledDefinitions.length > 0 && missingEnabledFontPaths.length === 0
+  };
 };
